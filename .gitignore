@@ -32,4 +32,6 @@
 *.dSYM/
 *.su
 
+#moto added.
 tmp/*
+*.lnk
