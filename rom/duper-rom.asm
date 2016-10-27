@@ -38,6 +38,12 @@
     jsr print_ln
     jsr print_ln
 
+    lda ad_cht_chk_msg1
+    sta $00
+    lda ad_cht_chk_msg1+1
+    sta $01
+    jsr print_ln
+
 
     ;;init scroll point.
     lda #$00
@@ -78,10 +84,9 @@ mainloop:
     beq @ppu_skip
 
 ;;vram pos start from the top left.
-;;(pos 0,0 is sprite hit point.)
     lda #$20
     sta vram_current
-    lda #$01
+    lda #$00
     sta vram_current + 1
 
     lda #$00
@@ -219,7 +224,15 @@ mainloop:
 ad_start_msg:
     .addr   :+
 :
-    .byte   "regression test start..."
+    .byte   "test start..."
+    .byte   $00
+
+ad_cht_chk_msg1:
+    .addr   :+
+:
+    .byte   " !"
+    .byte   $22    ;;;" char.
+    .byte   "#$%&'()*+,-./0123456789:;<=>?"
     .byte   $00
 
 ;;ppu test flag.
