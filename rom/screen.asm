@@ -9,98 +9,26 @@
 
 .proc	main_screen_init
 
-    ;leftmost @ 2021.
+    ;;create box.
     lda #$20
-    sta $2006
+    sta $00
     lda #$41
-    sta $2006
-    lda #$82
-    sta $2007
-
-    ;top right
+    sta $01
     lda #$20
-    sta $2006
+    sta $02
     lda #$4e
-    sta $2006
-    lda #$83
-    sta $2007
-
-    ;left bottom
+    sta $03
     lda #$21
-    sta $2006
+    sta $04
     lda #$61
-    sta $2006
-    lda #$84
-    sta $2007
-
-    ;right bottom
+    sta $05
     lda #$21
-    sta $2006
+    sta $06
     lda #$6e
-    sta $2006
-    lda #$85
-    sta $2007
+    sta $07
+    jsr create_rect
 
-    lda #$20
-    sta $2006
-    lda #$42
-    sta $2006
-
-    ldx #11
-    lda #$80
-:
-    sta $2007
-    dex
-    bpl :-
-
-    lda #$21
-    sta $2006
-    lda #$62
-    sta $2006
-
-    ldx #11
-    lda #$80
-:
-    sta $2007
-    dex
-    bpl :-
-
-    ;;incretemt 32 bit.
-    lda #$04
-    ora ppu_stat1
-    sta ppu_stat1
-    sta $2000
-    
-    lda #$20
-    sta $2006
-    lda #$61
-    sta $2006
-
-    ldx #7
-    lda #$81
-:
-    sta $2007
-    dex
-    bpl :-
-
-    lda #$20
-    sta $2006
-    lda #$6e
-    sta $2006
-
-    ldx #7
-    lda #$81
-:
-    sta $2007
-    dex
-    bpl :-
-
-
-    lda #$fb
-    and ppu_stat1
-    sta ppu_stat1
-    sta $2000
-
+    ;;set message.
     lda #$20
     sta $02
     lda #$62
@@ -141,6 +69,229 @@
     sta $01
     jsr print_str
     
+
+
+
+    ;;create box.
+    lda #$20
+    sta $00
+    lda #$6d
+    sta $01
+    lda #$20
+    sta $02
+    lda #$79
+    sta $03
+    lda #$21
+    sta $04
+    lda #$ad
+    sta $05
+    lda #$21
+    sta $06
+    lda #$b9
+    sta $07
+    jsr create_rect
+
+    rts
+.endproc
+
+;;;param $00, $01 = top left.
+;;;param $02, $03 = top right
+;;;param $04, $05 = bottom left.
+;;;param $06, $07 = bottom right
+.proc	create_rect
+
+    ;leftmost @ 2021.
+    lda $00
+    sta $2006
+    lda $01
+    sta $2006
+    lda #$82
+    sta $2007
+
+    ;top right
+    lda $02
+    sta $2006
+    lda $03
+    sta $2006
+    lda #$83
+    sta $2007
+
+    ;left bottom
+    lda $04
+    sta $2006
+    lda $05
+    sta $2006
+    lda #$84
+    sta $2007
+
+    ;right bottom
+    lda $06
+    sta $2006
+    lda $07
+    sta $2006
+    lda #$85
+    sta $2007
+    
+    ;;calc width
+    sec
+    lda $03
+    sbc $01
+    sta $08 ;;$08=width
+    dec $08
+    dec $08
+
+    ;;get y index1
+    lda $01
+    lsr
+    lsr
+    lsr
+    lsr
+    lsr
+    sta $0a ;;$0a=top pos in y axis (bottom 3bit.)
+
+    lda #$1f
+    and $00 ;;$0b=top pos (top 5bit.)
+    asl
+    asl
+    asl
+    ora $0a ;;$09=top pos
+    sta $09
+
+    ;;get y index2
+    lda $05
+    lsr
+    lsr
+    lsr
+    lsr
+    lsr
+    sta $0a ;;$0a=bottom pos in y axis (bottom 3bit.)
+
+    lda #$1f
+    and $04 ;;$0b=bottom pos (top 5bit.)
+    asl
+    asl
+    asl
+    ora $0a ;;$0a=bottom pos
+    sta $0a
+    
+    sec
+    sbc $09
+    sta $09 ;;$09=hight
+    dec $09
+    dec $09
+
+    ;;horizontal line.
+    lda $00
+    sta $2006
+    clc
+    lda #$01
+    adc $01
+    sta $2006
+
+    ldx $08
+    lda #$80
+:
+    sta $2007
+    dex
+    bpl :-
+
+    lda $04
+    sta $2006
+    lda #$01
+    adc $05
+    sta $2006
+
+    ldx $08
+    lda #$80
+:
+    sta $2007
+    dex
+    bpl :-
+
+    ;;incretemt 32 bit.
+    lda #$04
+    ora ppu_stat1
+    sta ppu_stat1
+    sta $2000
+    
+    ;;vertical line.
+    clc
+    lda #32
+    adc $01
+    sta $0a
+
+    lda #0
+    adc $00
+    sta $2006
+    lda $0a
+    sta $2006
+
+    ldx $09
+    lda #$81
+:
+    sta $2007
+    dex
+    bpl :-
+
+    ;;
+    clc
+    lda #32
+    adc $03
+    sta $0a
+
+    lda #0
+    adc $02
+    sta $2006
+    lda $0a
+    sta $2006
+
+    ldx $09
+    lda #$81
+:
+    sta $2007
+    dex
+    bpl :-
+
+
+    lda #$fb
+    and ppu_stat1
+    sta ppu_stat1
+    sta $2000
+
+
+    ;;fill blank in the box.
+
+    lda #33
+    adc $01
+    sta $0c
+    lda #0
+    adc $00
+    sta $0b
+    ;;set left most point @0b, 0c.
+    ldy $09
+    
+@y_loop:
+    lda $0b
+    sta $2006
+    lda $0c
+    sta $2006
+    ldx $08
+    lda #' '
+:
+    sta $2007
+    dex
+    bpl :-
+    
+    lda #$20
+    clc
+    adc $0c
+    bcc :+
+    inc $0b
+:
+    sta $0c
+    dey
+    bpl @y_loop
+
     rts
 .endproc
 

@@ -23,7 +23,7 @@
 
 .segment "STARTUP"
 
-.proc	Reset
+.proc	reset_proc
 
 ; interrupt off, initialize sp.
 	sei
@@ -33,7 +33,7 @@
     jsr init_global
     jsr init_ppu
 
-;    jsr char_test
+    jsr char_test
     jsr main_screen_init
 
 
@@ -65,7 +65,7 @@ mainloop:
 	jmp	mainloop
 .endproc
 
-.proc	nmi_test
+.proc	nmi_proc
     rti
 .endproc
 
@@ -178,13 +178,13 @@ disp_cnt:
 
 ;;;for DE1 internal memory constraints.
 .segment "VECINFO_8k"
-	.word	nmi_test
-	.word	Reset
+	.word	nmi_proc
+	.word	reset_proc
 	.word	$0000
 
 .segment "VECINFO"
-	.word	nmi_test
-	.word	Reset
+	.word	nmi_proc
+	.word	reset_proc
 	.word	$0000
 
 ; character rom file.
