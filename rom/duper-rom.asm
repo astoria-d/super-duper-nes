@@ -43,6 +43,18 @@
     lda ad_cht_chk_msg1+1
     sta $01
     jsr print_ln
+    lda ad_cht_chk_msg2
+    sta $00
+    lda ad_cht_chk_msg2+1
+    sta $01
+    jsr print_ln
+
+    lda ad_cht_chk_msg3
+    sta $00
+    lda ad_cht_chk_msg3+1
+    sta $01
+    jsr print_ln
+
 
 
     ;;init scroll point.
@@ -233,6 +245,18 @@ ad_cht_chk_msg1:
     .byte   " !"
     .byte   $22    ;;;" char.
     .byte   "#$%&'()*+,-./0123456789:;<=>?"
+    .byte   $00
+
+ad_cht_chk_msg2:
+    .addr   :+
+:
+    .byte   "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_"
+    .byte   $00
+
+ad_cht_chk_msg3:
+    .addr   :+
+:
+    .byte   "`abcdefghijklmnopqrstuvwxyz{|}~"
     .byte   $00
 
 ;;ppu test flag.
