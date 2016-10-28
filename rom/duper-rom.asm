@@ -1,6 +1,9 @@
 .setcpu		"6502"
 .autoimport	on
 
+.export check_ppu
+.export ppu_stat1
+
 ; iNES header
 .segment "HEADER"
 	.byte	$4E, $45, $53, $1A	; "NES" Header
@@ -30,31 +33,8 @@
     jsr init_global
     jsr init_ppu
 
-    lda ad_start_msg
-    sta $00
-    lda ad_start_msg+1
-    sta $01
-    jsr print_ln
-    jsr print_ln
-    jsr print_ln
-
-    lda ad_cht_chk_msg1
-    sta $00
-    lda ad_cht_chk_msg1+1
-    sta $01
-    jsr print_ln
-    lda ad_cht_chk_msg2
-    sta $00
-    lda ad_cht_chk_msg2+1
-    sta $01
-    jsr print_ln
-
-    lda ad_cht_chk_msg3
-    sta $00
-    lda ad_cht_chk_msg3+1
-    sta $01
-    jsr print_ln
-
+;    jsr char_test
+    jsr main_screen_init
 
 
     ;;init scroll point.
@@ -172,92 +152,6 @@ mainloop:
     rts
 .endproc
 
-;;;param $00, $01 = msg addr.
-;;;print_ln display message. 
-;;;start position is the bottom of the screen.
-.proc print_ln
-    jsr check_ppu
-    lda vram_current
-    sta $2006
-    lda vram_current + 1
-    sta $2006
-
-    ldy #$00
-@msg_loop:
-    lda ($00), y
-    sta $2007
-    beq @print_done
-    iny
-    jmp @msg_loop
-@print_done:
-
-    ;;clear remaining space.
-@clr_line:
-    tya
-    and #$1f
-    cmp #$1f
-    beq @clr_done
-    lda #$00
-    sta $2007
-    iny
-    jmp @clr_line
-@clr_done:
-
-    ;;renew vram pos
-    lda vram_current + 1
-    sty vram_current + 1
-    adc vram_current + 1
-    sta vram_current + 1
-    tax         ;; x = new vram_l
-    lda vram_current
-    bcc @no_carry
-    clc
-    adc #01     ;; a = new vram_h
-    sta vram_current
-@no_carry:
-
-    cmp #$23
-    bne @vpos_done
-
-    txa 
-    cmp #$c0
-    bne @vpos_done
-    ;;;if vram pos = 23c0. reset pos.
-    lda #$20
-    sta vram_current
-    lda #$00
-    sta vram_current + 1
-@vpos_done:
-
-    rts
-.endproc
-
-;;;;string datas
-ad_start_msg:
-    .addr   :+
-:
-    .byte   "test start..."
-    .byte   $00
-
-ad_cht_chk_msg1:
-    .addr   :+
-:
-    .byte   " !"
-    .byte   $22    ;;;" char.
-    .byte   "#$%&'()*+,-./0123456789:;<=>?"
-    .byte   $00
-
-ad_cht_chk_msg2:
-    .addr   :+
-:
-    .byte   "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_"
-    .byte   $00
-
-ad_cht_chk_msg3:
-    .addr   :+
-:
-    .byte   "`abcdefghijklmnopqrstuvwxyz{|}~"
-    .byte   $00
 
 ;;ppu test flag.
 use_ppu:
@@ -265,9 +159,6 @@ use_ppu:
 
 ;;;;r/w global variables.
 .segment "BSS"
-vram_current:
-    .byte   $00
-    .byte   $00
 scroll_x:
     .byte   $00
 scroll_y:
