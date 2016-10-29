@@ -64,9 +64,8 @@ mainloop:
 .proc init_global
     lda #$00
     sta ppu_ctl
-    lda #$00
     sta ppu_mask
-
+    sta jp_suspend_cnt
     rts
 .endproc
 

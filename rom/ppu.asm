@@ -1,12 +1,14 @@
-.setcpu		"6502"
-.autoimport	on
+.setcpu        "6502"
+.autoimport    on
 
 .export update_screen
 .export main_screen_init
 .export char_test
 .export init_ppu
+.export jp_status
 
 .segment "STARTUP"
+
 
 ;;;screen func table.
 screen_funcs:
@@ -16,7 +18,7 @@ screen_funcs:
     .addr   update_shell_select1
     .word   $00
 
-.proc	update_screen
+.proc update_screen
     ;;;get current screen stat.
     lda screen_status
     asl     ;;offset address to word.
@@ -31,25 +33,248 @@ screen_funcs:
     jmp ($02)
 .endproc
 
-.proc	update_top_select1
+
+;;;init func table.
+init_funcs:
+    .addr   main_screen_init
+    .addr   inet_screen_init
+    .addr   game_screen_init
+    .addr   shell_screen_init
+    .word   $00
+
+.proc init_screen
+    ;;;get current screen stat.
+    lda screen_status
+    asl     ;;offset address to word.
+    tay
+    lda init_funcs, y ;;get handler low.
+    sta $02
+    iny
+    lda init_funcs, y ;;get handler hi
+    sta $03
+
+    ;;goto handler.
+    jmp ($02)
+.endproc
+
+.proc update_top_select1
+    ;;;case up
+    lda #$10
+    bit jp1_data
+    beq @down
+
+    lda top_menu_select
+    bne :+
+    jmp @end
+:
+    ;;move cursor up.
+    lda top_menu_cur_pos
+    sta $02
+    lda top_menu_cur_pos+1
+    sta $03
+    lda un_select_cursor
+    sta $00
+    lda un_select_cursor+1
+    sta $01
+    jsr print_str
+
+    sec
+    lda #$20
+    sta $00
+    lda top_menu_cur_pos+1
+    sbc $00
+    sta top_menu_cur_pos+1
+    sta $03
+
+    lda #$00
+    sta $00
+    lda top_menu_cur_pos
+    sbc $00
+    sta top_menu_cur_pos
+    sta $02
+
+    lda select_cursor
+    sta $00
+    lda select_cursor+1
+    sta $01
+    jsr print_str
+    
+    ;;increment selected index.
+    dec top_menu_select
+    
+    ;;invalidate jp input for a while.
+    lda #$00
+    sta jp_status
+
+    jmp @end
+
+@down:
+    ;;case down
+    lda #$20
+    bit jp1_data
+    beq @a
+
+    lda #2
+    cmp top_menu_select
+    beq @end
+
+    ;;move cursor down.
+    lda top_menu_cur_pos
+    sta $02
+    lda top_menu_cur_pos+1
+    sta $03
+    lda un_select_cursor
+    sta $00
+    lda un_select_cursor+1
+    sta $01
+    jsr print_str
+
+    clc
+    lda #$20
+    adc top_menu_cur_pos+1
+    sta top_menu_cur_pos+1
+    sta $03
+    lda #$00
+    adc top_menu_cur_pos
+    sta top_menu_cur_pos
+    sta $02
+
+    lda select_cursor
+    sta $00
+    lda select_cursor+1
+    sta $01
+    jsr print_str
+    
+    ;;increment selected index.
+    inc top_menu_select
+
+    ;;invalidate jp input for a while.
+    lda #$00
+    sta jp_status
+
+    jmp @end
+
+@a:
+    ;;case a
+    lda #$01
+    bit jp1_data
+    beq @end
+
+    clc
+    lda #$01
+    adc top_menu_select
+    sta screen_status   ;;navigate to next screen.
+    
+    jsr init_screen
+
+    ;;invalidate jp input for a while.
+    lda #$00
+    sta jp_status
+
+@end:
     rts
 .endproc
 
-.proc	update_inet_select1
+.proc update_inet_select1
     rts
 .endproc
 
-.proc	update_game_select1
+.proc update_game_select1
     rts
 .endproc
 
-.proc	update_shell_select1
+.proc update_shell_select1
     rts
 .endproc
 
 
-.proc	main_screen_init
+.proc inet_screen_init
+    ;;create box.
+    lda #$20
+    sta $00
+    lda #$41
+    sta $01
+    lda #$20
+    sta $02
+    lda #$4e
+    sta $03
+    lda #$21
+    sta $04
+    lda #$61
+    sta $05
+    lda #$21
+    sta $06
+    lda #$6e
+    sta $07
+    jsr create_rect
 
+    ;;set message.
+    lda #$20
+    sta $02
+    lda #$62
+    sta $03
+    lda top_menu_internet
+    sta $00
+    lda top_menu_internet+1
+    sta $01
+    jsr print_str
+
+    lda #$20
+    sta $02
+    lda #$84
+    sta $03
+    lda inet_menu_bookmark
+    sta $00
+    lda inet_menu_bookmark+1
+    sta $01
+    jsr print_str
+    
+;    lda #$20
+;    sta $02
+;    lda #$a4
+;    sta $03
+;    lda inet_menu_search
+;    sta $00
+;    lda inet_menu_search+1
+;    sta $01
+;    jsr print_str
+;    
+;    lda #$20
+;    sta $02
+;    lda #$c4
+;    sta $03
+;    lda inet_menu_direct
+;    sta $00
+;    lda inet_menu_direct+1
+;    sta $01
+;    jsr print_str
+;    
+;
+    lda #$20
+    sta $02
+    sta inet_menu_cur_pos
+    lda #$82
+    sta $03
+    sta inet_menu_cur_pos+1
+    
+    lda select_cursor
+    sta $00
+    lda select_cursor+1
+    sta $01
+    jsr print_str
+
+    rts
+.endproc
+
+.proc game_screen_init
+    rts
+.endproc
+
+.proc shell_screen_init
+    rts
+.endproc
+
+.proc main_screen_init
     ;;create box.
     lda #$20
     sta $00
@@ -111,6 +336,18 @@ screen_funcs:
     jsr print_str
     
 
+    lda #$20
+    sta $02
+    sta top_menu_cur_pos
+    lda #$82
+    sta $03
+    sta top_menu_cur_pos+1
+    
+    lda select_cursor
+    sta $00
+    lda select_cursor+1
+    sta $01
+    jsr print_str
 
 
 ;    ;;create box.
@@ -135,7 +372,11 @@ screen_funcs:
     ;;set screen status
     lda #$00
     sta screen_status
+    sta top_menu_select
 
+    ;;ready to input.
+    lda #$01
+    sta jp_status
     rts
 .endproc
 
@@ -143,7 +384,7 @@ screen_funcs:
 ;;;param $02, $03 = top right
 ;;;param $04, $05 = bottom left.
 ;;;param $06, $07 = bottom right
-.proc	create_rect
+.proc create_rect
 
     ;leftmost @ 2021.
     lda $00
@@ -341,7 +582,7 @@ screen_funcs:
 .endproc
 
 
-.proc	char_test
+.proc char_test
     lda ad_start_msg
     sta $00
     lda ad_start_msg+1
@@ -461,39 +702,39 @@ screen_funcs:
     sta vram_current + 1
 
     ;ppu register initialize.
-	lda	#$00
-	sta	$2000
-	sta ppu_ctl
-	sta	$2001
-	sta ppu_mask
+    lda    #$00
+    sta    $2000
+    sta ppu_ctl
+    sta    $2001
+    sta ppu_mask
 
     ;;load palette.
-	lda	#$3f
-	sta	$2006
-	lda	#$00
-	sta	$2006
+    lda    #$3f
+    sta    $2006
+    lda    #$00
+    sta    $2006
 
-	ldx	#$00
-	ldy	#$20
+    ldx    #$00
+    ldy    #$20
 @copypal:
-	lda	@palettes, x
-	sta	$2007
-	inx
-	dey
-	bne	@copypal
+    lda    @palettes, x
+    sta    $2007
+    inx
+    dey
+    bne    @copypal
     rts
 
 @palettes:
 ;;;bg palette
-	.byte	$0f, $00, $10, $20
-	.byte	$0f, $04, $14, $24
-	.byte	$0f, $08, $18, $28
-	.byte	$0f, $0c, $1c, $2c
+    .byte    $0f, $00, $10, $20
+    .byte    $0f, $04, $14, $24
+    .byte    $0f, $08, $18, $28
+    .byte    $0f, $0c, $1c, $2c
 ;;;spr palette
-	.byte	$0f, $00, $10, $20
-	.byte	$0f, $06, $16, $26
-	.byte	$0f, $08, $18, $28
-	.byte	$0f, $0a, $1a, $2a
+    .byte    $0f, $00, $10, $20
+    .byte    $0f, $06, $16, $26
+    .byte    $0f, $08, $18, $28
+    .byte    $0f, $0a, $1a, $2a
 
 .endproc
 
@@ -549,6 +790,42 @@ top_menu_shell:
     .byte   "Shell"
     .byte   $00
 
+select_cursor:
+    .addr   :+
+:
+    .byte   ">"
+    .byte   $00
+
+un_select_cursor:
+    .addr   :+
+:
+    .byte   " "
+    .byte   $00
+
+inet_menu_bookmark:
+    .addr   :+
+:
+    .byte   "Bookmark"
+    .byte   $00
+
+inet_menu_search:
+    .addr   :+
+:
+    .byte   "Search"
+    .byte   $00
+
+inet_menu_direct:
+    .addr   :+
+:
+    .byte   "Direct"
+    .byte   $00
+
+inet_menu_history:
+    .addr   :+
+:
+    .byte   "History"
+    .byte   $00
+
 ;;;;r/w global variables.
 .segment "BSS"
 vram_current:
@@ -563,3 +840,18 @@ vram_current:
 screen_status:
     .byte   $00
 
+top_menu_select:
+    .byte   $00
+
+top_menu_cur_pos:
+    .byte   $00
+    .byte   $00
+
+inet_menu_cur_pos:
+    .byte   $00
+    .byte   $00
+
+;;input ready: 1
+;;input suspend: 0
+jp_status:
+    .byte   $00

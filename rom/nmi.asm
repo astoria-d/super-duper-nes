@@ -2,6 +2,8 @@
 .autoimport	on
 
 .export nmi_proc
+.export jp1_data
+.export jp_suspend_cnt
 
 .segment "STARTUP"
 
@@ -79,7 +81,28 @@
     sta jp1_data
 :
 
+    ;;check jp1 status...
+    lda jp_status
+    beq @no_update
+    
     jsr update_screen
+    jmp @update_done
+
+@no_update:
+    inc jp_suspend_cnt
+    lda jp_suspend_rate
+    cmp jp_suspend_cnt
+    bne @update_done
+    lda #$00
+    sta jp_suspend_cnt
+    lda #$01
+    sta jp_status
+@update_done:
+
+    ;;scroll reg set.
+    lda #$00
+    sta $2005
+    sta $2005
 
     ;;enable nmi
     lda #$80
@@ -89,18 +112,24 @@
     rti
 .endproc
 
+jp_suspend_rate:
+    .byte   100
+
 
 ;;;;r/w global variables.
 .segment "BSS"
 
-;;;jp1_data bit 0 to 7
-;;a button
-;;b button
-;;select button
-;;start button
-;;up button
-;;down button
-;;left button
-;;right button
+;;;jp1_data bit
+;;0: a button
+;;1: b button
+;;2: select button
+;;3: start button
+;;4: up button
+;;5: down button
+;;6: left button
+;;7: right button
 jp1_data:
+    .byte   $00
+
+jp_suspend_cnt:
     .byte   $00
