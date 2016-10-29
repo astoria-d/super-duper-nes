@@ -49,7 +49,6 @@
 	sta	$2001
 	sta	ppu_mask
 
-short_cut1:
     ;;;enable nmi
 	lda	#$80
 	sta	$2000

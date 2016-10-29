@@ -1,11 +1,52 @@
 .setcpu		"6502"
 .autoimport	on
 
+.export update_screen
 .export main_screen_init
 .export char_test
 .export init_ppu
 
 .segment "STARTUP"
+
+;;;screen func table.
+screen_funcs:
+    .addr   update_top_select1
+    .addr   update_inet_select1
+    .addr   update_game_select1
+    .addr   update_shell_select1
+    .word   $00
+
+.proc	update_screen
+    ;;;get current screen stat.
+    lda screen_status
+    asl     ;;offset address to word.
+    tay
+    lda screen_funcs, y ;;get handler low.
+    sta $02
+    iny
+    lda screen_funcs, y ;;get handler hi
+    sta $03
+
+    ;;goto handler.
+    jmp ($02)
+.endproc
+
+.proc	update_top_select1
+    rts
+.endproc
+
+.proc	update_inet_select1
+    rts
+.endproc
+
+.proc	update_game_select1
+    rts
+.endproc
+
+.proc	update_shell_select1
+    rts
+.endproc
+
 
 .proc	main_screen_init
 
@@ -90,6 +131,10 @@
 ;    lda #$b9
 ;    sta $07
 ;    jsr create_rect
+
+    ;;set screen status
+    lda #$00
+    sta screen_status
 
     rts
 .endproc
@@ -509,3 +554,12 @@ top_menu_shell:
 vram_current:
     .byte   $00
     .byte   $00
+
+;;screen status
+;   0: top page select 1
+;   1: internet page select 1
+;   2: game page select 1
+;   3: shell page select 1
+screen_status:
+    .byte   $00
+
