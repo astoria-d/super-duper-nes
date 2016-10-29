@@ -3,7 +3,7 @@
 
 .export main_screen_init
 .export char_test
-.export vram_current
+.export init_ppu
 
 .segment "STARTUP"
 
@@ -72,24 +72,24 @@
 
 
 
-    ;;create box.
-    lda #$20
-    sta $00
-    lda #$6d
-    sta $01
-    lda #$20
-    sta $02
-    lda #$79
-    sta $03
-    lda #$21
-    sta $04
-    lda #$ad
-    sta $05
-    lda #$21
-    sta $06
-    lda #$b9
-    sta $07
-    jsr create_rect
+;    ;;create box.
+;    lda #$20
+;    sta $00
+;    lda #$6d
+;    sta $01
+;    lda #$20
+;    sta $02
+;    lda #$79
+;    sta $03
+;    lda #$21
+;    sta $04
+;    lda #$ad
+;    sta $05
+;    lda #$21
+;    sta $06
+;    lda #$b9
+;    sta $07
+;    jsr create_rect
 
     rts
 .endproc
@@ -210,8 +210,8 @@
 
     ;;incretemt 32 bit.
     lda #$04
-    ora ppu_stat1
-    sta ppu_stat1
+    ora ppu_ctl
+    sta ppu_ctl
     sta $2000
     
     ;;vertical line.
@@ -254,8 +254,8 @@
 
 
     lda #$fb
-    and ppu_stat1
-    sta ppu_stat1
+    and ppu_ctl
+    sta ppu_ctl
     sta $2000
 
 
@@ -351,7 +351,6 @@
 ;;;print_ln display message. 
 ;;;start position is the bottom of the screen.
 .proc print_ln
-    jsr check_ppu
     lda vram_current
     sta $2006
     lda vram_current + 1
@@ -406,6 +405,53 @@
 
     rts
 .endproc
+
+
+;;ppu initialize
+.proc init_ppu
+;;vram pos start from the top left.
+    lda #$20
+    sta vram_current
+    lda #$00
+    sta vram_current + 1
+
+    ;ppu register initialize.
+	lda	#$00
+	sta	$2000
+	sta ppu_ctl
+	sta	$2001
+	sta ppu_mask
+
+    ;;load palette.
+	lda	#$3f
+	sta	$2006
+	lda	#$00
+	sta	$2006
+
+	ldx	#$00
+	ldy	#$20
+@copypal:
+	lda	@palettes, x
+	sta	$2007
+	inx
+	dey
+	bne	@copypal
+    rts
+
+@palettes:
+;;;bg palette
+	.byte	$0f, $00, $10, $20
+	.byte	$0f, $04, $14, $24
+	.byte	$0f, $08, $18, $28
+	.byte	$0f, $0c, $1c, $2c
+;;;spr palette
+	.byte	$0f, $00, $10, $20
+	.byte	$0f, $06, $16, $26
+	.byte	$0f, $08, $18, $28
+	.byte	$0f, $0a, $1a, $2a
+
+.endproc
+
 
 ;;;;string datas
 ad_start_msg:
