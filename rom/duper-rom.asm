@@ -1,8 +1,8 @@
 .setcpu		"6502"
 .autoimport	on
 
-.export check_ppu
-.export ppu_stat1
+.export ppu_ctl
+.export ppu_mask
 
 ; iNES header
 .segment "HEADER"
@@ -44,20 +44,15 @@
     lda #$00
     sta $2005
 
-    ;;set vs_cnt init value.
-    lda #60
-    sta vs_cnt
-
     ;;show bg...
 	lda	#$1e
 	sta	$2001
-	sta	ppu_stat2
+	sta	ppu_mask
 
-short_cut1:
     ;;;enable nmi
 	lda	#$80
 	sta	$2000
-	sta	ppu_stat1
+	sta	ppu_ctl
 
     ;;done...
     ;;infinite loop.
@@ -65,115 +60,23 @@ mainloop:
 	jmp	mainloop
 .endproc
 
-.proc	nmi_proc
-    rti
-.endproc
-
 ;;initialize bss segment datas
 .proc init_global
-;;ppu test flag
-    lda use_ppu
-    beq @ppu_skip
-
-;;vram pos start from the top left.
-    lda #$20
-    sta vram_current
     lda #$00
-    sta vram_current + 1
-
-    lda #$00
-    sta scroll_x
-    lda #$00
-    sta scroll_y
-
-    lda #$00
-    sta ppu_stat1
-    lda #$00
-    sta ppu_stat2
-
-    lda #$00
-    sta vs_cnt
-    lda #$00
-    sta disp_cnt
-@ppu_skip:
-
-    rts
-
-.endproc
-
-;;ppu initialize
-.proc init_ppu
-    jsr check_ppu
-    ;ppu register initialize.
-	lda	#$00
-	sta	$2000
-	sta ppu_stat1
-	sta	$2001
-	sta ppu_stat2
-
-    ;;load palette.
-	lda	#$3f
-	sta	$2006
-	lda	#$00
-	sta	$2006
-
-	ldx	#$00
-	ldy	#$20
-@copypal:
-	lda	@palettes, x
-	sta	$2007
-	inx
-	dey
-	bne	@copypal
-    rts
-
-@palettes:
-;;;bg palette
-	.byte	$0f, $00, $10, $20
-	.byte	$0f, $04, $14, $24
-	.byte	$0f, $08, $18, $28
-	.byte	$0f, $0c, $1c, $2c
-;;;spr palette
-	.byte	$0f, $00, $10, $20
-	.byte	$0f, $06, $16, $26
-	.byte	$0f, $08, $18, $28
-	.byte	$0f, $0a, $1a, $2a
-
-.endproc
-
-;;check_ppu exists caller's function if use_ppu flag is off
-.proc check_ppu
-    lda use_ppu
-    bne @use_ppu_ret
-    ;;pop caller's return addr
-    pla
-    pla
-@use_ppu_ret:
+    sta ppu_ctl
+    sta ppu_mask
+    sta jp_suspend_cnt
     rts
 .endproc
-
-
-;;ppu test flag.
-use_ppu:
-    .byte   $01
 
 ;;;;r/w global variables.
 .segment "BSS"
-scroll_x:
-    .byte   $00
-scroll_y:
-    .byte   $00
 
-;;ppu status reg val @2000
-ppu_stat1:
+;;ppu ctl reg val @2000
+ppu_ctl:
     .byte   $00
-;;ppu status reg val @2001
-ppu_stat2:
-    .byte   $00
-
-vs_cnt:
-    .byte   $00
-disp_cnt:
+;;ppu mask reg val @2001
+ppu_mask:
     .byte   $00
 
 ;;;for DE1 internal memory constraints.

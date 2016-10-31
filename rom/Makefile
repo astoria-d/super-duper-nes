@@ -1,4 +1,4 @@
-ASMSOURCES =	duper-rom.asm screen.asm
+ASMSOURCES =	duper-rom.asm ppu.asm nmi.asm
 
 OBJECTS	=	$(ASMSOURCES:.asm=.o)
 
