@@ -300,6 +300,120 @@ init_funcs:
 .endproc
 
 .proc inet_bmark_scr_updt
+    ;;;case up
+    lda #$10
+    bit jp1_data
+    beq @down
+
+    lda #0
+    cmp bmark_menu_select
+    bne :+
+    jmp @end
+:
+    ;;move cursor up.
+    lda bmark_menu_cur_pos
+    sta $02
+    lda bmark_menu_cur_pos+1
+    sta $03
+    lda un_select_cursor
+    sta $00
+    lda un_select_cursor+1
+    sta $01
+    jsr print_str
+
+    sec
+    lda #$20
+    sta $00
+    lda bmark_menu_cur_pos+1
+    sbc $00
+    sta bmark_menu_cur_pos+1
+    sta $03
+
+    lda #$00
+    sta $00
+    lda bmark_menu_cur_pos
+    sbc $00
+    sta bmark_menu_cur_pos
+    sta $02
+
+    lda select_cursor
+    sta $00
+    lda select_cursor+1
+    sta $01
+    jsr print_str
+
+    ;;increment selected index.
+    dec bmark_menu_select
+
+    ;;invalidate jp input for a while.
+    lda #$00
+    sta jp_status
+
+    jmp @end
+
+@down:
+    ;;case down
+    lda #$20
+    bit jp1_data
+    beq @a
+
+    lda #4
+    cmp bmark_menu_select
+    beq @end
+
+    ;;move cursor down.
+    lda bmark_menu_cur_pos
+    sta $02
+    lda bmark_menu_cur_pos+1
+    sta $03
+    lda un_select_cursor
+    sta $00
+    lda un_select_cursor+1
+    sta $01
+    jsr print_str
+
+    clc
+    lda #$20
+    adc bmark_menu_cur_pos+1
+    sta bmark_menu_cur_pos+1
+    sta $03
+    lda #$00
+    adc bmark_menu_cur_pos
+    sta bmark_menu_cur_pos
+    sta $02
+
+    lda select_cursor
+    sta $00
+    lda select_cursor+1
+    sta $01
+    jsr print_str
+
+    ;;increment selected index.
+    inc bmark_menu_select
+
+    ;;invalidate jp input for a while.
+    lda #$00
+    sta jp_status
+
+    jmp @end
+
+@a:
+    ;;case a
+    lda #$01
+    bit jp1_data
+    beq @end
+
+    lda bmark_menu_select
+    sta screen_status   ;;navigate to next screen.
+
+;;;    jsr init_screen
+
+    ;;invalidate jp input for a while.
+    lda #$00
+    sta jp_status
+
+@end:
+
     rts
 .endproc
 
@@ -409,6 +523,90 @@ init_funcs:
 .endproc
 
 .proc inet_bmark_scr_init
+    ;;create box.
+    lda #$20
+    sta $00
+    lda #$6d
+    sta $01
+    lda #$20
+    sta $02
+    lda #$79
+    sta $03
+    lda #$21
+    sta $04
+    lda #$ad
+    sta $05
+    lda #$21
+    sta $06
+    lda #$b9
+    sta $07
+    jsr create_rect
+
+    ;;set message.
+    lda #$20
+    sta $02
+    lda #$90
+    sta $03
+    lda bm_msn
+    sta $00
+    lda bm_msn+1
+    sta $01
+    jsr print_str
+
+    lda #$20
+    sta $02
+    lda #$b0
+    sta $03
+    lda bm_abc
+    sta $00
+    lda bm_abc+1
+    sta $01
+    jsr print_str
+
+    lda #$20
+    sta $02
+    lda #$d0
+    sta $03
+    lda bm_cnn
+    sta $00
+    lda bm_cnn+1
+    sta $01
+    jsr print_str
+
+    lda #$20
+    sta $02
+    lda #$f0
+    sta $03
+    lda bm_bbc
+    sta $00
+    lda bm_bbc+1
+    sta $01
+    jsr print_str
+
+    lda #$21
+    sta $02
+    lda #$10
+    sta $03
+    lda menu_return
+    sta $00
+    lda menu_return+1
+    sta $01
+    jsr print_str
+
+
+    lda #$20
+    sta $02
+    sta bmark_menu_cur_pos
+    lda #$8e
+    sta $03
+    sta bmark_menu_cur_pos+1
+    
+    lda select_cursor
+    sta $00
+    lda select_cursor+1
+    sta $01
+    jsr print_str
+
     rts
 .endproc
 
@@ -832,6 +1030,9 @@ init_funcs:
     sta top_menu_select
     lda #4
     sta inet_menu_select
+
+    lda #0
+    sta bmark_menu_select
     rts
 .endproc
 
@@ -974,6 +1175,30 @@ menu_return:
     .byte   "Return"
     .byte   $00
 
+bm_msn:
+    .addr   :+
+:
+    .byte   "MSN"
+    .byte   $00
+
+bm_abc:
+    .addr   :+
+:
+    .byte   "ABC"
+    .byte   $00
+
+bm_cnn:
+    .addr   :+
+:
+    .byte   "CNN"
+    .byte   $00
+
+bm_bbc:
+    .addr   :+
+:
+    .byte   "BBC"
+    .byte   $00
+
 ;;;;r/w global variables.
 .segment "BSS"
 vram_current:
@@ -999,11 +1224,19 @@ top_menu_select:
 inet_menu_select:
     .byte   $00
 
+;0 - 4
+bmark_menu_select:
+    .byte   $00
+
 top_menu_cur_pos:
     .byte   $00
     .byte   $00
 
 inet_menu_cur_pos:
+    .byte   $00
+    .byte   $00
+
+bmark_menu_cur_pos:
     .byte   $00
     .byte   $00
 
