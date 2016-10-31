@@ -14,6 +14,12 @@
     sta ppu_ctl
     sta $2000
     
+    ;;hide bg/sprite.
+	lda	#$18
+	eor ppu_mask
+	sta	$2001
+	sta	ppu_mask
+
     ;;read controller button status.
     lda #$00
     sta jp1_data
@@ -103,6 +109,12 @@
     lda #$00
     sta $2005
     sta $2005
+
+    ;;show bg/sprite.
+	lda	#$18
+	ora ppu_mask
+	sta	$2001
+	sta	ppu_mask
 
     ;;enable nmi
     lda #$80

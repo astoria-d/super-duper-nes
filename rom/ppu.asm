@@ -228,28 +228,27 @@ init_funcs:
     lda inet_menu_bookmark+1
     sta $01
     jsr print_str
-    
-;    lda #$20
-;    sta $02
-;    lda #$a4
-;    sta $03
-;    lda inet_menu_search
-;    sta $00
-;    lda inet_menu_search+1
-;    sta $01
-;    jsr print_str
-;    
-;    lda #$20
-;    sta $02
-;    lda #$c4
-;    sta $03
-;    lda inet_menu_direct
-;    sta $00
-;    lda inet_menu_direct+1
-;    sta $01
-;    jsr print_str
-;    
-;
+
+    lda #$20
+    sta $02
+    lda #$a4
+    sta $03
+    lda inet_menu_search
+    sta $00
+    lda inet_menu_search+1
+    sta $01
+    jsr print_str
+
+    lda #$20
+    sta $02
+    lda #$c4
+    sta $03
+    lda inet_menu_direct
+    sta $00
+    lda inet_menu_direct+1
+    sta $01
+    jsr print_str
+
     lda #$20
     sta $02
     sta inet_menu_cur_pos
