@@ -2,3 +2,7 @@
 *.log
 *.txt
 *.jpg
+*.map
+*.dbg
+*.bin
+*.disas

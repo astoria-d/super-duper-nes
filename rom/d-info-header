@@ -1,0 +1,19 @@
+# This is a comment. It extends to the end of the line
+GLOBAL {
+    INPUTNAME       "duper-rom-prg.bin";
+    OUTPUTNAME      "duper-rom.disas";
+    STARTADDR       $8000;
+    CPU             "6502";
+};
+
+# One segment for the whole stuff
+SEGMENT { START $8000;  END   $FFFF; NAME "code"; };
+
+# Stack
+LABEL { NAME "stack";   ADDR  $100;  SIZE 255;  };
+
+# Hardware vectors
+LABEL { NAME "nmivec";   ADDR  $FFFA; };
+LABEL { NAME "resvec";   ADDR  $FFFC; };
+LABEL { NAME "irqvec";   ADDR  $FFFE; };
+

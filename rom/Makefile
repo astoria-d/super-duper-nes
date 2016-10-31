@@ -5,8 +5,8 @@ OBJECTS	=	$(ASMSOURCES:.asm=.o)
 LIBRARIES =
 #-------------------------------------------------------------------------------
 all :	$(OBJECTS) $(LIBRARIES)
-	ld65 -o duper-rom.nes --config linker.cfg --obj $(OBJECTS)
-#	./dd-img.sh regression
+	ld65 -o duper-rom.nes --dbgfile duper-rom.dbg -vm --mapfile duper-rom.map  --config linker.cfg --obj $(OBJECTS)
+	./dd-img.sh duper-rom
 #	cp regression.nes ../../de1_nes/simulation/modelsim/rom-file.nes
 #	cp regression.nes ../../de0_cv_nes/simulation/modelsim/rom-file.nes
 #	cp sample1-chr.hex ../../de1_nes/
@@ -17,6 +17,9 @@ all :	$(OBJECTS) $(LIBRARIES)
 run : all
 	date; VirtuaNES.exe duper-rom.nes
 
+disas : all
+	./disasm-rom.sh
+	less duper-rom.disas
 
 .SUFFIXES : .asm .o
 
@@ -27,4 +30,6 @@ clean :
 	-rm *.nes
 	-rm *.o
 	-rm *.bin *.hex
+	-rm *.map *.dbg *.disas
+	-rm debug-info.cfg
 
