@@ -4,6 +4,7 @@
 .export update_screen
 .export main_screen_init
 .export char_test
+.export init_menu
 .export init_ppu
 .export jp_status
 
@@ -12,10 +13,13 @@
 
 ;;;screen func table.
 screen_funcs:
-    .addr   update_top_select1
-    .addr   update_inet_select1
-    .addr   update_game_select1
-    .addr   update_shell_select1
+    .addr   main_screen_updt        ;0
+    .addr   inet_screen_updt        ;1
+    .addr   game_screen_updt        ;2
+    .addr   shell_screen_updt       ;3
+    .addr   inet_bmark_scr_updt     ;4
+    .addr   inet_srch_scr_updt      ;5
+    .addr   inet_dirct_scr_updt     ;6
     .word   $00
 
 .proc update_screen
@@ -36,10 +40,13 @@ screen_funcs:
 
 ;;;init func table.
 init_funcs:
-    .addr   main_screen_init
-    .addr   inet_screen_init
-    .addr   game_screen_init
-    .addr   shell_screen_init
+    .addr   main_screen_init        ;0
+    .addr   inet_screen_init        ;1
+    .addr   game_screen_init        ;2
+    .addr   shell_screen_init       ;3
+    .addr   inet_bmark_scr_init     ;4
+    .addr   inet_srch_scr_init      ;5
+    .addr   inet_dirct_scr_init     ;6
     .word   $00
 
 .proc init_screen
@@ -57,13 +64,14 @@ init_funcs:
     jmp ($02)
 .endproc
 
-.proc update_top_select1
+.proc main_screen_updt
     ;;;case up
     lda #$10
     bit jp1_data
     beq @down
 
-    lda top_menu_select
+    lda #1
+    cmp top_menu_select
     bne :+
     jmp @end
 :
@@ -99,7 +107,7 @@ init_funcs:
     sta $01
     jsr print_str
     
-    ;;increment selected index.
+    ;;decrement selected index.
     dec top_menu_select
     
     ;;invalidate jp input for a while.
@@ -114,7 +122,7 @@ init_funcs:
     bit jp1_data
     beq @a
 
-    lda #2
+    lda #3
     cmp top_menu_select
     beq @end
 
@@ -160,9 +168,7 @@ init_funcs:
     bit jp1_data
     beq @end
 
-    clc
-    lda #$01
-    adc top_menu_select
+    lda top_menu_select
     sta screen_status   ;;navigate to next screen.
     
     jsr init_screen
@@ -175,15 +181,142 @@ init_funcs:
     rts
 .endproc
 
-.proc update_inet_select1
+.proc inet_screen_updt
+    ;;;case up
+    lda #$10
+    bit jp1_data
+    beq @down
+
+    lda #4
+    cmp inet_menu_select
+    bne :+
+    jmp @end
+:
+    ;;move cursor up.
+    lda inet_menu_cur_pos
+    sta $02
+    lda inet_menu_cur_pos+1
+    sta $03
+    lda un_select_cursor
+    sta $00
+    lda un_select_cursor+1
+    sta $01
+    jsr print_str
+
+    sec
+    lda #$20
+    sta $00
+    lda inet_menu_cur_pos+1
+    sbc $00
+    sta inet_menu_cur_pos+1
+    sta $03
+
+    lda #$00
+    sta $00
+    lda inet_menu_cur_pos
+    sbc $00
+    sta inet_menu_cur_pos
+    sta $02
+
+    lda select_cursor
+    sta $00
+    lda select_cursor+1
+    sta $01
+    jsr print_str
+
+    ;;increment selected index.
+    dec inet_menu_select
+
+    ;;invalidate jp input for a while.
+    lda #$00
+    sta jp_status
+
+    jmp @end
+
+@down:
+    ;;case down
+    lda #$20
+    bit jp1_data
+    beq @a
+
+    lda #7
+    cmp inet_menu_select
+    beq @end
+
+    ;;move cursor down.
+    lda inet_menu_cur_pos
+    sta $02
+    lda inet_menu_cur_pos+1
+    sta $03
+    lda un_select_cursor
+    sta $00
+    lda un_select_cursor+1
+    sta $01
+    jsr print_str
+
+    clc
+    lda #$20
+    adc inet_menu_cur_pos+1
+    sta inet_menu_cur_pos+1
+    sta $03
+    lda #$00
+    adc inet_menu_cur_pos
+    sta inet_menu_cur_pos
+    sta $02
+
+    lda select_cursor
+    sta $00
+    lda select_cursor+1
+    sta $01
+    jsr print_str
+
+    ;;increment selected index.
+    inc inet_menu_select
+
+    ;;invalidate jp input for a while.
+    lda #$00
+    sta jp_status
+
+    jmp @end
+
+@a:
+    ;;case a
+    lda #$01
+    bit jp1_data
+    beq @end
+
+    lda inet_menu_select
+    sta screen_status   ;;navigate to next screen.
+
+    jsr init_screen
+
+    ;;invalidate jp input for a while.
+    lda #$00
+    sta jp_status
+
+@end:
+
     rts
 .endproc
 
-.proc update_game_select1
+.proc inet_bmark_scr_updt
     rts
 .endproc
 
-.proc update_shell_select1
+.proc inet_srch_scr_updt
+    rts
+.endproc
+
+.proc inet_dirct_scr_updt
+    rts
+.endproc
+
+
+.proc game_screen_updt
+    rts
+.endproc
+
+.proc shell_screen_updt
     rts
 .endproc
 
@@ -251,6 +384,16 @@ init_funcs:
 
     lda #$20
     sta $02
+    lda #$e4
+    sta $03
+    lda menu_return
+    sta $00
+    lda menu_return+1
+    sta $01
+    jsr print_str
+
+    lda #$20
+    sta $02
     sta inet_menu_cur_pos
     lda #$82
     sta $03
@@ -262,6 +405,18 @@ init_funcs:
     sta $01
     jsr print_str
 
+    rts
+.endproc
+
+.proc inet_bmark_scr_init
+    rts
+.endproc
+
+.proc inet_srch_scr_init
+    rts
+.endproc
+
+.proc inet_dirct_scr_init
     rts
 .endproc
 
@@ -348,30 +503,9 @@ init_funcs:
     sta $01
     jsr print_str
 
-
-;    ;;create box.
-;    lda #$20
-;    sta $00
-;    lda #$6d
-;    sta $01
-;    lda #$20
-;    sta $02
-;    lda #$79
-;    sta $03
-;    lda #$21
-;    sta $04
-;    lda #$ad
-;    sta $05
-;    lda #$21
-;    sta $06
-;    lda #$b9
-;    sta $07
-;    jsr create_rect
-
     ;;set screen status
-    lda #$00
+    lda top_menu_select
     sta screen_status
-    sta top_menu_select
 
     ;;ready to input.
     lda #$01
@@ -692,6 +826,15 @@ init_funcs:
 .endproc
 
 
+;;init menu items.
+.proc init_menu
+    lda #1
+    sta top_menu_select
+    lda #4
+    sta inet_menu_select
+    rts
+.endproc
+
 ;;ppu initialize
 .proc init_ppu
 ;;vram pos start from the top left.
@@ -825,6 +968,12 @@ inet_menu_history:
     .byte   "History"
     .byte   $00
 
+menu_return:
+    .addr   :+
+:
+    .byte   "Return"
+    .byte   $00
+
 ;;;;r/w global variables.
 .segment "BSS"
 vram_current:
@@ -832,14 +981,22 @@ vram_current:
     .byte   $00
 
 ;;screen status
-;   0: top page select 1
-;   1: internet page select 1
-;   2: game page select 1
-;   3: shell page select 1
+;   0: top page
+;   1: internet top page
+;   2: game top page
+;   3: shell top page
+;   4: bookmakr page
+;   5: search page
+;   6: direct page
 screen_status:
     .byte   $00
 
+;1 - 3
 top_menu_select:
+    .byte   $00
+
+;4 - 6
+inet_menu_select:
     .byte   $00
 
 top_menu_cur_pos:

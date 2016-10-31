@@ -36,6 +36,7 @@
     jsr char_test
     jsr main_screen_init
 
+    jsr init_menu
 
     ;;init scroll point.
     lda #$00
