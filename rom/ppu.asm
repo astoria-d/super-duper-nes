@@ -667,11 +667,11 @@ init_funcs:
     ;;create box.
     lda #$22
     sta $00
-    lda #$63
+    lda #$83
     sta $01
     lda #$22
     sta $02
-    lda #$7d
+    lda #$9d
     sta $03
     lda #$23
     sta $04
@@ -686,7 +686,7 @@ init_funcs:
     ;;show keyboard first row.
     lda #$22
     sta $02
-    lda #$85
+    lda #$a5
     sta $03
     lda kb_1
     sta $00
@@ -696,7 +696,7 @@ init_funcs:
 
     lda #$22
     sta $02
-    lda #$c5
+    lda #$e5
     sta $03
     lda kb_2
     sta $00
@@ -706,7 +706,7 @@ init_funcs:
 
     lda #$23
     sta $02
-    lda #$05
+    lda #$25
     sta $03
     lda kb_3
     sta $00
@@ -716,7 +716,7 @@ init_funcs:
 
     lda #$23
     sta $02
-    lda #$47
+    lda #$65
     sta $03
     lda kb_4
     sta $00
@@ -727,7 +727,7 @@ init_funcs:
     lda #$22
     sta $02
     sta kb_cur_pos
-    lda #$84
+    lda #$a4
     sta $03
     sta kb_cur_pos+1
     lda select_cursor
@@ -1411,13 +1411,16 @@ kb_2:
 kb_3:
     .addr   :+
 :
-    .byte   "a s d f g h j k l ; '"
+    .byte   "a s d f g h j k l ; ' "
+    .byte   $87
     .byte   $00
 
 kb_4:
     .addr   :+
 :
-    .byte   "z x c v b n m , . /"
+    .byte   $86
+    .byte   " z x c v b n m , . / "
+    .byte   $88
     .byte   $00
 
 ;;;;r/w global variables.
