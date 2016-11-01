@@ -664,6 +664,81 @@ init_funcs:
 .endproc
 
 .proc shell_screen_init
+    ;;create box.
+    lda #$22
+    sta $00
+    lda #$63
+    sta $01
+    lda #$22
+    sta $02
+    lda #$7d
+    sta $03
+    lda #$23
+    sta $04
+    lda #$83
+    sta $05
+    lda #$23
+    sta $06
+    lda #$9d
+    sta $07
+    jsr create_rect
+
+    ;;show keyboard first row.
+    lda #$22
+    sta $02
+    lda #$85
+    sta $03
+    lda kb_1
+    sta $00
+    lda kb_1+1
+    sta $01
+    jsr print_str
+
+    lda #$22
+    sta $02
+    lda #$c5
+    sta $03
+    lda kb_2
+    sta $00
+    lda kb_2+1
+    sta $01
+    jsr print_str
+
+    lda #$23
+    sta $02
+    lda #$05
+    sta $03
+    lda kb_3
+    sta $00
+    lda kb_3+1
+    sta $01
+    jsr print_str
+
+    lda #$23
+    sta $02
+    lda #$47
+    sta $03
+    lda kb_4
+    sta $00
+    lda kb_4+1
+    sta $01
+    jsr print_str
+
+    lda #$22
+    sta $02
+    sta kb_cur_pos
+    lda #$84
+    sta $03
+    sta kb_cur_pos+1
+    lda select_cursor
+    sta $00
+    lda select_cursor+1
+    sta $01
+    jsr print_str
+
+    lda #3
+    sta screen_status
+
     rts
 .endproc
 
@@ -1075,8 +1150,8 @@ init_funcs:
     ldy #$00
 @msg_loop:
     lda ($00), y
-    sta $2007
     beq @print_done
+    sta $2007
     iny
     jmp @msg_loop
 @print_done:
@@ -1321,6 +1396,30 @@ bm_bbc:
     .byte   "BBC"
     .byte   $00
 
+kb_1:
+    .addr   :+
+:
+    .byte   "1 2 3 4 5 6 7 8 9 0 - ="
+    .byte   $00
+
+kb_2:
+    .addr   :+
+:
+    .byte   "q w e r t y u i o p [ ]"
+    .byte   $00
+
+kb_3:
+    .addr   :+
+:
+    .byte   "a s d f g h j k l ; '"
+    .byte   $00
+
+kb_4:
+    .addr   :+
+:
+    .byte   "z x c v b n m , . /"
+    .byte   $00
+
 ;;;;r/w global variables.
 .segment "BSS"
 vram_current:
@@ -1359,6 +1458,10 @@ inet_menu_cur_pos:
     .byte   $00
 
 bmark_menu_cur_pos:
+    .byte   $00
+    .byte   $00
+
+kb_cur_pos:
     .byte   $00
     .byte   $00
 
