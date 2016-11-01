@@ -462,6 +462,248 @@ init_funcs:
 .endproc
 
 .proc shell_screen_updt
+    ;;;case up
+    lda #$10
+    bit jp1_data
+    beq @down
+
+    lda #0
+    cmp kb_select
+    bne :+
+    jmp @end
+:
+    ;;move cursor up.
+    lda kb_cur_pos
+    sta $02
+    lda kb_cur_pos+1
+    sta $03
+    lda un_select_cursor
+    sta $00
+    lda un_select_cursor+1
+    sta $01
+    jsr print_str
+
+    sec
+    lda #$40
+    sta $00
+    lda kb_cur_pos+1
+    sbc $00
+    sta kb_cur_pos+1
+    sta $03
+
+    lda #$00
+    sta $00
+    lda kb_cur_pos
+    sbc $00
+    sta kb_cur_pos
+    sta $02
+
+    lda select_cursor
+    sta $00
+    lda select_cursor+1
+    sta $01
+    jsr print_str
+
+    ;;increment selected index.
+    dec kb_select
+
+    ;;invalidate jp input for a while.
+    lda #$00
+    sta jp_status
+
+    jmp @end
+
+@down:
+    ;;case down
+    lda #$20
+    bit jp1_data
+    bne :+
+    jmp @left
+:
+
+    lda #4
+    cmp kb_select
+    bne :+
+    jmp @left
+:
+    ;;move cursor down.
+    lda kb_cur_pos
+    sta $02
+    lda kb_cur_pos+1
+    sta $03
+    lda un_select_cursor
+    sta $00
+    lda un_select_cursor+1
+    sta $01
+    jsr print_str
+
+    clc
+    lda #$40
+    adc kb_cur_pos+1
+    sta kb_cur_pos+1
+    sta $03
+    lda #$00
+    adc kb_cur_pos
+    sta kb_cur_pos
+    sta $02
+
+    lda select_cursor
+    sta $00
+    lda select_cursor+1
+    sta $01
+    jsr print_str
+
+    ;;increment selected index.
+    inc kb_select
+
+    ;;invalidate jp input for a while.
+    lda #$00
+    sta jp_status
+
+    jmp @end
+
+@left:
+    ;;case left
+    lda #$40
+    bit jp1_data
+    beq @right
+
+    lda #4
+    cmp kb_select
+    bne :+
+    jmp @end
+:
+    ;;move cursor left.
+    lda kb_cur_pos
+    sta $02
+    lda kb_cur_pos+1
+    sta $03
+    lda un_select_cursor
+    sta $00
+    lda un_select_cursor+1
+    sta $01
+    jsr print_str
+
+    sec
+    lda #$2
+    sta $00
+    lda kb_cur_pos+1
+    sbc $00
+    sta kb_cur_pos+1
+    sta $03
+
+    lda #$00
+    sta $00
+    lda kb_cur_pos
+    sbc $00
+    sta kb_cur_pos
+    sta $02
+
+    lda select_cursor
+    sta $00
+    lda select_cursor+1
+    sta $01
+    jsr print_str
+
+    ;;increment selected index.
+    dec kb_select
+
+    ;;invalidate jp input for a while.
+    lda #$00
+    sta jp_status
+
+    jmp @end
+
+@right:
+    ;;case down
+    lda #$80
+    bit jp1_data
+    bne :+
+    jmp @a
+:
+
+    lda #4
+    cmp kb_select
+    bne :+
+    jmp @end
+:
+    ;;move cursor right.
+    lda kb_cur_pos
+    sta $02
+    lda kb_cur_pos+1
+    sta $03
+    lda un_select_cursor
+    sta $00
+    lda un_select_cursor+1
+    sta $01
+    jsr print_str
+
+    clc
+    lda #$2
+    adc kb_cur_pos+1
+    sta kb_cur_pos+1
+    sta $03
+    lda #$00
+    adc kb_cur_pos
+    sta kb_cur_pos
+    sta $02
+
+    lda select_cursor
+    sta $00
+    lda select_cursor+1
+    sta $01
+    jsr print_str
+
+    ;;increment selected index.
+    inc kb_select
+
+    ;;invalidate jp input for a while.
+    lda #$00
+    sta jp_status
+
+    jmp @end
+
+@a:
+    ;;case a
+    lda #$01
+    bit jp1_data
+    beq @end
+
+
+;    lda #4
+;    cmp bmark_menu_select
+;    bne :+
+;    ;;case return
+;    lda #$20
+;    sta $00
+;    lda #$6d
+;    sta $01
+;    lda #$20
+;    sta $02
+;    lda #$79
+;    sta $03
+;    lda #$21
+;    sta $04
+;    lda #$ad
+;    sta $05
+;    lda #$21
+;    sta $06
+;    lda #$b9
+;    sta $07
+;    jsr delete_rect
+;    jsr inet_screen_init
+;    jmp @next_page_done
+;:
+;    ;;case bmark is selected...
+;;;;    sta screen_status   ;;navigate to next screen.
+;;;;    jsr init_screen
+;@next_page_done:
+;    ;;invalidate jp input for a while.
+;    lda #$00
+;
+;    sta jp_status
+;
+@end:
     rts
 .endproc
 
@@ -1450,6 +1692,13 @@ inet_menu_select:
 
 ;0 - 4
 bmark_menu_select:
+    .byte   $00
+
+; 0 - 11
+;12 - 23
+;24 - 35
+;36 - 47
+kb_select:
     .byte   $00
 
 top_menu_cur_pos:
