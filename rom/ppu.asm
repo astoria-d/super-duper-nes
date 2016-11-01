@@ -365,8 +365,9 @@ init_funcs:
 
     lda #4
     cmp bmark_menu_select
-    beq @end
-
+    bne :+
+    jmp @end
+:
     ;;move cursor down.
     lda bmark_menu_cur_pos
     sta $02
@@ -409,11 +410,35 @@ init_funcs:
     bit jp1_data
     beq @end
 
-    lda bmark_menu_select
-    sta screen_status   ;;navigate to next screen.
 
+    lda #4
+    cmp bmark_menu_select
+    bne :+
+    ;;case return
+    lda #$20
+    sta $00
+    lda #$6d
+    sta $01
+    lda #$20
+    sta $02
+    lda #$79
+    sta $03
+    lda #$21
+    sta $04
+    lda #$ad
+    sta $05
+    lda #$21
+    sta $06
+    lda #$b9
+    sta $07
+    jsr delete_rect
+    jsr inet_screen_init
+    jmp @next_page_done
+:
+    ;;case bmark is selected...
+;;;    sta screen_status   ;;navigate to next screen.
 ;;;    jsr init_screen
-
+@next_page_done:
     ;;invalidate jp input for a while.
     lda #$00
     sta jp_status
@@ -618,6 +643,11 @@ init_funcs:
     sta $01
     jsr print_str
 
+    lda #0
+    sta bmark_menu_select
+    lda #4
+    sta screen_status
+
     rts
 .endproc
 
@@ -667,7 +697,7 @@ init_funcs:
     lda top_menu1+1
     sta $01
     jsr print_str
-    
+
     lda #$20
     sta $02
     lda #$84
@@ -677,7 +707,7 @@ init_funcs:
     lda top_menu_internet+1
     sta $01
     jsr print_str
-    
+
     lda #$20
     sta $02
     lda #$a4
@@ -687,7 +717,7 @@ init_funcs:
     lda top_menu_game+1
     sta $01
     jsr print_str
-    
+
     lda #$20
     sta $02
     lda #$c4
@@ -697,7 +727,6 @@ init_funcs:
     lda top_menu_shell+1
     sta $01
     jsr print_str
-    
 
     lda #$20
     sta $02
@@ -705,7 +734,7 @@ init_funcs:
     lda #$82
     sta $03
     sta top_menu_cur_pos+1
-    
+
     lda select_cursor
     sta $00
     lda select_cursor+1
@@ -723,6 +752,84 @@ init_funcs:
     sta jp_status
     rts
 .endproc
+
+
+;;;param $00, $01 = top left.
+;;;param $02, $03 = top right
+;;;param $04, $05 = bottom left.
+;;;param $06, $07 = bottom right
+.proc delete_rect
+
+    ;;calc width
+    sec
+    lda $03
+    sbc $01
+    sta $08 ;;$08=width
+
+    ;;get y index1
+    lda $01
+    lsr
+    lsr
+    lsr
+    lsr
+    lsr
+    sta $0a ;;$0a=top pos in y axis (bottom 3bit.)
+
+    lda #$1f
+    and $00 ;;$0b=top pos (top 5bit.)
+    asl
+    asl
+    asl
+    ora $0a ;;$09=top pos
+    sta $09
+
+    ;;get y index2
+    lda $05
+    lsr
+    lsr
+    lsr
+    lsr
+    lsr
+    sta $0a ;;$0a=bottom pos in y axis (bottom 3bit.)
+
+    lda #$1f
+    and $04 ;;$0b=bottom pos (top 5bit.)
+    asl
+    asl
+    asl
+    ora $0a ;;$0a=bottom pos
+    sta $0a
+
+    sec
+    sbc $09
+    sta $09 ;;$09=hight
+
+    ldy $09
+@y_loop:
+    lda $00
+    sta $2006
+    lda $01
+    sta $2006
+    ldx $08
+    lda #' '
+:
+    sta $2007
+    dex
+    bpl :-
+
+    lda #$20
+    clc
+    adc $01
+    bcc :+
+    inc $00
+:
+    sta $01
+    dey
+    bpl @y_loop
+
+    rts
+.endproc
+
 
 ;;;param $00, $01 = top left.
 ;;;param $02, $03 = top right
