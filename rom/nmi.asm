@@ -104,9 +104,15 @@
     lda #$01
     sta jp_status
 @update_done:
+    ;;clear ppu reg.
+    lda $2002
 
     ;;scroll reg set.
     lda #$00
+    ;;clear ppu addr reg.
+    sta $2006
+    sta $2006
+    ;set scroll reg.
     sta $2005
     sta $2005
 
@@ -125,7 +131,7 @@
 .endproc
 
 jp_suspend_rate:
-    .byte   100
+    .byte   10
 
 
 ;;;;r/w global variables.
