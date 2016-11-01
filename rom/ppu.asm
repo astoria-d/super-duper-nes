@@ -12,7 +12,7 @@
 
 
 ;;;screen func table.
-screen_funcs:
+update_funcs:
     .addr   main_screen_updt        ;0
     .addr   inet_screen_updt        ;1
     .addr   game_screen_updt        ;2
@@ -27,10 +27,10 @@ screen_funcs:
     lda screen_status
     asl     ;;offset address to word.
     tay
-    lda screen_funcs, y ;;get handler low.
+    lda update_funcs, y ;;get handler low.
     sta $02
     iny
-    lda screen_funcs, y ;;get handler hi
+    lda update_funcs, y ;;get handler hi
     sta $03
 
     ;;goto handler.
@@ -170,7 +170,7 @@ init_funcs:
 
     lda top_menu_select
     sta screen_status   ;;navigate to next screen.
-    
+
     jsr init_screen
 
     ;;invalidate jp input for a while.
@@ -285,11 +285,17 @@ init_funcs:
     bit jp1_data
     beq @end
 
+    lda #7
+    cmp inet_menu_select
+    bne :+
+    ;;case return.
+    jsr main_screen_init
+    jmp @next_page_done
+:
     lda inet_menu_select
     sta screen_status   ;;navigate to next screen.
-
     jsr init_screen
-
+@next_page_done:
     ;;invalidate jp input for a while.
     lda #$00
     sta jp_status
@@ -519,6 +525,11 @@ init_funcs:
     sta $01
     jsr print_str
 
+    lda #4
+    sta inet_menu_select
+    lda #1
+    sta screen_status
+
     rts
 .endproc
 
@@ -702,7 +713,9 @@ init_funcs:
     jsr print_str
 
     ;;set screen status
-    lda top_menu_select
+    lda #1
+    sta top_menu_select
+    lda #0
     sta screen_status
 
     ;;ready to input.
@@ -1026,6 +1039,8 @@ init_funcs:
 
 ;;init menu items.
 .proc init_menu
+    lda #0
+    sta screen_status
     lda #1
     sta top_menu_select
     lda #4
