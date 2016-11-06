@@ -14,6 +14,10 @@ do
         export_started2=true
         continue
     fi
+    if [ "$line" == "Exports list:" ] ; then
+        export_started2=true
+        continue
+    fi
     if [ -z "$line" ] ; then
         continue
     fi
