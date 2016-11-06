@@ -645,7 +645,7 @@ init_funcs:
     lda #$80
     bit jp1_data
     bne :+
-    jmp @a
+    jmp @b
 :
 
 	;;right most side is 11, 23, 35, 47
@@ -705,16 +705,19 @@ init_funcs:
 
     jmp @end
 
-@a:
-    ;;case a
-    lda #$01
+@b:
+    ;;case b
+    ;;select in the buffer.
+    lda #$02
     bit jp1_data
-    beq @end
+    beq @a
 
     lda #60
     ;;max input text is 60 chars.
     cmp in_text_carret
-    beq @end
+    bne :+
+    jmp @end
+:
     clc
 
     ;;get selected char in x.
@@ -752,6 +755,43 @@ init_funcs:
     jsr print_str
 
     inc in_text_carret
+
+    ;;invalidate jp input for a while.
+    lda #$00
+    sta jp_status
+    jmp @end
+
+@a:
+    ;;case a..
+    lda #$01
+    bit jp1_data
+    beq @end
+
+    ;;reset carret.
+    lda #$22
+    sta $02
+    sta carret_pos
+    lda #$41
+    sta carret_pos+1
+    sta $03
+    lda #0
+    sta in_text_carret
+    lda in_text_buf_addr
+    sta $00
+    lda in_text_buf_addr+1
+    sta $01
+    lda #$8a
+    ldy #0
+    sta ($00), y
+    ldx #61
+    lda #' '
+    iny
+:
+    sta ($00), y
+    iny
+    dex
+    bne :-
+    jsr print_str
 
     ;;invalidate jp input for a while.
     lda #$00
