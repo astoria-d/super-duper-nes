@@ -1654,7 +1654,7 @@ kb_3:
     .addr   :+
 :
     .byte   "a s d f g h j k l ; ' "
-    .byte   $87
+    .byte   $88
     .byte   $00
 
 kb_4:
@@ -1662,7 +1662,7 @@ kb_4:
 :
     .byte   $86
     .byte   " z x c v b n m , . / "
-    .byte   $88
+    .byte   $89
     .byte   $00
 
 ;;;;r/w global variables.
