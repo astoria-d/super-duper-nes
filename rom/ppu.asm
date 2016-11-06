@@ -1008,6 +1008,29 @@ init_funcs:
     sta $01
     jsr print_str
 
+    ;;draw input text line.
+    lda #$22
+    sta $02
+    lda #$61
+    sta $03
+    lda in_text_line
+    sta $00
+    lda in_text_line+1
+    sta $01
+    jsr print_str
+
+    lda #$22
+    sta $02
+    sta carret_pos
+    lda #$41
+    sta carret_pos+1
+    sta $03
+    lda in_text_carret
+    sta $00
+    lda in_text_carret+1
+    sta $01
+    jsr print_str
+
     lda #$22
     sta $02
     sta kb_cur_pos
@@ -1707,6 +1730,20 @@ kb_4:
     .byte   $89
     .byte   $00
 
+in_text_line:
+    .addr   :+
+:
+.repeat 30
+    .byte   $80
+.endrepeat
+    .byte   $00
+
+in_text_carret:
+    .addr   :+
+:
+    .byte   $8a
+    .byte   $00
+
 ;;;;r/w global variables.
 .segment "BSS"
 vram_current:
@@ -1756,6 +1793,10 @@ bmark_menu_cur_pos:
     .byte   $00
 
 kb_cur_pos:
+    .byte   $00
+    .byte   $00
+
+carret_pos:
     .byte   $00
     .byte   $00
 
