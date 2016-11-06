@@ -711,40 +711,52 @@ init_funcs:
     bit jp1_data
     beq @end
 
+    lda #60
+    ;;max input text is 60 chars.
+    cmp in_text_carret
+    beq @end
+    clc
 
-;    lda #4
-;    cmp bmark_menu_select
-;    bne :+
-;    ;;case return
-;    lda #$20
-;    sta $00
-;    lda #$6d
-;    sta $01
-;    lda #$20
-;    sta $02
-;    lda #$79
-;    sta $03
-;    lda #$21
-;    sta $04
-;    lda #$ad
-;    sta $05
-;    lda #$21
-;    sta $06
-;    lda #$b9
-;    sta $07
-;    jsr delete_rect
-;    jsr inet_screen_init
-;    jmp @next_page_done
-;:
-;    ;;case bmark is selected...
-;;;;    sta screen_status   ;;navigate to next screen.
-;;;;    jsr init_screen
-;@next_page_done:
-;    ;;invalidate jp input for a while.
-;    lda #$00
-;
-;    sta jp_status
-;
+    ;;get selected char in x.
+    ldy kb_select
+    lda text_kb_matrix
+    sta $02
+    lda text_kb_matrix+1
+    sta $03
+    lda ($02), y
+    tax
+
+    ;;set buf base index.
+    ldy in_text_carret
+    lda in_text_buf_addr
+    sta $00
+    lda in_text_buf_addr+1
+    sta $01
+
+    ;;set char.
+    txa
+    sta ($00), y
+    iny
+    ;;put carret
+    lda #$8a
+    sta ($00), y
+    iny
+    ;;terminate.
+    lda #0
+    sta ($00), y
+
+    lda carret_pos
+    sta $02
+    lda carret_pos+1
+    sta $03
+    jsr print_str
+
+    inc in_text_carret
+
+    ;;invalidate jp input for a while.
+    lda #$00
+    sta jp_status
+
 @end:
     rts
 .endproc
@@ -1743,6 +1755,14 @@ in_text_line:
 
 in_text_buf_addr:
     .addr   in_text_buf
+
+text_kb_matrix:
+    .addr   :+
+:
+    .byte   "1234567890-="
+    .byte   "qwertyuiop[]"
+    .byte   "asdfghjkl;' "
+    .byte   " zxcvbnm,./ "
 
 
 ;;;;r/w global variables.
