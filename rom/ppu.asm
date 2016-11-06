@@ -795,7 +795,7 @@ init_funcs:
 
     lda #$20
     sta $02
-    lda #$84
+    lda #$83
     sta $03
     lda inet_menu_bookmark
     sta $00
@@ -805,7 +805,7 @@ init_funcs:
 
     lda #$20
     sta $02
-    lda #$a4
+    lda #$a3
     sta $03
     lda inet_menu_search
     sta $00
@@ -815,7 +815,7 @@ init_funcs:
 
     lda #$20
     sta $02
-    lda #$c4
+    lda #$c3
     sta $03
     lda inet_menu_direct
     sta $00
@@ -825,7 +825,7 @@ init_funcs:
 
     lda #$20
     sta $02
-    lda #$e4
+    lda #$e3
     sta $03
     lda menu_return
     sta $00
@@ -877,7 +877,7 @@ init_funcs:
     ;;set message.
     lda #$20
     sta $02
-    lda #$90
+    lda #$8f
     sta $03
     lda bm_msn
     sta $00
@@ -887,7 +887,7 @@ init_funcs:
 
     lda #$20
     sta $02
-    lda #$b0
+    lda #$af
     sta $03
     lda bm_abc
     sta $00
@@ -897,7 +897,7 @@ init_funcs:
 
     lda #$20
     sta $02
-    lda #$d0
+    lda #$cf
     sta $03
     lda bm_cnn
     sta $00
@@ -907,7 +907,7 @@ init_funcs:
 
     lda #$20
     sta $02
-    lda #$f0
+    lda #$ef
     sta $03
     lda bm_bbc
     sta $00
@@ -917,7 +917,7 @@ init_funcs:
 
     lda #$21
     sta $02
-    lda #$10
+    lda #$0f
     sta $03
     lda menu_return
     sta $00
@@ -1116,7 +1116,7 @@ init_funcs:
 
     lda #$20
     sta $02
-    lda #$84
+    lda #$83
     sta $03
     lda top_menu_internet
     sta $00
@@ -1126,7 +1126,7 @@ init_funcs:
 
     lda #$20
     sta $02
-    lda #$a4
+    lda #$a3
     sta $03
     lda top_menu_game
     sta $00
@@ -1136,7 +1136,7 @@ init_funcs:
 
     lda #$20
     sta $02
-    lda #$c4
+    lda #$c3
     sta $03
     lda top_menu_shell
     sta $00
@@ -1674,7 +1674,7 @@ top_menu_shell:
 select_cursor:
     .addr   :+
 :
-    .byte   ">"
+    .byte   $8b
     .byte   $00
 
 un_select_cursor:
