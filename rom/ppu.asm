@@ -961,6 +961,25 @@ init_funcs:
 
 .proc shell_screen_init
     ;;create box.
+    lda #$20
+    sta $00
+    lda #$21
+    sta $01
+    lda #$20
+    sta $02
+    lda #$3e
+    sta $03
+    lda #$22
+    sta $04
+    lda #$21
+    sta $05
+    lda #$22
+    sta $06
+    lda #$3e
+    sta $07
+    jsr create_rect
+
+    ;;create box.
     lda #$22
     sta $00
     lda #$83
