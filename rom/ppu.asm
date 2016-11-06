@@ -467,9 +467,10 @@ init_funcs:
     bit jp1_data
     beq @down
 
-    lda #0
+	;;0 - 11 is the top line.
+    lda #11
     cmp kb_select
-    bne :+
+    bcc :+
     jmp @end
 :
     ;;move cursor up.
@@ -504,8 +505,13 @@ init_funcs:
     sta $01
     jsr print_str
 
-    ;;increment selected index.
-    dec kb_select
+    ;;update selected index.
+    lda #12
+    sta $0
+    sec
+    lda kb_select
+    sbc $0
+    sta kb_select
 
     ;;invalidate jp input for a while.
     lda #$00
@@ -521,9 +527,10 @@ init_funcs:
     jmp @left
 :
 
-    lda #4
+	;;36 - 47 is the bottom line.
+    lda #35
     cmp kb_select
-    bne :+
+    bcs :+
     jmp @left
 :
     ;;move cursor down.
@@ -553,8 +560,11 @@ init_funcs:
     sta $01
     jsr print_str
 
-    ;;increment selected index.
-    inc kb_select
+    ;;update selected index.
+    lda #12
+    clc
+    adc kb_select
+    sta kb_select
 
     ;;invalidate jp input for a while.
     lda #$00
@@ -568,7 +578,23 @@ init_funcs:
     bit jp1_data
     beq @right
 
-    lda #4
+	;;left most side is 0, 12, 24, 36.
+    lda #0
+    cmp kb_select
+    bne :+
+    jmp @end
+:
+    lda #12
+    cmp kb_select
+    bne :+
+    jmp @end
+:
+    lda #24
+    cmp kb_select
+    bne :+
+    jmp @end
+:
+    lda #36
     cmp kb_select
     bne :+
     jmp @end
@@ -622,7 +648,23 @@ init_funcs:
     jmp @a
 :
 
-    lda #4
+	;;right most side is 11, 23, 35, 47
+    lda #11
+    cmp kb_select
+    bne :+
+    jmp @end
+:
+    lda #23
+    cmp kb_select
+    bne :+
+    jmp @end
+:
+    lda #35
+    cmp kb_select
+    bne :+
+    jmp @end
+:
+    lda #47
     cmp kb_select
     bne :+
     jmp @end
