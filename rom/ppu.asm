@@ -1008,27 +1008,30 @@ init_funcs:
     sta $01
     jsr print_str
 
-    ;;draw input text line.
-    lda #$22
-    sta $02
-    lda #$61
-    sta $03
-    lda in_text_line
-    sta $00
-    lda in_text_line+1
-    sta $01
-    jsr print_str
-
+    ;;draw blank text w/ carret.
     lda #$22
     sta $02
     sta carret_pos
     lda #$41
     sta carret_pos+1
     sta $03
-    lda in_text_carret
+    lda #0
+    sta in_text_carret
+    lda in_text_buf_addr
     sta $00
-    lda in_text_carret+1
+    lda in_text_buf_addr+1
     sta $01
+    lda #$8a
+    ldy #0
+    sta ($00), y
+    ldx #61
+    lda #' '
+    iny
+:
+    sta ($00), y
+    iny
+    dex
+    bne :-
     jsr print_str
 
     lda #$22
@@ -1738,11 +1741,9 @@ in_text_line:
 .endrepeat
     .byte   $00
 
-in_text_carret:
-    .addr   :+
-:
-    .byte   $8a
-    .byte   $00
+in_text_buf_addr:
+    .addr   in_text_buf
+
 
 ;;;;r/w global variables.
 .segment "BSS"
@@ -1799,6 +1800,18 @@ kb_cur_pos:
 carret_pos:
     .byte   $00
     .byte   $00
+
+;;in_text_carret is the offset in from the text buffer top.
+in_text_carret:
+    .byte   $00
+:
+;;input text buffer is 2 lines (60 char + null char.)
+in_text_buf:
+    .byte   $8a
+.repeat 63
+    .byte   $00
+.endrepeat
+
 
 ;;input ready: 1
 ;;input suspend: 0
