@@ -815,6 +815,11 @@ init_funcs:
     bne :+
     jmp @sft_btn
 :
+    lda #35
+    cmp kb_select
+    bne :+
+    jmp @bs_btn
+:
     clc
 
     ;;get selected char in x.
@@ -996,6 +1001,44 @@ init_funcs:
     lda #$00
     sta jp_status
     jmp @end
+
+@bs_btn:
+    ;;backspace.
+    lda in_text_carret
+    bne :+
+    jmp @end
+:
+
+    dec in_text_carret
+
+    ldy in_text_carret
+    lda in_text_buf_addr
+    sta $00
+    lda in_text_buf_addr+1
+    sta $01
+
+    ;;put carret
+    lda #$8a
+    sta ($00), y
+    iny
+    ;;erase old char.
+    lda #' '
+    sta ($00), y
+    iny
+    ;;terminate.
+    lda #0
+    sta ($00), y
+
+    lda carret_pos
+    sta $02
+    lda carret_pos+1
+    sta $03
+    jsr print_str
+
+    lda #$00
+    sta jp_status
+    jmp @end
+
 @a:
     ;;case a..
     lda #$01
