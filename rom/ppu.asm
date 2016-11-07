@@ -810,14 +810,30 @@ init_funcs:
     bne :+
     jmp @end_shell
 :
+    lda #36
+    cmp kb_select
+    bne :+
+    jmp @sft_btn
+:
     clc
 
     ;;get selected char in x.
-    ldy kb_select
+    lda kb_sft_status
+    bne :+
+    ;;case shift off
     lda text_kb_matrix
     sta $02
     lda text_kb_matrix+1
     sta $03
+    jmp @ld_chr
+:
+    ;;case shift on
+    lda text_kb_matrix_s
+    sta $02
+    lda text_kb_matrix_s+1
+    sta $03
+@ld_chr:
+    ldy kb_select
     lda ($02), y
     tax
 
@@ -879,6 +895,107 @@ init_funcs:
     sta jp_status
     jmp @end
 
+@sft_btn:
+    lda kb_sft_status
+    bne @s_on
+
+    ;;case shift off
+    lda #$22
+    sta $02
+    lda #$a5
+    sta $03
+    lda kb_1_s
+    sta $00
+    lda kb_1_s+1
+    sta $01
+    jsr print_str
+
+    lda #$22
+    sta $02
+    lda #$e5
+    sta $03
+    lda kb_2_s
+    sta $00
+    lda kb_2_s+1
+    sta $01
+    jsr print_str
+
+    lda #$23
+    sta $02
+    lda #$25
+    sta $03
+    lda kb_3_s
+    sta $00
+    lda kb_3_s+1
+    sta $01
+    jsr print_str
+
+    lda #$23
+    sta $02
+    lda #$65
+    sta $03
+    lda kb_4_s
+    sta $00
+    lda kb_4_s+1
+    sta $01
+    jsr print_str
+
+    ;;set shift on.
+    lda #1
+    sta kb_sft_status
+
+    lda #$00
+    sta jp_status
+    jmp @end
+@s_on:
+    ;;case shift on.
+    lda #$22
+    sta $02
+    lda #$a5
+    sta $03
+    lda kb_1
+    sta $00
+    lda kb_1+1
+    sta $01
+    jsr print_str
+
+    lda #$22
+    sta $02
+    lda #$e5
+    sta $03
+    lda kb_2
+    sta $00
+    lda kb_2+1
+    sta $01
+    jsr print_str
+
+    lda #$23
+    sta $02
+    lda #$25
+    sta $03
+    lda kb_3
+    sta $00
+    lda kb_3+1
+    sta $01
+    jsr print_str
+
+    lda #$23
+    sta $02
+    lda #$65
+    sta $03
+    lda kb_4
+    sta $00
+    lda kb_4+1
+    sta $01
+    jsr print_str
+
+    ;;set shift off
+    lda #0
+    sta kb_sft_status
+
+    lda #$00
+    sta jp_status
+    jmp @end
 @a:
     ;;case a..
     lda #$01
@@ -1249,6 +1366,9 @@ init_funcs:
 
     lda #3
     sta screen_status
+
+    lda #0
+    sta kb_sft_status
 
     rts
 .endproc
@@ -1929,8 +2049,37 @@ kb_3:
 kb_4:
     .addr   :+
 :
-    .byte   $86
+    .byte   $87
     .byte   " z x c v b n m , . / "
+    .byte   $89
+    .byte   $00
+
+kb_1_s:
+    .addr   :+
+:
+    .byte   "! @ # $ % ^ & * ( ) _ +"
+    .byte   $00
+
+kb_2_s:
+    .addr   :+
+:
+    .byte   "Q W E R T Y U I O P { }"
+    .byte   $00
+
+kb_3_s:
+    .addr   :+
+:
+    .byte   "A S D F G H J K L : "
+    .byte   '"'
+    .byte   ' '
+    .byte   $88
+    .byte   $00
+
+kb_4_s:
+    .addr   :+
+:
+    .byte   $86
+    .byte   " Z X C V B N M < > ? "
     .byte   $89
     .byte   $00
 
@@ -1959,6 +2108,15 @@ text_kb_matrix:
     .byte   "asdfghjkl;' "
     .byte   " zxcvbnm,./ "
 
+text_kb_matrix_s:
+    .addr   :+
+:
+    .byte   "!@#$%^&*()_+"
+    .byte   "QWERTYUIOP{}"
+    .byte   "ASDFGHJKL:"
+    .byte   '"'
+    .byte   $0
+    .byte   " ZXCVBNM<>? "
 
 ;;;;r/w global variables.
 .segment "BSS"
@@ -2031,4 +2189,7 @@ in_text_buf:
 ;;input ready: 1
 ;;input suspend: 0
 jp_status:
+    .byte   $00
+
+kb_sft_status:
     .byte   $00
