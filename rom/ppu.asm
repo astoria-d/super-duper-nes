@@ -473,6 +473,11 @@ init_funcs:
     bcc :+
     jmp @end
 :
+    lda #$7f
+    cmp kb_select
+    bne :+
+    jmp @end
+:
     ;;move cursor up.
     lda kb_cur_pos
     sta $02
@@ -576,25 +581,31 @@ init_funcs:
     ;;case left
     lda #$40
     bit jp1_data
-    beq @right
-
+    bne :+
+    jmp @right
+:
 	;;left most side is 0, 12, 24, 36.
     lda #0
     cmp kb_select
     bne :+
-    jmp @end
+    jmp @rtn_btn
 :
     lda #12
     cmp kb_select
     bne :+
-    jmp @end
+    jmp @rtn_btn
 :
     lda #24
     cmp kb_select
     bne :+
-    jmp @end
+    jmp @rtn_btn
 :
     lda #36
+    cmp kb_select
+    bne :+
+    jmp @rtn_btn
+:
+    lda #$7f
     cmp kb_select
     bne :+
     jmp @end
@@ -640,6 +651,41 @@ init_funcs:
 
     jmp @end
 
+@rtn_btn:
+    ;;move cursor to return button pos.
+    lda kb_cur_pos
+    sta $02
+    lda kb_cur_pos+1
+    sta $03
+    lda un_select_cursor
+    sta $00
+    lda un_select_cursor+1
+    sta $01
+    jsr print_str
+
+    lda #$22
+    sta $00
+    sta kb_cur_pos
+    lda #$a1
+    sta $03
+    sta kb_cur_pos+1
+
+    lda select_cursor
+    sta $00
+    lda select_cursor+1
+    sta $01
+    jsr print_str
+
+    ;;set selected index.
+    lda #$7f
+    sta kb_select
+
+    ;;invalidate jp input for a while.
+    lda #$00
+    sta jp_status
+
+    jmp @end
+
 @right:
     ;;case down
     lda #$80
@@ -668,6 +714,11 @@ init_funcs:
     cmp kb_select
     bne :+
     jmp @end
+:
+    lda #$7f
+    cmp kb_select
+    bne :+
+    jmp @back_to_kb
 :
     ;;move cursor right.
     lda kb_cur_pos
@@ -698,6 +749,41 @@ init_funcs:
 
     ;;increment selected index.
     inc kb_select
+
+    ;;invalidate jp input for a while.
+    lda #$00
+    sta jp_status
+
+    jmp @end
+
+@back_to_kb:
+    ;;return from back btn.
+    lda kb_cur_pos
+    sta $02
+    lda kb_cur_pos+1
+    sta $03
+    lda un_select_cursor
+    sta $00
+    lda un_select_cursor+1
+    sta $01
+    jsr print_str
+
+    lda #$22
+    sta $00
+    sta kb_cur_pos
+    lda #$a4
+    sta $03
+    sta kb_cur_pos+1
+
+    lda select_cursor
+    sta $00
+    lda select_cursor+1
+    sta $01
+    jsr print_str
+
+    ;;set selected index.
+    lda #00
+    sta kb_select
 
     ;;invalidate jp input for a while.
     lda #$00
@@ -1037,6 +1123,18 @@ init_funcs:
     lda #$9d
     sta $07
     jsr create_rect
+
+    ;;top right back button
+    lda #$22
+    sta $02
+    lda #$a2
+    sta $03
+    lda shell_back_btn
+    sta $00
+    lda shell_back_btn+1
+    sta $01
+    jsr print_str
+
 
     ;;show keyboard first row.
     lda #$22
@@ -1814,6 +1912,12 @@ in_text_line:
 
 in_text_buf_addr:
     .addr   in_text_buf
+
+shell_back_btn:
+    .addr   :+
+:
+    .byte   $8c
+    .byte   $00
 
 text_kb_matrix:
     .addr   :+
