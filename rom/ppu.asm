@@ -796,13 +796,19 @@ init_funcs:
     ;;select in the buffer.
     lda #$02
     bit jp1_data
-    beq @a
-
+    bne :+
+    jmp @a
+:
     lda #60
     ;;max input text is 60 chars.
     cmp in_text_carret
     bne :+
     jmp @end
+:
+    lda #$7f
+    cmp kb_select
+    bne :+
+    jmp @end_shell
 :
     clc
 
@@ -841,6 +847,32 @@ init_funcs:
     jsr print_str
 
     inc in_text_carret
+
+    ;;invalidate jp input for a while.
+    lda #$00
+    sta jp_status
+    jmp @end
+
+@end_shell:
+    ;;close all window.
+    lda #$20
+    sta $00
+    sta $01
+    lda #$20
+    sta $02
+    lda #$3e
+    sta $03
+    lda #$23
+    sta $04
+    lda #$a0
+    sta $05
+    lda #$23
+    sta $06
+    lda #$be
+    sta $07
+    jsr delete_rect
+    ;;back to main screen
+    jsr main_screen_init
 
     ;;invalidate jp input for a while.
     lda #$00
