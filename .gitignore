@@ -35,5 +35,6 @@
 #moto added.
 tmp/*
 *.lnk
+*.url
 ~$*
 
