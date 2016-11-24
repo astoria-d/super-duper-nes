@@ -1,3 +1,0 @@
-*SRC=BAT54;DI_BAT54;Diodes;Si;  30.0V  0.200A  5.00ns   Diodes Inc. Schottky
-.MODEL DI_BAT54 D  ( IS=34.9u RS=0.210 BV=30.0 IBV=2.00u
-+ CJO=13.3p  M=0.333 N=2.28 TT=7.20n )
