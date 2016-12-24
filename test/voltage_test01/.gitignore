@@ -2,4 +2,5 @@ db/*
 incremental_db/*
 output_files/*
 *.bak
+*.qws
 simulation/*

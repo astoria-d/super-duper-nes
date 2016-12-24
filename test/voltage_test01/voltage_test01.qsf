@@ -51,8 +51,77 @@ set_global_assignment -name DEVICE_FILTER_SPEED_GRADE 7
 set_global_assignment -name ERROR_CHECK_FREQUENCY_DIVISOR 1
 set_global_assignment -name EDA_SIMULATION_TOOL "ModelSim-Altera (VHDL)"
 set_global_assignment -name EDA_OUTPUT_DATA_FORMAT VHDL -section_id eda_simulation
-set_global_assignment -name VHDL_FILE voltage_test01.vhd
 set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
 set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
 set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
+set_global_assignment -name STRATIX_DEVICE_IO_STANDARD "3.3-V LVTTL"
+
+##need this line for active serial programming.
+set_global_assignment -name STRATIX_CONFIGURATION_DEVICE EPCS4
+
+
+##pin asignment.
+set_location_assignment PIN_L1 -to pi_base_clk
+
+set_location_assignment PIN_T21 -to pi_btn_n[3]
+set_location_assignment PIN_T22 -to pi_btn_n[2]
+set_location_assignment PIN_R21 -to pi_btn_n[1]
+set_location_assignment PIN_R22 -to pi_btn_n[0]
+
+set_location_assignment PIN_L2 -to pi_sw[9]
+set_location_assignment PIN_M1 -to pi_sw[8]
+set_location_assignment PIN_M2 -to pi_sw[7]
+set_location_assignment PIN_U11 -to pi_sw[6]
+set_location_assignment PIN_U12 -to pi_sw[5]
+set_location_assignment PIN_W12 -to pi_sw[4]
+set_location_assignment PIN_V12 -to pi_sw[3]
+set_location_assignment PIN_M22 -to pi_sw[2]
+set_location_assignment PIN_L21 -to pi_sw[1]
+set_location_assignment PIN_L22 -to pi_sw[0]
+
+set_location_assignment PIN_Y21 -to po_led_g[7]
+set_location_assignment PIN_Y22 -to po_led_g[6]
+set_location_assignment PIN_W21 -to po_led_g[5]
+set_location_assignment PIN_W22 -to po_led_g[4]
+set_location_assignment PIN_V21 -to po_led_g[3]
+set_location_assignment PIN_V22 -to po_led_g[2]
+set_location_assignment PIN_U21 -to po_led_g[1]
+set_location_assignment PIN_U22 -to po_led_g[0]
+
+set_location_assignment PIN_R17 -to po_led_r[9]
+set_location_assignment PIN_R18 -to po_led_r[8]
+set_location_assignment PIN_U18 -to po_led_r[7]
+set_location_assignment PIN_Y18 -to po_led_r[6]
+set_location_assignment PIN_V19 -to po_led_r[5]
+set_location_assignment PIN_T18 -to po_led_r[4]
+set_location_assignment PIN_Y19 -to po_led_r[3]
+set_location_assignment PIN_U19 -to po_led_r[2]
+set_location_assignment PIN_R19 -to po_led_r[1]
+set_location_assignment PIN_R20 -to po_led_r[0]
+
+set_location_assignment PIN_A13 -to po_gpio0[3]
+set_location_assignment PIN_B13 -to po_gpio0[2]
+set_location_assignment PIN_A14 -to po_gpio0[1]
+set_location_assignment PIN_B14 -to po_gpio0[0]
+
+set_location_assignment PIN_F13 -to po_gpio1[9]
+set_location_assignment PIN_F12 -to po_gpio1[8]
+set_location_assignment PIN_G16 -to po_gpio1[7]
+set_location_assignment PIN_F15 -to po_gpio1[6]
+set_location_assignment PIN_E15 -to po_gpio1[5]
+set_location_assignment PIN_E14 -to po_gpio1[4]
+set_location_assignment PIN_G15 -to po_gpio1[3]
+set_location_assignment PIN_H14 -to po_gpio1[2]
+set_location_assignment PIN_H13 -to po_gpio1[1]
+set_location_assignment PIN_H12 -to po_gpio1[0]
+
+##global clock set.
+set_instance_assignment -name GLOBAL_SIGNAL "GLOBAL CLOCK" -to pi_base_clk
+
+
+##project files.
+set_global_assignment -name SDC_FILE voltage_test01.sdc
+set_global_assignment -name VHDL_FILE voltage_test01.vhd
+
+##
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
