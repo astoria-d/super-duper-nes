@@ -1,0 +1,236 @@
+<session jtag_chain="USB-Blaster [USB-0]" jtag_device="@1: EP2C(15|20) (0x020B30DD)" sof_file="">
+  <display_tree gui_logging_enabled="0">
+    <display_branch instance="auto_signaltap_0" log="USE_GLOBAL_TEMP" signal_set="USE_GLOBAL_TEMP" trigger="USE_GLOBAL_TEMP"/>
+  </display_tree>
+  <global_info>
+    <single attribute="active instance" value="0"/>
+    <multi attribute="frame size" size="2" value="1920,1017"/>
+    <single attribute="jtag widget visible" value="1"/>
+    <multi attribute="jtag widget size" size="2" value="334,120"/>
+    <single attribute="instance widget visible" value="1"/>
+    <single attribute="config widget visible" value="1"/>
+    <single attribute="hierarchy widget visible" value="1"/>
+    <single attribute="data log widget visible" value="1"/>
+  </global_info>
+  <instance entity_name="sld_signaltap" is_auto_node="yes" name="auto_signaltap_0" source_file="sld_signaltap.vhd">
+    <node_ip_info instance_id="0" mfg_id="110" node_id="0" version="6"/>
+    <position_info>
+      <single attribute="active tab" value="0"/>
+      <single attribute="data vertical scroll position" value="0"/>
+      <single attribute="data horizontal scroll position" value="12"/>
+      <single attribute="zoom level numerator" value="8"/>
+      <single attribute="zoom level denominator" value="1"/>
+      <single attribute="zoom offset numerator" value="16368"/>
+      <single attribute="zoom offset denominator" value="1"/>
+    </position_info>
+    <signal_set global_temp="1" name="signal_set: 2017/01/08 19:54:43  #0">
+      <clock name="pi_base_clk" polarity="posedge" tap_mode="classic"/>
+      <config ram_type="M4K" reserved_data_nodes="0" reserved_storage_qualifier_nodes="0" reserved_trigger_nodes="0" sample_depth="128" trigger_in_enable="no" trigger_out_enable="no"/>
+      <top_entity/>
+      <signal_vec>
+        <trigger_input_vec>
+          <wire name="pi_btn_n[0]" tap_mode="classic"/>
+          <wire name="pi_btn_n[3]" tap_mode="classic"/>
+        </trigger_input_vec>
+        <data_input_vec>
+          <wire name="pi_btn_n[0]" tap_mode="classic"/>
+          <wire name="pi_btn_n[3]" tap_mode="classic"/>
+          <wire name="pio_gpio0[0]" tap_mode="classic"/>
+          <wire name="pio_gpio0[1]" tap_mode="classic"/>
+          <wire name="pio_gpio0[2]" tap_mode="classic"/>
+          <wire name="pio_gpio0[3]" tap_mode="classic"/>
+          <wire name="pio_gpio0[4]" tap_mode="classic"/>
+          <wire name="pio_gpio0[5]" tap_mode="classic"/>
+          <wire name="pio_gpio0[6]" tap_mode="classic"/>
+          <wire name="pio_gpio0[7]" tap_mode="classic"/>
+          <wire name="pio_gpio1[0]" tap_mode="classic"/>
+          <wire name="pio_gpio1[1]" tap_mode="classic"/>
+          <wire name="pio_gpio1[2]" tap_mode="classic"/>
+          <wire name="pio_gpio1[3]" tap_mode="classic"/>
+          <wire name="pio_gpio1[4]" tap_mode="classic"/>
+          <wire name="pio_gpio1[5]" tap_mode="classic"/>
+          <wire name="pio_gpio1[6]" tap_mode="classic"/>
+          <wire name="pio_gpio1[7]" tap_mode="classic"/>
+          <wire name="reg_8bit_cnt[0]" tap_mode="classic"/>
+          <wire name="reg_8bit_cnt[1]" tap_mode="classic"/>
+          <wire name="reg_8bit_cnt[2]" tap_mode="classic"/>
+          <wire name="reg_8bit_cnt[3]" tap_mode="classic"/>
+          <wire name="reg_8bit_cnt[4]" tap_mode="classic"/>
+          <wire name="reg_8bit_cnt[5]" tap_mode="classic"/>
+          <wire name="reg_8bit_cnt[6]" tap_mode="classic"/>
+          <wire name="reg_8bit_cnt[7]" tap_mode="classic"/>
+        </data_input_vec>
+        <storage_qualifier_input_vec>
+          <wire name="pi_btn_n[0]" tap_mode="classic"/>
+          <wire name="pi_btn_n[3]" tap_mode="classic"/>
+          <wire name="pio_gpio0[0]" tap_mode="classic"/>
+          <wire name="pio_gpio0[1]" tap_mode="classic"/>
+          <wire name="pio_gpio0[2]" tap_mode="classic"/>
+          <wire name="pio_gpio0[3]" tap_mode="classic"/>
+          <wire name="pio_gpio0[4]" tap_mode="classic"/>
+          <wire name="pio_gpio0[5]" tap_mode="classic"/>
+          <wire name="pio_gpio0[6]" tap_mode="classic"/>
+          <wire name="pio_gpio0[7]" tap_mode="classic"/>
+          <wire name="pio_gpio1[0]" tap_mode="classic"/>
+          <wire name="pio_gpio1[1]" tap_mode="classic"/>
+          <wire name="pio_gpio1[2]" tap_mode="classic"/>
+          <wire name="pio_gpio1[3]" tap_mode="classic"/>
+          <wire name="pio_gpio1[4]" tap_mode="classic"/>
+          <wire name="pio_gpio1[5]" tap_mode="classic"/>
+          <wire name="pio_gpio1[6]" tap_mode="classic"/>
+          <wire name="pio_gpio1[7]" tap_mode="classic"/>
+          <wire name="reg_8bit_cnt[0]" tap_mode="classic"/>
+          <wire name="reg_8bit_cnt[1]" tap_mode="classic"/>
+          <wire name="reg_8bit_cnt[2]" tap_mode="classic"/>
+          <wire name="reg_8bit_cnt[3]" tap_mode="classic"/>
+          <wire name="reg_8bit_cnt[4]" tap_mode="classic"/>
+          <wire name="reg_8bit_cnt[5]" tap_mode="classic"/>
+          <wire name="reg_8bit_cnt[6]" tap_mode="classic"/>
+          <wire name="reg_8bit_cnt[7]" tap_mode="classic"/>
+        </storage_qualifier_input_vec>
+      </signal_vec>
+      <presentation>
+        <unified_setup_data_view>
+          <node data_index="0" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="true" level-0="dont_care" name="pi_btn_n[0]" storage_index="0" tap_mode="classic" trigger_index="0" type="input pin"/>
+          <node data_index="1" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="true" level-0="falling edge" name="pi_btn_n[3]" storage_index="1" tap_mode="classic" trigger_index="1" type="input pin"/>
+          <node name="reg_8bit_cnt" order="msb_to_lsb" state="collapse" type="register">
+            <node data_index="25" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="reg_8bit_cnt[7]" storage_index="25" tap_mode="classic" type="register"/>
+            <node data_index="24" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="reg_8bit_cnt[6]" storage_index="24" tap_mode="classic" type="register"/>
+            <node data_index="23" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="reg_8bit_cnt[5]" storage_index="23" tap_mode="classic" type="register"/>
+            <node data_index="22" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="reg_8bit_cnt[4]" storage_index="22" tap_mode="classic" type="register"/>
+            <node data_index="21" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="reg_8bit_cnt[3]" storage_index="21" tap_mode="classic" type="register"/>
+            <node data_index="20" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="reg_8bit_cnt[2]" storage_index="20" tap_mode="classic" type="register"/>
+            <node data_index="19" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="reg_8bit_cnt[1]" storage_index="19" tap_mode="classic" type="register"/>
+            <node data_index="18" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="reg_8bit_cnt[0]" storage_index="18" tap_mode="classic" type="register"/>
+          </node>
+          <node name="pio_gpio0" order="msb_to_lsb" state="collapse" type="bidir pin">
+            <node data_index="9" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio0[7]" storage_index="9" tap_mode="classic" type="bidir pin"/>
+            <node data_index="8" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio0[6]" storage_index="8" tap_mode="classic" type="bidir pin"/>
+            <node data_index="7" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio0[5]" storage_index="7" tap_mode="classic" type="bidir pin"/>
+            <node data_index="6" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio0[4]" storage_index="6" tap_mode="classic" type="bidir pin"/>
+            <node data_index="5" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio0[3]" storage_index="5" tap_mode="classic" type="bidir pin"/>
+            <node data_index="4" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio0[2]" storage_index="4" tap_mode="classic" type="bidir pin"/>
+            <node data_index="3" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio0[1]" storage_index="3" tap_mode="classic" type="bidir pin"/>
+            <node data_index="2" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio0[0]" storage_index="2" tap_mode="classic" type="bidir pin"/>
+          </node>
+          <node name="pio_gpio1" order="msb_to_lsb" state="collapse" type="bidir pin">
+            <node data_index="17" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio1[7]" storage_index="17" tap_mode="classic" type="bidir pin"/>
+            <node data_index="16" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio1[6]" storage_index="16" tap_mode="classic" type="bidir pin"/>
+            <node data_index="15" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio1[5]" storage_index="15" tap_mode="classic" type="bidir pin"/>
+            <node data_index="14" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio1[4]" storage_index="14" tap_mode="classic" type="bidir pin"/>
+            <node data_index="13" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio1[3]" storage_index="13" tap_mode="classic" type="bidir pin"/>
+            <node data_index="12" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio1[2]" storage_index="12" tap_mode="classic" type="bidir pin"/>
+            <node data_index="11" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio1[1]" storage_index="11" tap_mode="classic" type="bidir pin"/>
+            <node data_index="10" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio1[0]" storage_index="10" tap_mode="classic" type="bidir pin"/>
+          </node>
+        </unified_setup_data_view>
+        <data_view>
+          <net data_index="0" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="true" level-0="dont_care" name="pi_btn_n[0]" storage_index="0" tap_mode="classic" trigger_index="0" type="input pin"/>
+          <net data_index="1" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="true" level-0="falling edge" name="pi_btn_n[3]" storage_index="1" tap_mode="classic" trigger_index="1" type="input pin"/>
+          <bus name="reg_8bit_cnt" order="msb_to_lsb" state="collapse" type="register">
+            <net data_index="25" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="reg_8bit_cnt[7]" storage_index="25" tap_mode="classic" type="register"/>
+            <net data_index="24" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="reg_8bit_cnt[6]" storage_index="24" tap_mode="classic" type="register"/>
+            <net data_index="23" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="reg_8bit_cnt[5]" storage_index="23" tap_mode="classic" type="register"/>
+            <net data_index="22" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="reg_8bit_cnt[4]" storage_index="22" tap_mode="classic" type="register"/>
+            <net data_index="21" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="reg_8bit_cnt[3]" storage_index="21" tap_mode="classic" type="register"/>
+            <net data_index="20" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="reg_8bit_cnt[2]" storage_index="20" tap_mode="classic" type="register"/>
+            <net data_index="19" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="reg_8bit_cnt[1]" storage_index="19" tap_mode="classic" type="register"/>
+            <net data_index="18" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="reg_8bit_cnt[0]" storage_index="18" tap_mode="classic" type="register"/>
+          </bus>
+          <bus name="pio_gpio0" order="msb_to_lsb" state="collapse" type="bidir pin">
+            <net data_index="9" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio0[7]" storage_index="9" tap_mode="classic" type="bidir pin"/>
+            <net data_index="8" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio0[6]" storage_index="8" tap_mode="classic" type="bidir pin"/>
+            <net data_index="7" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio0[5]" storage_index="7" tap_mode="classic" type="bidir pin"/>
+            <net data_index="6" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio0[4]" storage_index="6" tap_mode="classic" type="bidir pin"/>
+            <net data_index="5" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio0[3]" storage_index="5" tap_mode="classic" type="bidir pin"/>
+            <net data_index="4" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio0[2]" storage_index="4" tap_mode="classic" type="bidir pin"/>
+            <net data_index="3" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio0[1]" storage_index="3" tap_mode="classic" type="bidir pin"/>
+            <net data_index="2" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio0[0]" storage_index="2" tap_mode="classic" type="bidir pin"/>
+          </bus>
+          <bus name="pio_gpio1" order="msb_to_lsb" state="collapse" type="bidir pin">
+            <net data_index="17" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio1[7]" storage_index="17" tap_mode="classic" type="bidir pin"/>
+            <net data_index="16" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio1[6]" storage_index="16" tap_mode="classic" type="bidir pin"/>
+            <net data_index="15" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio1[5]" storage_index="15" tap_mode="classic" type="bidir pin"/>
+            <net data_index="14" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio1[4]" storage_index="14" tap_mode="classic" type="bidir pin"/>
+            <net data_index="13" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio1[3]" storage_index="13" tap_mode="classic" type="bidir pin"/>
+            <net data_index="12" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio1[2]" storage_index="12" tap_mode="classic" type="bidir pin"/>
+            <net data_index="11" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio1[1]" storage_index="11" tap_mode="classic" type="bidir pin"/>
+            <net data_index="10" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio1[0]" storage_index="10" tap_mode="classic" type="bidir pin"/>
+          </bus>
+        </data_view>
+        <setup_view>
+          <net data_index="0" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="true" level-0="dont_care" name="pi_btn_n[0]" storage_index="0" tap_mode="classic" trigger_index="0" type="input pin"/>
+          <net data_index="1" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="true" level-0="falling edge" name="pi_btn_n[3]" storage_index="1" tap_mode="classic" trigger_index="1" type="input pin"/>
+          <bus name="reg_8bit_cnt" order="msb_to_lsb" state="collapse" type="register">
+            <net data_index="25" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="reg_8bit_cnt[7]" storage_index="25" tap_mode="classic" type="register"/>
+            <net data_index="24" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="reg_8bit_cnt[6]" storage_index="24" tap_mode="classic" type="register"/>
+            <net data_index="23" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="reg_8bit_cnt[5]" storage_index="23" tap_mode="classic" type="register"/>
+            <net data_index="22" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="reg_8bit_cnt[4]" storage_index="22" tap_mode="classic" type="register"/>
+            <net data_index="21" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="reg_8bit_cnt[3]" storage_index="21" tap_mode="classic" type="register"/>
+            <net data_index="20" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="reg_8bit_cnt[2]" storage_index="20" tap_mode="classic" type="register"/>
+            <net data_index="19" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="reg_8bit_cnt[1]" storage_index="19" tap_mode="classic" type="register"/>
+            <net data_index="18" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="reg_8bit_cnt[0]" storage_index="18" tap_mode="classic" type="register"/>
+          </bus>
+          <bus name="pio_gpio0" order="msb_to_lsb" state="collapse" type="bidir pin">
+            <net data_index="9" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio0[7]" storage_index="9" tap_mode="classic" type="bidir pin"/>
+            <net data_index="8" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio0[6]" storage_index="8" tap_mode="classic" type="bidir pin"/>
+            <net data_index="7" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio0[5]" storage_index="7" tap_mode="classic" type="bidir pin"/>
+            <net data_index="6" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio0[4]" storage_index="6" tap_mode="classic" type="bidir pin"/>
+            <net data_index="5" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio0[3]" storage_index="5" tap_mode="classic" type="bidir pin"/>
+            <net data_index="4" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio0[2]" storage_index="4" tap_mode="classic" type="bidir pin"/>
+            <net data_index="3" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio0[1]" storage_index="3" tap_mode="classic" type="bidir pin"/>
+            <net data_index="2" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio0[0]" storage_index="2" tap_mode="classic" type="bidir pin"/>
+          </bus>
+          <bus name="pio_gpio1" order="msb_to_lsb" state="collapse" type="bidir pin">
+            <net data_index="17" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio1[7]" storage_index="17" tap_mode="classic" type="bidir pin"/>
+            <net data_index="16" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio1[6]" storage_index="16" tap_mode="classic" type="bidir pin"/>
+            <net data_index="15" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio1[5]" storage_index="15" tap_mode="classic" type="bidir pin"/>
+            <net data_index="14" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio1[4]" storage_index="14" tap_mode="classic" type="bidir pin"/>
+            <net data_index="13" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio1[3]" storage_index="13" tap_mode="classic" type="bidir pin"/>
+            <net data_index="12" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio1[2]" storage_index="12" tap_mode="classic" type="bidir pin"/>
+            <net data_index="11" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio1[1]" storage_index="11" tap_mode="classic" type="bidir pin"/>
+            <net data_index="10" is_data_input="true" is_node_valid="true" is_storage_input="true" is_trigger_input="false" name="pio_gpio1[0]" storage_index="10" tap_mode="classic" type="bidir pin"/>
+          </bus>
+        </setup_view>
+        <trigger_in_editor/>
+        <trigger_out_editor/>
+      </presentation>
+      <trigger CRC="3389DE44" attribute_mem_mode="false" gap_record="true" global_temp="1" name="trigger: 2017/01/08 20:00:02  #0" position="pre" power_up_trigger_mode="false" record_data_gap="true" segment_size="1" storage_mode="off" storage_qualifier_disabled="no" storage_qualifier_port_is_pin="true" storage_qualifier_port_name="auto_stp_external_storage_qualifier" storage_qualifier_port_tap_mode="classic" trigger_type="circular">
+        <power_up_trigger position="pre" storage_qualifier_disabled="no"/>
+        <events use_custom_flow_control="no">
+          <level enabled="yes" name="condition1" type="basic">'pi_btn_n[3]' == falling edge
+            <power_up enabled="yes">
+            </power_up>
+            <op_node/>
+          </level>
+        </events>
+        <storage_qualifier_events>
+          <transitional>11000000000000000000000000
+            <pwr_up_transitional>11000000000000000000000000</pwr_up_transitional>
+          </transitional>
+          <storage_qualifier_level type="basic">
+            <power_up>
+            </power_up>
+            <op_node/>
+          </storage_qualifier_level>
+          <storage_qualifier_level type="basic">
+            <power_up>
+            </power_up>
+            <op_node/>
+          </storage_qualifier_level>
+          <storage_qualifier_level type="basic">
+            <power_up>
+            </power_up>
+            <op_node/>
+          </storage_qualifier_level>
+        </storage_qualifier_events>
+        <log>
+          <data global_temp="1" name="log: 2017/01/08 20:00:02  #1" power_up_mode="false" sample_depth="128" trigger_position="16">1100110000001100000011000011001100000011000000110000110011000000110000001100001100110000001100000011000011001100000011000000110000110011000000110000001100001100110000001100000011000011001100000011000000110000110011000000110000001100001100110000001100000011000011001100000011000000110000110011000000110000001100001100110000001100000011000011001100000011000000110000110011000000110000001100001100110000001100000011000010001100000011000000110000100011000000110000101100001010110000001100000111000010011100001011000011110000101111000001110000000010001000001000111100001000100010100010000000100001001000100100100010001000110010001011001000010010000010100010001010001100100010101000101010100000101000011010001001101000101010001110100010111010000110100000011000100001100011101000100110001010011000000010000101100010010110001001100011011000101101100001011000001110001000111000110110001011100010101110000011100001111000100111100010111000111110001011111000011110000000010010000001001111100010000100101000010000000100010001001001000100100001001100010010110001000100010000100100100010010011000100101001001010100100000001000110010010011001001010010011100100101110010001100100000101001000010100111001001001010010100101000000010001010100100101010010010100110101001011010100010101000011010010001101001101010010110100101011010000110100011101001001110100101101001111010010111101000111010000001100100000110011110100100011001010001100000011000100110010010011001000110011001100101100110001001100001011001000101100110011001010110010101011000010110001101100100110110010101100111011001011101100011011000001110010000111001110110010011100101001110000001100010111001001011100100111001101110010110111000101110000111100100011110011011100101111001010111100001111000111110010011111001011110011111100101111110001111100000000101000000010111101001000001010100000100000001001000010100100001010000010110000101011000010010000100010001010001000101100001010100010101010001000100010011000101001100010101000101110001010111000100110001000010010100001001011100010100100101010010010000000100101001010010100101001001011010010101101001001010010001100101000110010110100101011001010101100100011001001110010100111001010110010111100101011110010011100100000101010000010101111001010001010101000101000001010010010101001001010100010101100101010110010100100101000101010100010101011001010101010101010101010001010100110101010011010101010101011101010101110101001101010000110101000011010111010101001101010100110100000101001011010100101101010011010110110101011011010010110100011101010001110101101101010111010101011101000111010011110101001111010101110101111101010111110100111101000000110100000011011111110100001101010000110000001100100011010010001101000011011000110101100011001000110001001101000100110110001101010011010101001100010011001100110100110011010100110111001101011100110011001100001011010000101101110011010010110101001011000000110010101101001010110100101101101011010110101100101011000110110100011011011010110101101101010110110001101100111011010011101101011011011110110101111011001110110000011101000001110111101101000111010100011100000111001001110100100111010001110110011101011001110010011100010111010001011101100111010101110101010111000001110011011101001101110101011101110111010111011100110111000011110100001111011101110100111101010011110000011100101111010010111101001111011011110</data>
+          <extradata>1111111111111111T111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111</extradata>
+        </log>
+      </trigger>
+    </signal_set>
+  </instance>
+  <mnemonics/>
+  <static_plugin_mnemonics/>
+</session>
