@@ -29,12 +29,14 @@ signal reg_cnt_devider      : integer range 0 to FREQ_DEVIDE;
 signal reg_8bit_cnt     : std_logic_vector(7 downto 0);
 
 signal wr_rst_n         : std_logic;
-signal wr_direction    : std_logic;
+signal wr_direction     : std_logic;
+signal wr_dvd           : std_logic;
 
 begin
 
     wr_rst_n <= pi_btn_n(0);
     wr_direction <= pi_sw(9);
+    wr_dvd <= pi_sw(8);
 
 
     gpio_p : process (wr_rst_n, pi_base_clk)
@@ -68,8 +70,16 @@ begin
         if (wr_rst_n = '0') then
             reg_8bit_cnt <= (others => '0');
         elsif (rising_edge(pi_base_clk)) then
-            if (pi_btn_n(3) = '0' and reg_cnt_devider = 0) then
-                reg_8bit_cnt <= reg_8bit_cnt + 1;
+            if (wr_dvd = '1') then
+                --slow down count up
+                if (pi_btn_n(3) = '0' and reg_cnt_devider = 0) then
+                    reg_8bit_cnt <= reg_8bit_cnt + 1;
+                end if;
+            else
+                --clock speed count up.
+                if (pi_btn_n(3) = '0') then
+                    reg_8bit_cnt <= reg_8bit_cnt + 1;
+                end if;
             end if;
         end if;
     end process;
