@@ -16,82 +16,53 @@ entity rom_test01 is
         pi_btn_n       : in std_logic_vector(3 downto 0);
         po_led_r       : out std_logic_vector(9 downto 0);
         po_led_g       : out std_logic_vector(7 downto 0);
-        pio_gpio0       : inout std_logic_vector(7 downto 0);
-        pio_gpio1       : inout std_logic_vector(7 downto 0)
+        pi_prg_ce_n         : in std_logic;
+        pi_prg_r_nw         : in std_logic;
+        pi_prg_addr         : in std_logic_vector(14 downto 0);
+        po_prg_data         : out std_logic_vector(7 downto 0)
          );
 end rom_test01;
 
 architecture rtl of rom_test01 is
 
---slow down button update timing.
-constant FREQ_DEVIDE    : integer := 1000000;
-signal reg_cnt_devider      : integer range 0 to FREQ_DEVIDE;
-signal reg_8bit_cnt     : std_logic_vector(7 downto 0);
+component prg_rom port (
+    pi_base_clk 	: in std_logic;
+    pi_ce_n         : in std_logic;
+    pi_oe_n         : in std_logic;
+    pi_addr         : in std_logic_vector (14 downto 0);
+    po_data         : out std_logic_vector (7 downto 0)
+    );
+end component;
 
+signal reg_prg_addr     : std_logic_vector(14 downto 0);
+signal wr_prg_data      : std_logic_vector(7 downto 0);
 signal wr_rst_n         : std_logic;
-signal wr_direction     : std_logic;
-signal wr_dvd           : std_logic;
 
 begin
 
     wr_rst_n <= pi_btn_n(0);
-    wr_direction <= pi_sw(9);
-    wr_dvd <= pi_sw(8);
-
+    po_prg_data <= wr_prg_data;
 
     gpio_p : process (wr_rst_n, pi_base_clk)
     begin
         if (wr_rst_n = '0') then
-            pio_gpio0 <= (others => 'Z');
-            pio_gpio1 <= (others => 'Z');
             po_led_r <= (others => '0');
             po_led_g <= (others => '0');
+            reg_prg_addr <= (others => '0');
         elsif (rising_edge(pi_base_clk)) then
-            if (wr_direction = '0') then
-                --case off = cp gpio 1 to 0
-                pio_gpio0 <= (others => 'Z');
-                pio_gpio1 <= pi_sw(7 downto 0);
-                po_led_r <= pi_sw;
-                po_led_g <= pio_gpio0;
-            else
-                --on = cp gpio 0 to 1
-                pio_gpio0 <= reg_8bit_cnt;
-                pio_gpio1 <= (others => 'Z');
-                po_led_r(7 downto 0) <= pio_gpio1;
-                po_led_r(9 downto 8) <= pi_sw(9 downto 8);
-                po_led_g <= reg_8bit_cnt;
-            end if;
+            reg_prg_addr <= pi_prg_addr;
+            po_led_r(7 downto 0) <= reg_prg_addr(7 downto 0);
+            po_led_g <= wr_prg_data;
         end if;
     end process;
 
-    --key3 button proc.
-    key3_cnt_p : process (wr_rst_n, pi_base_clk)
-    begin
-        if (wr_rst_n = '0') then
-            reg_8bit_cnt <= (others => '0');
-        elsif (rising_edge(pi_base_clk)) then
-            if (wr_dvd = '1') then
-                --slow down count up
-                if (pi_btn_n(3) = '0' and reg_cnt_devider = 0) then
-                    reg_8bit_cnt <= reg_8bit_cnt + 1;
-                end if;
-            else
-                --clock speed count up.
-                if (pi_btn_n(3) = '0') then
-                    reg_8bit_cnt <= reg_8bit_cnt + 1;
-                end if;
-            end if;
-        end if;
-    end process;
-
-    --
-    cnt_devide_p : process (wr_rst_n, pi_base_clk)
-    begin
-        if (wr_rst_n = '0') then
-            reg_cnt_devider <= 0;
-        elsif (rising_edge(pi_base_clk)) then
-            reg_cnt_devider <= reg_cnt_devider + 1;
-        end if;
-    end process;
+    --program rom
+    prom_inst : prg_rom port map (
+        pi_base_clk, 
+        pi_prg_ce_n,
+        pi_prg_ce_n,
+        pi_prg_addr, 
+        wr_prg_data
+    );
 
 end rtl;
