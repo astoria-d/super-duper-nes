@@ -32,7 +32,8 @@ begin
     begin
     if (rising_edge(pi_base_clk)) then
         if (pi_ce_n = '0' and pi_oe_n = '0') then
-            po_data <= p_rom(conv_integer(pi_addr));
+            --po_data <= p_rom(conv_integer(pi_addr));
+            po_data <= p_rom(conv_integer(pi_addr(12 downto 0)));
         else
             po_data <= (others => 'Z');
         end if;

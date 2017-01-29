@@ -1,0 +1,7 @@
+b 802d
+#d3 on
+#d4 on
+d5 on
+c
+q
+
