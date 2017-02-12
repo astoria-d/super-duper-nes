@@ -60,41 +60,41 @@ set_global_assignment -name STRATIX_CONFIGURATION_DEVICE EPCS4
 ##pin asignment.
 set_location_assignment PIN_L1 -to pi_base_clk
 
-set_location_assignment PIN_T21 -to pi_btn_n[3]
-set_location_assignment PIN_T22 -to pi_btn_n[2]
-set_location_assignment PIN_R21 -to pi_btn_n[1]
-set_location_assignment PIN_R22 -to pi_btn_n[0]
-
-set_location_assignment PIN_L2 -to pi_sw[9]
-set_location_assignment PIN_M1 -to pi_sw[8]
-set_location_assignment PIN_M2 -to pi_sw[7]
-set_location_assignment PIN_U11 -to pi_sw[6]
-set_location_assignment PIN_U12 -to pi_sw[5]
-set_location_assignment PIN_W12 -to pi_sw[4]
-set_location_assignment PIN_V12 -to pi_sw[3]
-set_location_assignment PIN_M22 -to pi_sw[2]
-set_location_assignment PIN_L21 -to pi_sw[1]
-set_location_assignment PIN_L22 -to pi_sw[0]
-
-set_location_assignment PIN_Y21 -to po_led_g[7]
-set_location_assignment PIN_Y22 -to po_led_g[6]
-set_location_assignment PIN_W21 -to po_led_g[5]
-set_location_assignment PIN_W22 -to po_led_g[4]
-set_location_assignment PIN_V21 -to po_led_g[3]
-set_location_assignment PIN_V22 -to po_led_g[2]
-set_location_assignment PIN_U21 -to po_led_g[1]
-set_location_assignment PIN_U22 -to po_led_g[0]
-
-set_location_assignment PIN_R17 -to po_led_r[9]
-set_location_assignment PIN_R18 -to po_led_r[8]
-set_location_assignment PIN_U18 -to po_led_r[7]
-set_location_assignment PIN_Y18 -to po_led_r[6]
-set_location_assignment PIN_V19 -to po_led_r[5]
-set_location_assignment PIN_T18 -to po_led_r[4]
-set_location_assignment PIN_Y19 -to po_led_r[3]
-set_location_assignment PIN_U19 -to po_led_r[2]
-set_location_assignment PIN_R19 -to po_led_r[1]
-set_location_assignment PIN_R20 -to po_led_r[0]
+##set_location_assignment PIN_T21 -to pi_btn_n[3]
+##set_location_assignment PIN_T22 -to pi_btn_n[2]
+##set_location_assignment PIN_R21 -to pi_btn_n[1]
+##set_location_assignment PIN_R22 -to pi_btn_n[0]
+##
+##set_location_assignment PIN_L2 -to pi_sw[9]
+##set_location_assignment PIN_M1 -to pi_sw[8]
+##set_location_assignment PIN_M2 -to pi_sw[7]
+##set_location_assignment PIN_U11 -to pi_sw[6]
+##set_location_assignment PIN_U12 -to pi_sw[5]
+##set_location_assignment PIN_W12 -to pi_sw[4]
+##set_location_assignment PIN_V12 -to pi_sw[3]
+##set_location_assignment PIN_M22 -to pi_sw[2]
+##set_location_assignment PIN_L21 -to pi_sw[1]
+##set_location_assignment PIN_L22 -to pi_sw[0]
+##
+##set_location_assignment PIN_Y21 -to po_led_g[7]
+##set_location_assignment PIN_Y22 -to po_led_g[6]
+##set_location_assignment PIN_W21 -to po_led_g[5]
+##set_location_assignment PIN_W22 -to po_led_g[4]
+##set_location_assignment PIN_V21 -to po_led_g[3]
+##set_location_assignment PIN_V22 -to po_led_g[2]
+##set_location_assignment PIN_U21 -to po_led_g[1]
+##set_location_assignment PIN_U22 -to po_led_g[0]
+##
+##set_location_assignment PIN_R17 -to po_led_r[9]
+##set_location_assignment PIN_R18 -to po_led_r[8]
+##set_location_assignment PIN_U18 -to po_led_r[7]
+##set_location_assignment PIN_Y18 -to po_led_r[6]
+##set_location_assignment PIN_V19 -to po_led_r[5]
+##set_location_assignment PIN_T18 -to po_led_r[4]
+##set_location_assignment PIN_Y19 -to po_led_r[3]
+##set_location_assignment PIN_U19 -to po_led_r[2]
+##set_location_assignment PIN_R19 -to po_led_r[1]
+##set_location_assignment PIN_R20 -to po_led_r[0]
 
 
 set_location_assignment PIN_H12 -to po_prg_data[1]
@@ -225,5 +225,5 @@ set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_TRIGGER_IN_ENABLE
 set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_ADVANCED_TRIGGER_ENTITY=basic,1," -section_id auto_signaltap_0
 set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_TRIGGER_LEVEL_PIPELINE=1" -section_id auto_signaltap_0
 set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_ENABLE_ADVANCED_TRIGGER=0" -section_id auto_signaltap_0
-set_global_assignment -name SLD_FILE "D:/daisuke/nes/repo/super-duper-nes/test/rom_test01/rom_test01_auto_stripped.stp"
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
+set_global_assignment -name SLD_FILE "D:/daisuke/nes/repo/super-duper-nes/test/rom_test01/rom_test01_auto_stripped.stp"
