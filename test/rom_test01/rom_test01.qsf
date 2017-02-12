@@ -98,12 +98,12 @@ set_location_assignment PIN_L1 -to pi_base_clk
 
 
 set_location_assignment PIN_H12 -to po_prg_data[1]
-set_location_assignment PIN_H13 -to po_prg_data[0]
-set_location_assignment PIN_H14 -to po_prg_data[2]
-set_location_assignment PIN_G15 -to po_prg_data[3]
-set_location_assignment PIN_E14 -to po_prg_data[4]
-set_location_assignment PIN_E15 -to po_prg_data[5]
-set_location_assignment PIN_F15 -to po_prg_data[6]
+set_location_assignment PIN_H13 -to po_prg_data[4]
+set_location_assignment PIN_H14 -to po_prg_data[0]
+set_location_assignment PIN_G15 -to po_prg_data[5]
+set_location_assignment PIN_E14 -to po_prg_data[2]
+set_location_assignment PIN_E15 -to po_prg_data[6]
+set_location_assignment PIN_F15 -to po_prg_data[3]
 set_location_assignment PIN_G16 -to po_prg_data[7]
 #set_location_assignment PIN_F12 -to 
 #set_location_assignment PIN_F13 -to 
