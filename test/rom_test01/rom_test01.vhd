@@ -25,11 +25,11 @@ end rom_test01;
 
 architecture rtl of rom_test01 is
 
-component prg_rom port (
+component prg_rom_8k port (
     pi_base_clk 	: in std_logic;
     pi_ce_n         : in std_logic;
     pi_oe_n         : in std_logic;
-    pi_addr         : in std_logic_vector (14 downto 0);
+    pi_addr         : in std_logic_vector (13 downto 0);
     po_data         : out std_logic_vector (7 downto 0)
     );
 end component;
@@ -57,11 +57,11 @@ begin
     end process;
 
     --program rom
-    prom_inst : prg_rom port map (
+    prom_inst : prg_rom_8k port map (
         pi_base_clk, 
         pi_prg_ce_n,
         pi_prg_ce_n,
-        pi_prg_addr, 
+        pi_prg_addr(13 downto 0), 
         wr_prg_data
     );
 
