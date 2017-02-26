@@ -89,7 +89,7 @@ ppu_mask:
 .segment "VECINFO"
 	.word	nmi_proc
 	.word	reset_proc
-	.word	reset_proc    ;;;unknown irq is reset...
+	.word	$0000
 
 ; character rom file.
 .segment "CHARS"
