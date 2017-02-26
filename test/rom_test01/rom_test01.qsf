@@ -97,33 +97,33 @@ set_location_assignment PIN_L1 -to pi_base_clk
 ##set_location_assignment PIN_R20 -to po_led_r[0]
 
 
-set_location_assignment PIN_H12 -to po_prg_data[1]
-set_location_assignment PIN_H13 -to po_prg_data[4]
-set_location_assignment PIN_H14 -to po_prg_data[0]
-set_location_assignment PIN_G15 -to po_prg_data[5]
-set_location_assignment PIN_E14 -to po_prg_data[2]
-set_location_assignment PIN_E15 -to po_prg_data[6]
-set_location_assignment PIN_F15 -to po_prg_data[3]
+set_location_assignment PIN_H12 -to po_prg_data[0]
+set_location_assignment PIN_H13 -to po_prg_data[1]
+set_location_assignment PIN_H14 -to po_prg_data[2]
+set_location_assignment PIN_G15 -to po_prg_data[3]
+set_location_assignment PIN_E14 -to po_prg_data[4]
+set_location_assignment PIN_E15 -to po_prg_data[5]
+set_location_assignment PIN_F15 -to po_prg_data[6]
 set_location_assignment PIN_G16 -to po_prg_data[7]
 #set_location_assignment PIN_F12 -to 
 #set_location_assignment PIN_F13 -to 
-set_location_assignment PIN_C14 -to pi_prg_ce_n
-set_location_assignment PIN_D14 -to pi_prg_addr[6]
-set_location_assignment PIN_D15 -to pi_prg_r_nw
-set_location_assignment PIN_D16 -to pi_prg_addr[7]
-set_location_assignment PIN_C17 -to pi_prg_addr[0]
-set_location_assignment PIN_C18 -to pi_prg_addr[8]
-set_location_assignment PIN_C19 -to pi_prg_addr[1]
-set_location_assignment PIN_C20 -to pi_prg_addr[9]
-set_location_assignment PIN_D19 -to pi_prg_addr[2]
-set_location_assignment PIN_D20 -to pi_prg_addr[10]
-set_location_assignment PIN_E20 -to pi_prg_addr[3]
-set_location_assignment PIN_F20 -to pi_prg_addr[11]
-set_location_assignment PIN_E19 -to pi_prg_addr[4]
-set_location_assignment PIN_E18 -to pi_prg_addr[14]
-set_location_assignment PIN_G20 -to pi_prg_addr[5]
-set_location_assignment PIN_G18 -to pi_prg_addr[13]
-set_location_assignment PIN_G17 -to pi_prg_addr[12]
+set_location_assignment PIN_C14 -to pi_prg_addr[4]
+set_location_assignment PIN_D14 -to pi_prg_addr[14]
+set_location_assignment PIN_D15 -to pi_prg_addr[5]
+set_location_assignment PIN_D16 -to pi_prg_addr[13]
+set_location_assignment PIN_C17 -to pi_prg_addr[6]
+set_location_assignment PIN_C18 -to pi_prg_addr[12]
+set_location_assignment PIN_C19 -to pi_prg_addr[7]
+set_location_assignment PIN_C20 -to pi_prg_r_nw
+set_location_assignment PIN_D19 -to pi_prg_addr[8]
+set_location_assignment PIN_D20 -to pi_prg_addr[0]
+set_location_assignment PIN_E20 -to pi_prg_addr[9]
+set_location_assignment PIN_F20 -to pi_prg_addr[1]
+set_location_assignment PIN_E19 -to pi_prg_addr[10]
+set_location_assignment PIN_E18 -to pi_prg_addr[2]
+set_location_assignment PIN_G20 -to pi_prg_addr[11]
+set_location_assignment PIN_G18 -to pi_prg_addr[3]
+set_location_assignment PIN_G17 -to pi_prg_ce_n
 #set_location_assignment PIN_H17 -to 
 #set_location_assignment PIN_J15 -to 
 #set_location_assignment PIN_H18 -to 
