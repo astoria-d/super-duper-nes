@@ -97,6 +97,43 @@ set_location_assignment PIN_L1 -to pi_base_clk
 ##set_location_assignment PIN_R20 -to po_led_r[0]
 
 
+set_location_assignment PIN_A13 -to pi_chr_addr[3]
+set_location_assignment PIN_B13 -to po_chr_data[0]
+set_location_assignment PIN_A14 -to pi_chr_addr[2]
+set_location_assignment PIN_B14 -to po_chr_data[1]
+set_location_assignment PIN_A15 -to pi_chr_addr[1]
+set_location_assignment PIN_B15 -to po_chr_data[2]
+set_location_assignment PIN_A16 -to pi_chr_addr[0]
+set_location_assignment PIN_B16 -to po_chr_data[3]
+set_location_assignment PIN_A17 -to pi_chr_oe_n
+set_location_assignment PIN_B17 -to pi_chr_addr[10]
+set_location_assignment PIN_A18 -to pi_chr_addr[6]
+set_location_assignment PIN_B18 -to pi_chr_addr[11]
+set_location_assignment PIN_A19 -to pi_chr_addr[5]
+set_location_assignment PIN_B19 -to pi_chr_addr[12]
+set_location_assignment PIN_A20 -to pi_chr_addr[4]
+set_location_assignment PIN_B20 -to pi_chr_ce_n
+set_location_assignment PIN_C21 -to pi_chr_we_n
+set_location_assignment PIN_C22 -to po_chr_data[7]
+set_location_assignment PIN_D21 -to pi_chr_addr[7]
+set_location_assignment PIN_D22 -to po_chr_data[6]
+set_location_assignment PIN_E21 -to pi_chr_addr[8]
+set_location_assignment PIN_E22 -to po_chr_data[5]
+set_location_assignment PIN_F21 -to pi_chr_addr[9]
+set_location_assignment PIN_F22 -to po_chr_data[4]
+#set_location_assignment PIN_G21 -to 
+#set_location_assignment PIN_G22 -to 
+#set_location_assignment PIN_J21 -to 
+#set_location_assignment PIN_J22 -to 
+#set_location_assignment PIN_K21 -to 
+#set_location_assignment PIN_K22 -to 
+#set_location_assignment PIN_J19 -to 
+#set_location_assignment PIN_J20 -to 
+#set_location_assignment PIN_J18 -to 
+#set_location_assignment PIN_K20 -to 
+#set_location_assignment PIN_L19 -to 
+#set_location_assignment PIN_L18 -to 
+
 set_location_assignment PIN_H12 -to po_prg_data[0]
 set_location_assignment PIN_H13 -to po_prg_data[4]
 set_location_assignment PIN_H14 -to po_prg_data[1]
@@ -225,5 +262,5 @@ set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_TRIGGER_IN_ENABLE
 set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_ADVANCED_TRIGGER_ENTITY=basic,1," -section_id auto_signaltap_0
 set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_TRIGGER_LEVEL_PIPELINE=1" -section_id auto_signaltap_0
 set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_ENABLE_ADVANCED_TRIGGER=0" -section_id auto_signaltap_0
-set_global_assignment -name SLD_FILE "D:/daisuke/nes/repo/super-duper-nes/test/rom_test01/rom_test01_auto_stripped.stp"
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
+set_global_assignment -name SLD_FILE "D:/daisuke/nes/repo/super-duper-nes/test/rom_test01/rom_test01_auto_stripped.stp"
