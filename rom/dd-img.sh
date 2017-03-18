@@ -27,4 +27,10 @@ objcopy -I binary -O ihex $in_name-chr.bin $in_name-chr.hex
 dd if=$in_name-prg.bin of=$in_name-prg-8k.bin bs=512 count=16
 objcopy -I binary -O ihex $in_name-prg-8k.bin sample1-prg-8k.hex
 
+#4k chr rom img creation
+dd if=$in_name-chr.bin of=$in_name-chr-4k.bin bs=256 count=16
+objcopy -I binary -O ihex $in_name-chr-4k.bin sample1-chr-4k.hex
+
+
+
 echo "done."
