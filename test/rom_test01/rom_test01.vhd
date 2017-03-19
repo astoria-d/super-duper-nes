@@ -20,10 +20,10 @@ entity rom_test01 is
         pi_prg_r_nw         : in std_logic;
         pi_prg_addr         : in std_logic_vector(14 downto 0);
         po_prg_data         : out std_logic_vector(7 downto 0);
---        pi_chr_ce_n         : in std_logic;
+        pi_chr_ce_n         : in std_logic;
         pi_chr_oe_n         : in std_logic;
         pi_chr_we_n         : in std_logic;
-        pi_chr_addr         : in std_logic_vector(13 downto 0);
+        pi_chr_addr         : in std_logic_vector(12 downto 0);
         po_chr_data         : out std_logic_vector(7 downto 0)
          );
 end rom_test01;
@@ -61,12 +61,13 @@ begin
         po_prg_data
     );
 
-    wk_chr_ce_n <= not pi_chr_addr(13);
+--    wk_chr_ce_n <= not pi_chr_addr(13);
     --character rom
     crom_inst : chr_rom_4k port map (
         pi_base_clk, 
-        wk_chr_ce_n,
-        '0',
+        --wk_chr_ce_n,
+        pi_chr_ce_n,
+        pi_chr_oe_n,
         pi_chr_addr(11 downto 0), 
         po_chr_data
     );

@@ -1,7 +1,11 @@
 b 802d
-#d3 on
-#d4 on
+d3 on
+d4 on
 d5 on
 c
+b 8f36
+c
+b 802d
+c
+b 8f36
 q
-
