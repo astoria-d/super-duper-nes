@@ -30,6 +30,7 @@
 	ldx	#$ff
 	txs
 
+    jsr init_reset
     jsr init_global
     jsr init_ppu
 
@@ -59,6 +60,99 @@
     ;;infinite loop.
 mainloop:
 	jmp	mainloop
+.endproc
+
+;;initialize very after reset.
+.proc init_reset
+
+;;must caribrate for several vblank counts.
+    ldx #3
+
+@car_start:
+    lda $2002
+    and #$80
+    beq @vbl_chk
+    ;;vblank happened.
+    dex
+    beq @car_done
+@vbl_chk:
+    jmp @car_start
+@car_done:
+
+;;initialize ram.
+
+;;init zp area.
+    lda #0
+    sta $0
+    sta $1
+    ldy #$ff
+:
+    sta ($0), y
+    dey
+    bne :-
+    sta ($0), y
+
+;;init sp area
+    tsx
+    txa
+    tay
+    lda #1
+    sta $1
+    lda #0
+    sta $0
+:
+    sta ($0), y
+    dey
+    bne :-
+    sta ($0), y
+
+
+;;init remaining area (0200 - 07ff).
+    ldx #7
+    lda #0
+
+@rep:
+    stx $1
+:
+    sta ($0), y
+    dey
+    bne :-
+    dex
+    cpx #2
+    bpl @rep
+
+
+;;init vram (2000 - 27ff)..
+    ldx #$20
+    lda #0
+    ldy #0
+
+@rep2:
+    stx $2006
+    sty $2006
+:
+    sta $2007
+    iny
+    bne :-
+    inx
+    cpx #$28
+    bmi @rep2
+
+;;init vram (3f00 - 3f1f)..
+    ldx #$3f
+    lda #0
+    ldy #0
+
+    stx $2006
+    sty $2006
+:
+    sta $2007
+    iny
+    cpy #$20
+    bne :-
+
+    rts
+
 .endproc
 
 ;;initialize bss segment datas
