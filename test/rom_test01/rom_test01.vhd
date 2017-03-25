@@ -16,6 +16,7 @@ entity rom_test01 is
 --        pi_btn_n       : in std_logic_vector(3 downto 0);
 --        po_led_r       : out std_logic_vector(9 downto 0);
 --        po_led_g       : out std_logic_vector(7 downto 0);
+        pi_phi2             : in std_logic;
         pi_prg_ce_n         : in std_logic;
         pi_prg_r_nw         : in std_logic;
         pi_prg_addr         : in std_logic_vector(14 downto 0);
@@ -24,7 +25,8 @@ entity rom_test01 is
         pi_chr_oe_n         : in std_logic;
         pi_chr_we_n         : in std_logic;
         pi_chr_addr         : in std_logic_vector(12 downto 0);
-        po_chr_data         : out std_logic_vector(7 downto 0)
+        po_chr_data         : out std_logic_vector(7 downto 0);
+        po_dbg_cnt          : out std_logic_vector (63 downto 0)
          );
 end rom_test01;
 
@@ -48,16 +50,28 @@ component chr_rom_4k port (
     );
 end component;
 
-signal wk_chr_ce_n  : std_logic;
+--signal wk_chr_ce_n  : std_logic;
+signal reg_reset_n      : std_logic;
+signal reg_chr_addr     : std_logic_vector(11 downto 0);
+signal reg_dbg_cnt      : std_logic_vector (63 downto 0);
 
 begin
+
+    chr_addr_p : process (pi_base_clk)
+    begin
+        if (rising_edge(pi_base_clk)) then
+            if (pi_chr_ce_n = '0') then
+                reg_chr_addr <= pi_chr_addr(11 downto 0);
+            end if;
+        end if;
+    end process;
 
     --program rom
     prom_inst : prg_rom_8k port map (
         pi_base_clk, 
         pi_prg_ce_n,
         pi_prg_ce_n,
-        pi_prg_addr(12 downto 0), 
+        pi_prg_addr(12 downto 0),
         po_prg_data
     );
 
@@ -68,8 +82,57 @@ begin
         --wk_chr_ce_n,
         pi_chr_ce_n,
         pi_chr_oe_n,
-        pi_chr_addr(11 downto 0), 
+        reg_chr_addr, 
+        --pi_chr_addr(11 downto 0), 
         po_chr_data
     );
 
+
+    reset_p : process (pi_base_clk)
+use ieee.std_logic_unsigned.all;
+    variable cnt1, cnt2 : integer;
+    begin
+        if (rising_edge(pi_base_clk)) then
+            -- case addr is 0x77fc
+            if (pi_prg_addr = "111111111111100") then
+            -- case addr is 0x77fd
+                cnt1 := cnt1 + 1;
+            elsif (pi_prg_addr = "111111111111101") then
+                cnt2 := cnt2 + 1;
+            else
+                cnt1 := 0;
+                cnt2 := 0;
+            end if;
+
+            --condition:
+            --reset vector is fetched.
+            --cpu address is fixed at the reset vector addr for more than 50 clocks.
+            --assume that reset happened.
+            if (cnt1 + cnt2 > 50) then
+                reg_reset_n <= '0';
+            else
+                reg_reset_n <= '1';
+            end if;
+        end if;
+    end process;
+
+
+    po_dbg_cnt <= reg_dbg_cnt;
+    deb_cnt_p : process (pi_phi2, reg_reset_n)
+use ieee.std_logic_unsigned.all;
+    variable cnt : integer;
+    begin
+        if (reg_reset_n = '0') then
+            reg_dbg_cnt <= (others => '0');
+            cnt := 0;
+        elsif (rising_edge(pi_phi2)) then
+            if (cnt = 0) then
+                --debug count is half cycle because too fast to capture in st ii.
+                reg_dbg_cnt <= reg_dbg_cnt + 1;
+                cnt := 1;
+            else
+                cnt := 0;
+            end if;
+        end if;
+    end process;
 end rtl;
