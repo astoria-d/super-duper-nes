@@ -4,12 +4,8 @@ use ieee.std_logic_unsigned.conv_integer;
 use ieee.std_logic_arith.conv_std_logic_vector;
 use ieee.std_logic_unsigned.all;
 
---  
---   MOTO NES FPGA On DE0-CV Environment Virtual Cuicuit Board
---   All of the components are assembled and instanciated on this board.
---  
-
-entity rom_test01 is 
+--entity rom_test01 is 
+entity rom_test01_de0_cv is 
     port (
         pi_base_clk    : in std_logic;
 --        pi_sw          : in std_logic_vector(9 downto 0);
@@ -28,9 +24,11 @@ entity rom_test01 is
         po_chr_data         : out std_logic_vector(7 downto 0);
         po_dbg_cnt          : out std_logic_vector (63 downto 0)
          );
-end rom_test01;
+--end rom_test01;
+end rom_test01_de0_cv;
 
-architecture rtl of rom_test01 is
+--architecture rtl of rom_test01 is
+architecture rtl of rom_test01_de0_cv is
 
 component prg_rom_8k port (
     pi_base_clk 	: in std_logic;
