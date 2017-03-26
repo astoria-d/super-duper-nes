@@ -32,6 +32,7 @@ architecture rtl of rom_test01_de0_cv is
 
 component prg_rom_8k port (
     pi_base_clk 	: in std_logic;
+    pi_divide_cnt   : in std_logic_vector (4 downto 0);
     pi_ce_n         : in std_logic;
     pi_oe_n         : in std_logic;
     pi_addr         : in std_logic_vector (12 downto 0);
@@ -49,11 +50,25 @@ component chr_rom_4k port (
 end component;
 
 --signal wk_chr_ce_n  : std_logic;
+--signal wk_phi2_n        : std_logic;
 signal reg_reset_n      : std_logic;
 signal reg_chr_addr     : std_logic_vector(11 downto 0);
 signal reg_dbg_cnt      : std_logic_vector (63 downto 0);
 
+--2, 4, 8, 16, 32 divide counter.
+signal reg_divide_cnt      : std_logic_vector (4 downto 0);
+
 begin
+
+--    wk_phi2_n <= not pi_phi2;
+
+    divider_p : process (pi_phi2)
+use ieee.std_logic_unsigned.all;
+    begin
+        if (rising_edge(pi_phi2)) then
+            reg_divide_cnt <= reg_divide_cnt + 1;
+        end if;
+    end process;
 
     chr_addr_p : process (pi_base_clk)
     begin
@@ -66,7 +81,8 @@ begin
 
     --program rom
     prom_inst : prg_rom_8k port map (
-        pi_base_clk, 
+        pi_base_clk,
+        reg_divide_cnt,
         pi_prg_ce_n,
         pi_prg_ce_n,
         pi_prg_addr(12 downto 0),
