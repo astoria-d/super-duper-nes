@@ -27,6 +27,7 @@
 
 ; interrupt off, initialize sp.
 	sei
+	cld
 	ldx	#$ff
 	txs
 
