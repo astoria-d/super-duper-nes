@@ -30,21 +30,20 @@ end rom_test01_de0_cv;
 --architecture rtl of rom_test01 is
 architecture rtl of rom_test01_de0_cv is
 
-component prg_rom_8k port (
+component prg_rom port (
     pi_base_clk 	: in std_logic;
---    pi_divide_cnt   : in std_logic_vector (4 downto 0);
     pi_ce_n         : in std_logic;
     pi_oe_n         : in std_logic;
-    pi_addr         : in std_logic_vector (12 downto 0);
+    pi_addr         : in std_logic_vector (14 downto 0);
     po_data         : out std_logic_vector (7 downto 0)
     );
 end component;
 
-component chr_rom_4k port (
+component chr_rom port (
     pi_base_clk 	: in std_logic;
     pi_ce_n         : in std_logic;
     pi_oe_n         : in std_logic;
-    pi_addr         : in std_logic_vector (11 downto 0);
+    pi_addr         : in std_logic_vector (12 downto 0);
     po_data         : out std_logic_vector (7 downto 0)
     );
 end component;
@@ -70,35 +69,30 @@ use ieee.std_logic_unsigned.all;
         end if;
     end process;
 
-    chr_addr_p : process (pi_base_clk)
-    begin
-        if (rising_edge(pi_base_clk)) then
-            if (pi_chr_ce_n = '0') then
-                reg_chr_addr <= pi_chr_addr(11 downto 0);
-            end if;
-        end if;
-    end process;
+--    chr_addr_p : process (pi_base_clk)
+--    begin
+--        if (rising_edge(pi_base_clk)) then
+--            if (pi_chr_ce_n = '0') then
+--                reg_chr_addr <= pi_chr_addr(11 downto 0);
+--            end if;
+--        end if;
+--    end process;
 
     --program rom
-    prom_inst : prg_rom_8k port map (
+    prom_inst : prg_rom port map (
         pi_base_clk,
---        pi_phi2,
---        reg_divide_cnt,
         pi_prg_ce_n,
         pi_prg_ce_n,
-        pi_prg_addr(12 downto 0),
+        pi_prg_addr,
         po_prg_data
     );
 
---    wk_chr_ce_n <= not pi_chr_addr(13);
     --character rom
-    crom_inst : chr_rom_4k port map (
+    crom_inst : chr_rom port map (
         pi_base_clk, 
-        --wk_chr_ce_n,
         pi_chr_ce_n,
         pi_chr_oe_n,
-        reg_chr_addr, 
-        --pi_chr_addr(11 downto 0), 
+        pi_chr_addr, 
         po_chr_data
     );
 
