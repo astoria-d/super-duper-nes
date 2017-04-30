@@ -60,32 +60,32 @@ set_location_assignment PIN_M9 -to pi_base_clk
 set_instance_assignment -name GLOBAL_SIGNAL "GLOBAL CLOCK" -to pi_base_clk
 
 ##I/O pins.
-set_location_assignment PIN_N16 -to pi_chr_oe_n
-set_location_assignment PIN_B16 -to pi_chr_we_n
-set_location_assignment PIN_M16 -to pi_chr_addr[6]
-set_location_assignment PIN_C16 -to pi_chr_addr[7]
-set_location_assignment PIN_D17 -to pi_chr_addr[5]
-set_location_assignment PIN_K20 -to pi_chr_addr[8]
-set_location_assignment PIN_K21 -to pi_chr_addr[4]
-set_location_assignment PIN_K22 -to pi_chr_addr[9]
+set_location_assignment PIN_N16 -to po_chr_data[4]
+set_location_assignment PIN_B16 -to po_chr_data[3]
+set_location_assignment PIN_M16 -to po_chr_data[5]
+set_location_assignment PIN_C16 -to po_chr_data[2]
+set_location_assignment PIN_D17 -to po_chr_data[6]
+set_location_assignment PIN_K20 -to po_chr_data[1]
+set_location_assignment PIN_K21 -to po_chr_data[7]
+set_location_assignment PIN_K22 -to po_chr_data[0]
 #set_location_assignment PIN_M20
 #set_location_assignment PIN_M21
-set_location_assignment PIN_N21 -to po_chr_data[0]
-set_location_assignment PIN_R22 -to pi_chr_addr[10]
-set_location_assignment PIN_R21 -to po_chr_data[1]
-set_location_assignment PIN_T22 -to pi_chr_addr[11]
-set_location_assignment PIN_N20 -to po_chr_data[2]
-set_location_assignment PIN_N19 -to pi_chr_addr[12]
-set_location_assignment PIN_M22 -to po_chr_data[3]
-set_location_assignment PIN_P19 -to pi_chr_ce_n
-set_location_assignment PIN_L22 -to po_chr_data[7]
-set_location_assignment PIN_P17 -to pi_chr_addr[3]
-set_location_assignment PIN_P16 -to po_chr_data[6]
-set_location_assignment PIN_M18 -to pi_chr_addr[2]
-set_location_assignment PIN_L18 -to po_chr_data[5]
-set_location_assignment PIN_L17 -to pi_chr_addr[1]
-set_location_assignment PIN_L19 -to po_chr_data[4]
-set_location_assignment PIN_K17 -to pi_chr_addr[0]
+set_location_assignment PIN_N21 -to pi_chr_ce_n
+set_location_assignment PIN_R22 -to pi_chr_addr[0]
+set_location_assignment PIN_R21 -to pi_chr_addr[12]
+set_location_assignment PIN_T22 -to pi_chr_addr[1]
+set_location_assignment PIN_N20 -to pi_chr_addr[11]
+set_location_assignment PIN_N19 -to pi_chr_addr[2]
+set_location_assignment PIN_M22 -to pi_chr_addr[10]
+set_location_assignment PIN_P19 -to pi_chr_addr[3]
+set_location_assignment PIN_L22 -to pi_chr_addr[9]
+set_location_assignment PIN_P17 -to pi_chr_addr[4]
+set_location_assignment PIN_P16 -to pi_chr_addr[8]
+set_location_assignment PIN_M18 -to pi_chr_addr[5]
+set_location_assignment PIN_L18 -to pi_chr_addr[7]
+set_location_assignment PIN_L17 -to pi_chr_addr[6]
+set_location_assignment PIN_L19 -to pi_chr_we_n
+set_location_assignment PIN_K17 -to pi_chr_oe_n
 ##set_location_assignment PIN_K19
 ##set_location_assignment PIN_P18
 ##set_location_assignment PIN_R15

@@ -3,6 +3,7 @@ incremental_db
 output_files
 *.bak
 *.qws
+*.stp
 simulation
 nes-images
 hc_output
