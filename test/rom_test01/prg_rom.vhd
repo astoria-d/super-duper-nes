@@ -14,7 +14,8 @@ end prg_rom;
 
 architecture rtl of prg_rom is
 
-constant PROM_SIZE   : integer := 15;
+--constant PROM_SIZE   : integer := 15;
+constant PROM_SIZE   : integer := 13;
 
 --PROG ROM is 32k
 subtype rom_data is std_logic_vector (7 downto 0);
@@ -24,8 +25,8 @@ type rom_array is array (0 to 2**PROM_SIZE - 1) of rom_data;
 signal p_rom : rom_array;
 attribute ram_init_file : string;
 
-attribute ram_init_file of p_rom : signal is "sample1-prg.hex";
---attribute ram_init_file of p_rom : signal is "sample1-prg-8k.hex";
+--attribute ram_init_file of p_rom : signal is "sample1-prg.hex";
+attribute ram_init_file of p_rom : signal is "sample1-prg-8k.hex";
 
 signal reg_out_n : std_logic;
 
@@ -64,7 +65,8 @@ end chr_rom;
 
 architecture rtl of chr_rom is
 
-constant CROM_SIZE   : integer := 13;
+--constant CROM_SIZE   : integer := 13;
+constant CROM_SIZE   : integer := 12;
 
 subtype rom_data is std_logic_vector (7 downto 0);
 type rom_array is array (0 to 2**CROM_SIZE - 1) of rom_data;
@@ -73,8 +75,8 @@ type rom_array is array (0 to 2**CROM_SIZE - 1) of rom_data;
 signal p_rom : rom_array;
 attribute ram_init_file : string;
 
-attribute ram_init_file of p_rom : signal is "sample1-chr.hex";
---attribute ram_init_file of p_rom : signal is "sample1-chr-4k.hex";
+--attribute ram_init_file of p_rom : signal is "sample1-chr.hex";
+attribute ram_init_file of p_rom : signal is "sample1-chr-4k.hex";
 
 begin
 
