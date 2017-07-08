@@ -1,0 +1,39 @@
+host
+sudo ifconfig enp24s0:0 192.168.1.100 netmask 255.255.255.0
+
+ssh 192.168.1.200
+
+--------------
+
+
+
+target
+sudo ifconfig eth0:0 192.168.1.200 netmask 255.255.255.0
+
+sudo mount -t nfs -o rw 192.168.1.100:/home/dmotooka/super-duper-nes/nfsroot /mnt/nfs
+
+setenv ipaddr 192.168.1.250; setenv serverip 192.168.1.100; tftpboot 0x80F80000 am335x-boneblack-moto.dtb; tftpboot 0x80007FC0 uImage-BBB-moto;setenv bootargs console=ttyO0,115200n8 root=/dev/mmcblk1p2 ro rootfstype=ext4 rootwait; bootm 0x80007FC0 - 0x80F80000
+
+
+eeprom
+sudo hexdump -C /sys/bus/i2c/devices/0-0050/eeprom
+
+------------------------
+
+
+
+10.90.137.202  Bcast:10.90.139.255  Mask:255.255.252.0
+
+sudo apt-get update 
+sudo apt-get install nfs-common 
+
+
+sudo mount 10.90.137.194:/home/dmotooka/super-duper-nes/nfsroot /mnt/nfs
+
+sudo exportfs -a
+sudo exportfs -rv
+sudo service nfs-kernel-server start
+
+
+
+

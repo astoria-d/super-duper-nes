@@ -1,0 +1,16 @@
+
+---------------------
+build kernel...
+
+git checkout 4.1
+make V=1 ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- bb.org_defconfig 
+make V=1 ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- -j4
+make V=1 ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- uImage dtbs LOADADDR=0x80008000 -j4
+
+
+make modules....
+
+make V=1 ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- modules -j4
+make V=1 ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- INSTALL_MOD_PATH=$(pwd)/_install modules_install
+
+

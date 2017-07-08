@@ -1,0 +1,7 @@
+
+rebreoffice menu issue..
+
+initctl stop unity-panel-service
+
+initctl start unity-panel-service
+

@@ -1,0 +1,107 @@
+
+
+sudo ifconfig enp24s0:0 192.168.1.100 netmask 255.255.255.0
+
+
+------------
+boot from tftp..
+uboot
+
+setenv ipaddr 192.168.1.250
+setenv serverip 192.168.1.100
+tftpboot 0x80F80000 am335x-boneblack.dtb
+tftpboot 0x80007FC0 uImage-BBB
+setenv bootargs console=ttyO0,115200n8 root=/dev/mmcblk1p2 ro rootfstype=ext4 rootwait
+bootm 0x80007FC0 - 0x80F80000
+
+
+-------------------
+>>>one line...
+
+setenv ipaddr 192.168.1.250; setenv serverip 192.168.1.100; tftpboot 0x80F80000 am335x-boneblack.dtb; tftpboot 0x80007FC0 uImage-BBB;setenv bootargs console=ttyO0,115200n8 root=/dev/mmcblk1p2 ro rootfstype=ext4 rootwait; bootm 0x80007FC0 - 0x80F80000
+
+
+-------------------------
+
+
+eMMC internal:
+
+/dev/mmcblk1p1   >> beaglebone export media dir. /media/BEAGLEBONE_____
+/dev/mmcblk1p2   >> rootfs..
+
+
+-----------------------
+uboot ls cmd..
+
+U-Boot# ls mmc 1:2 /boot                                                        
+<DIR>       4096 .                                                              
+<DIR>       4096 ..                                                             
+<DIR>       4096 dtbs                                                           
+<DIR>       4096 uboot                                                          
+             488 SOC.sh                                                         
+             818 uEnv.txt                                                       
+         2425213 System.map-3.8.13-bone70                                       
+          109319 config-3.8.13-bone70                                           
+         2867606 initrd.img-3.8.13-bone70                                       
+         5617184 vmlinuz-3.8.13-bone70                                          
+
+
+---------------------------
+
+normal boot...
+
+U-Boot# boot                                                                    
+gpio: pin 53 (gpio 53) value is 1                                               
+Card did not respond to voltage select!                                         
+Card did not respond to voltage select!                                         
+gpio: pin 56 (gpio 56) value is 0                                               
+gpio: pin 55 (gpio 55) value is 0                                               
+gpio: pin 54 (gpio 54) value is 0                                               
+switch to partitions #0, OK                                                     
+mmc1(part 0) is current device                                                  
+gpio: pin 54 (gpio 54) value is 1                                               
+Checking for: /uEnv.txt ...                                                     
+Checking for: /boot.scr ...                                                     
+Checking for: /boot/boot.scr ...                                                
+Checking for: /boot/uEnv.txt ...                                                
+gpio: pin 55 (gpio 55) value is 1                                               
+818 bytes read in 24 ms (33.2 KiB/s)                                            
+Loaded environment from /boot/uEnv.txt                                          
+Checking if uname_r is set in /boot/uEnv.txt...                                 
+gpio: pin 56 (gpio 56) value is 1                                               
+Running uname_boot ...                                                          
+loading /boot/vmlinuz-3.8.13-bone70 ...                                         
+5617184 bytes read in 336 ms (15.9 MiB/s)                                       
+loading /boot/dtbs/3.8.13-bone70/am335x-boneblack.dtb ...                       
+26098 bytes read in 32 ms (795.9 KiB/s)                                         
+loading /boot/initrd.img-3.8.13-bone70 ...                                      
+2867606 bytes read in 184 ms (14.9 MiB/s)                                       
+debug: [console=ttyO0,115200n8 root=UUID=47e61ec2-0d04-4621-af9b-9032f4eec1ed r.
+debug: [bootz 0x82000000 0x88080000:2bc196 0x88000000] ...                      
+Kernel image @ 0x82000000 [ 0x000000 - 0x55b620 ]                               
+## Flattened Device Tree blob at 88000000                                       
+   Booting using the fdt blob at 0x88000000                                     
+   Loading Ramdisk to 8fd43000, end 8ffff196 ... OK                             
+   Loading Device Tree to 8fd39000, end 8fd425f1 ... OK                         
+                                                                                
+Starting kernel ...                                                             
+                                                                                
+Uncompressing Linux... done, booting the kernel.                                
+
+
+--------------------
+
+[dmotooka@ *BBB* :/boot] ll /dev/disk/by-uuid/
+total 0
+lrwxrwxrwx 1 root root 15 Jun  4 09:52 3B20-4912 -> ../../mmcblk0p1
+lrwxrwxrwx 1 root root 15 Jun  4 09:52 47e61ec2-0d04-4621-af9b-9032f4eec1ed -> ../../mmcblk0p2
+[dmotooka@ *BBB* :/boot] ll /dev/mmcblk0*
+brw-rw---T 1 root floppy 179,  0 Jun  4 09:52 /dev/mmcblk0
+brw-rw---T 1 root floppy 179,  8 Jun  4 09:52 /dev/mmcblk0boot0
+brw-rw---T 1 root floppy 179, 16 Jun  4 09:52 /dev/mmcblk0boot1
+brw-rw---T 1 root floppy 179,  1 Jun  4 09:52 /dev/mmcblk0p1
+brw-rw---T 1 root floppy 179,  2 Jun  4 09:52 /dev/mmcblk0p2
+[dmotooka@ *BBB* :/boot] 
+
+
+
