@@ -8,3 +8,4 @@ nes-images
 hc_output
 c5_pin_model_dump.txt
 cio_dump_disallowed_lists.echo
+*.rpt
