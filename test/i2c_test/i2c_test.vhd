@@ -6,13 +6,13 @@ use ieee.std_logic_unsigned.all;
 
 entity i2c_test is 
     port (
-        pi_base_clk    : in std_logic;
-        pi_reset_n     : in std_logic;
-        pi_key             : in std_logic_vector(3 downto 0);
-        pi_sw             : in std_logic_vector(9 downto 0);
-        po_led             : out std_logic_vector(9 downto 0);
+        pi_base_clk     : in    std_logic;
+        pi_reset_n      : in    std_logic;
+        pi_key          : in    std_logic_vector(3 downto 0);
+        pi_sw           : in    std_logic_vector(9 downto 0);
+        po_led          : out   std_logic_vector(9 downto 0);
 
-        pio_i2c_scl     : inout std_logic;
+        pi_i2c_scl      : in    std_logic;
         pio_i2c_sda     : inout std_logic;
 
 --        pi_phi2             : in std_logic;
@@ -49,11 +49,9 @@ begin
     ---slow i2c clock for debugging...
 --    po_i2c_scl <= reg_dbg_cnt(23);
     i2c_slave_inst : i2c_slave port map (
-        pio_i2c_scl,
+        pi_i2c_scl,
         pio_i2c_sda
     );
-
-    pio_i2c_scl <= 'Z';
 
     deb_cnt_p : process (pi_base_clk, pi_reset_n)
 use ieee.std_logic_unsigned.all;
