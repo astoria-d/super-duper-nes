@@ -21,6 +21,8 @@ architecture stimulus of testbench_i2c_test is
     --i2c normal clock speed 100 KHz
     constant i2c_clock_time : time := 10 us;
 
+    constant test_addr1 : std_logic_vector(6 downto 0) := "0101100";
+
     component i2c_test 
     port (
         pi_base_clk     : in    std_logic;
@@ -46,6 +48,7 @@ architecture stimulus of testbench_i2c_test is
     signal dbg_cnt          : std_logic_vector (63 downto 0);
 
 begin
+
 
     sim_board : i2c_test port map (
     base_clk, 
@@ -82,10 +85,54 @@ begin
 
     --- step1. start seq.
     start_p1 : process
+
+procedure output_addr 
+(
+    addr    : in std_logic_vector (6 downto 0);
+    rw      : in std_logic
+) is
+begin
+    i2c_sda <= addr(6);
+    wait for i2c_clock_time;
+    i2c_sda <= addr(5);
+    wait for i2c_clock_time;
+    i2c_sda <= addr(4);
+    wait for i2c_clock_time;
+    i2c_sda <= addr(3);
+    wait for i2c_clock_time;
+    i2c_sda <= addr(2);
+    wait for i2c_clock_time;
+    i2c_sda <= addr(1);
+    wait for i2c_clock_time;
+    i2c_sda <= addr(0);
+    wait for i2c_clock_time;
+    i2c_sda <= rw;
+    wait for i2c_clock_time;
+end;
+
     begin
+        --pullup...
         i2c_sda <= '1';
         wait for start_time ;
+
+        --start up seq...
         i2c_sda <= '0';
+        
+        wait for i2c_clock_time / 2;
+
+        --addr output with write.....
+        output_addr(test_addr1, '1');
+
+        --ack wait.
+        i2c_sda <= 'Z';
+        wait until i2c_sda'event and i2c_sda='0' for i2c_clock_time * 10;
+
+
+        --stop seq...
+        wait for i2c_clock_time;
+        i2c_sda <= '0';
+        wait for i2c_clock_time / 2;
+        i2c_sda <= '1';
         wait;
     end process;
 

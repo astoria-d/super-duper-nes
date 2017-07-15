@@ -32,6 +32,6 @@ view signals
 
 #run -all
 
-run 200 us
+run 350 us
 wave zoom full
 
