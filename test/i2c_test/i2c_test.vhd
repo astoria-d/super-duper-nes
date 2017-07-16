@@ -32,7 +32,9 @@ end i2c_test;
 architecture rtl of i2c_test is
 
 
-component i2c_slave port (
+component i2c_slave
+generic (i2c_addr: std_logic_vector (6 downto 0):= "0101100");
+port (
     pi_rst_n        : in    std_logic;
     pi_base_clk     : in    std_logic;
     pi_i2c_scl      : in std_logic;
@@ -50,7 +52,8 @@ begin
     
     ---slow i2c clock for debugging...
 --    po_i2c_scl <= reg_dbg_cnt(23);
-    i2c_slave_inst : i2c_slave port map (
+    i2c_slave_inst : i2c_slave generic map ("0101100")
+    port map (
         pi_reset_n,
         pi_base_clk,
         pi_i2c_scl,
