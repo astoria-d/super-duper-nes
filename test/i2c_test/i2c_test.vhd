@@ -33,31 +33,40 @@ architecture rtl of i2c_test is
 
 
 component i2c_slave
-generic (i2c_addr: std_logic_vector (6 downto 0):= "0101100");
 port (
-    pi_rst_n        : in    std_logic;
-    pi_base_clk     : in    std_logic;
-    pi_i2c_scl      : in std_logic;
-    pio_i2c_sda     : inout std_logic
+    pi_rst_n            : in    std_logic;
+    pi_base_clk         : in    std_logic;
+    pi_slave_addr       : in    std_logic_vector (6 downto 0);
+    pi_i2c_scl          : in    std_logic;
+    pio_i2c_sda         : inout std_logic;
+    po_slave_in_data    : out   std_logic_vector (7 downto 0);
+    pi_slave_out_data   : in    std_logic_vector (7 downto 0)
     );
 end component;
 
 
-signal reg_dbg_cnt      : std_logic_vector (63 downto 0);
+signal reg_dbg_cnt          : std_logic_vector (63 downto 0);
+signal reg_slave_in_data    : std_logic_vector (7 downto 0);
+signal reg_slave_out_data   : std_logic_vector (7 downto 0);
+
 
 begin
 
     po_led <= reg_dbg_cnt(32 downto 23);
     po_dbg_cnt <= reg_dbg_cnt;
+    reg_slave_out_data <= conv_std_logic_vector(16#c3#, 8);
     
     ---slow i2c clock for debugging...
 --    po_i2c_scl <= reg_dbg_cnt(23);
-    i2c_slave_inst : i2c_slave generic map ("0101100")
+    i2c_slave_inst : i2c_slave
     port map (
         pi_reset_n,
         pi_base_clk,
+        conv_std_logic_vector(16#44#, 7),
         pi_i2c_scl,
-        pio_i2c_sda
+        pio_i2c_sda,
+        reg_slave_in_data,
+        reg_slave_out_data
     );
 
     deb_cnt_p : process (pi_base_clk, pi_reset_n)

@@ -1,6 +1,7 @@
 library IEEE;
 use IEEE.std_logic_1164.all;
 use ieee.std_logic_arith.all;
+use ieee.std_logic_arith.conv_std_logic_vector;
 
 entity testbench_i2c_test is
 end testbench_i2c_test;
@@ -21,7 +22,7 @@ architecture stimulus of testbench_i2c_test is
     --i2c normal clock speed 100 KHz
     constant i2c_clock_time : time := 10 us;
 
-    constant test_addr1 : std_logic_vector(6 downto 0) := "0101100";
+    constant test_addr1 : std_logic_vector(6 downto 0) := conv_std_logic_vector(16#44#, 7);
 
     component i2c_test 
     port (
@@ -138,7 +139,7 @@ end;
 procedure ack_wait is
 begin
     i2c_sda <= 'Z';
-    wait until i2c_sda'event and i2c_sda='1' for i2c_clock_time * 10;
+    wait until i2c_sda'event and i2c_sda='0' for i2c_clock_time * 10;
     wait for i2c_clock_time;
 end;
 
@@ -177,13 +178,13 @@ end;
         wait for i2c_clock_time / 2;
 
         --addr output with write.....
-        output_addr(test_addr1, '1');
+        output_addr(test_addr1, '0');
 
         --ack wait.
         ack_wait;
 
         --data output 
-        output_data("00110101");
+        output_data(conv_std_logic_vector(16#42#, 8));
 
         --ack wait.
         ack_wait;
@@ -201,14 +202,13 @@ end;
         wait for i2c_clock_time / 2;
 
         --addr output with write.....
-        output_addr(test_addr1, '1');
---        output_addr("1100101", '1');
+        output_addr(test_addr1, '0');
 
         --ack wait.
         ack_wait;
 
         --data output 
-        output_data("11001010");
+        output_data(conv_std_logic_vector(16#a5#, 8));
 
         --ack wait.
         ack_wait;
@@ -218,8 +218,8 @@ end;
         i2c_sda <= '0';
         wait for i2c_clock_time * 3 / 4;
         i2c_sda <= '1';
-        wait for i2c_clock_time;
 
+        wait for i2c_clock_time * 10;
 
         --start up seq...
         i2c_sda <= '0';
@@ -227,7 +227,7 @@ end;
         wait for i2c_clock_time / 2;
 
         --addr output with read.....
-        output_addr(test_addr1, '0');
+        output_addr(test_addr1, '1');
 
         --ack wait.
         ack_wait;
@@ -237,6 +237,7 @@ end;
         input_data;
 
         --ack wait.
+        i2c_sda <= 'Z';
         ack_wait;
 
         --stop seq...
