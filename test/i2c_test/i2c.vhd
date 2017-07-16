@@ -133,7 +133,7 @@ begin
                     reg_next_state <= d7;
                 else
                     if (pio_i2c_sda = '0') then
-                        reg_next_state <= reg_cur_state;
+                        reg_next_state <= d7;
                     else
                         reg_next_state <= reg_cur_state;
                     end if;
