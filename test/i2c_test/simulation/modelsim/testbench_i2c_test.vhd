@@ -236,9 +236,8 @@ end;
         i2c_sda <= 'Z';
         input_data;
 
-        --ack wait.
-        i2c_sda <= 'Z';
-        ack_wait;
+        --send ack.
+        i2c_sda <= '0';
 
         --stop seq...
         wait for i2c_clock_time;

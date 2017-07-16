@@ -4,13 +4,22 @@ use ieee.std_logic_unsigned.conv_integer;
 use ieee.std_logic_arith.conv_std_logic_vector;
 use ieee.std_logic_unsigned.all;
 
+
+---po_i2c_status(0): '1' = started, '0' = stopped.
+---po_i2c_status(1): '1' = acknowleged, '0' = not acknowleged.
+---po_i2c_status(2): '1' = read, '0' = write.
 entity i2c_slave is 
     port (
         pi_rst_n            : in    std_logic;
         pi_base_clk         : in    std_logic;
+
+        ---i2c bus lines...
         pi_slave_addr       : in    std_logic_vector (6 downto 0);
         pi_i2c_scl          : in    std_logic;
         pio_i2c_sda         : inout std_logic;
+
+        ---i2c bus contoler internal lines...
+        po_i2c_status       : out   std_logic_vector (2 downto 0);
         po_slave_in_data    : out   std_logic_vector (7 downto 0);
         pi_slave_out_data   : in    std_logic_vector (7 downto 0)
     );
@@ -132,6 +141,7 @@ begin
                 if (reg_i2c_cmd_r_nw = '0') then
                     reg_next_state <= d7;
                 else
+                    --wait for ack.
                     if (pio_i2c_sda = '0') then
                         reg_next_state <= d7;
                     else
@@ -205,8 +215,17 @@ begin
     begin
         if (pi_rst_n = '0') then
             pio_i2c_sda <= 'Z';
+            po_i2c_status <= (others => '0');
         elsif (rising_edge(pi_base_clk)) then
             if (reg_i2c_cmd_addr = pi_slave_addr) then
+                if (reg_cur_sp = start) then
+                    po_i2c_status(0) <= '1';
+                else
+                    po_i2c_status(0) <= '0';
+                end if;
+
+                po_i2c_status(1) <= reg_i2c_cmd_r_nw;
+
                 --addr ack reply.
                 if (reg_cur_state = rw and pi_i2c_scl = '0') then
                     pio_i2c_sda <= '0';
@@ -246,18 +265,20 @@ begin
                         pio_i2c_sda <= pi_slave_out_data(0);
                     end if;
 
-                --data ack reply.
                 elsif (reg_cur_state = d0 and pi_i2c_scl = '0') then
-                    pio_i2c_sda <= '0';
-                elsif (reg_cur_state = d_ack and pi_i2c_scl = '0') then
-                    if (reg_i2c_cmd_r_nw = '1') then
-                        pio_i2c_sda <= 'Z';
-                    elsif (pi_i2c_scl = '0') then
+                    --data ack reply.
+                    if (reg_i2c_cmd_r_nw = '0') then
+                        pio_i2c_sda <= '0';
+                    else
+                    --yield bus for incoming data.
                         pio_i2c_sda <= 'Z';
                     end if;
+                elsif (reg_cur_state = d_ack and pi_i2c_scl = '0') then
+                    pio_i2c_sda <= 'Z';
 
                 end if;
             else
+                po_i2c_status <= (others => '0');
                 pio_i2c_sda <= 'Z';
             end if;--if (reg_cur_state = rw and pi_i2c_scl = '0') then
 
