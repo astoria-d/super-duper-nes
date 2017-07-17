@@ -209,15 +209,21 @@ end;
         --data output 
         output_data(conv_std_logic_vector(16#00#, 8));
 
-        start_scl <= '0';
         --ack wait.
         ack_wait;
 
-        i2c_sda <= '0';
+        start_scl <= '0';
+        i2c_sda <= '1';
+
+        wait for i2c_clock_time / 2;
+
+
+        wait for i2c_clock_time;
+
 
         wait for i2c_clock_time * 5;
 
-
+        start_scl <= '1';
         wait;
 
     end process;
