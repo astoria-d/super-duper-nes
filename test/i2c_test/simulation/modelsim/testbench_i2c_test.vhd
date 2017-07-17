@@ -22,8 +22,6 @@ architecture stimulus of testbench_i2c_test is
     --i2c normal clock speed 100 KHz
     constant i2c_clock_time : time := 10 us;
 
-    constant test_addr1 : std_logic_vector(6 downto 0) := conv_std_logic_vector(16#44#, 7);
-
     component i2c_test 
     port (
         pi_base_clk     : in    std_logic;
@@ -49,6 +47,8 @@ architecture stimulus of testbench_i2c_test is
     signal dbg_cnt          : std_logic_vector (63 downto 0);
     
     signal rd_data          : std_logic_vector (7 downto 0);
+
+    signal start_scl        : std_logic;
 
 begin
 
@@ -85,9 +85,23 @@ begin
         wait for base_clock_time / 2;
     end process;
 
+    scl_p : process
+    begin
+        if(start_scl = '1') then
+            i2c_scl <= '1';
+            wait for i2c_clock_time / 2;
+            i2c_scl <= '0';
+            wait for i2c_clock_time / 2;
+        else
+            i2c_scl <= '1';
+            wait for i2c_clock_time / 2;
+            i2c_scl <= '1';
+            wait for i2c_clock_time / 2;
+        end if;
+    end process;
 
-    --- step1. start seq.
-    start_p1 : process
+    --- sda data generation....
+    sda_p : process
 
 procedure output_addr
 (
@@ -166,10 +180,12 @@ end;
 
     begin
         rd_data <= (others => '0');
+        start_scl <= '0';
 
 
         --pullup...
         i2c_sda <= '1';
+        start_scl <= '1';
         wait for start_time ;
 
         --start up seq...
@@ -178,85 +194,32 @@ end;
         wait for i2c_clock_time / 2;
 
         --addr output with write.....
-        output_addr(test_addr1, '0');
+        --0x44 = 100 0101.
+        output_addr(conv_std_logic_vector(16#44#, 7), '0');
 
         --ack wait.
         ack_wait;
 
         --data output 
-        output_data(conv_std_logic_vector(16#42#, 8));
-
-        --ack wait.
-        ack_wait;
-
-        --stop seq...
-        wait for i2c_clock_time;
-        i2c_sda <= '0';
-        wait for i2c_clock_time * 3 / 4;
-        i2c_sda <= '1';
-        wait for i2c_clock_time;
-
-        --start up seq...
-        i2c_sda <= '0';
-        
-        wait for i2c_clock_time / 2;
-
-        --addr output with write.....
-        output_addr(test_addr1, '0');
+        output_data(conv_std_logic_vector(16#00#, 8));
 
         --ack wait.
         ack_wait;
 
         --data output 
-        output_data(conv_std_logic_vector(16#a5#, 8));
+        output_data(conv_std_logic_vector(16#00#, 8));
 
+        start_scl <= '0';
         --ack wait.
         ack_wait;
 
-        --stop seq...
-        wait for i2c_clock_time;
-        i2c_sda <= '0';
-        wait for i2c_clock_time * 3 / 4;
-        i2c_sda <= '1';
-
-        wait for i2c_clock_time * 10;
-
-        --start up seq...
-        i2c_sda <= '0';
-        
-        wait for i2c_clock_time / 2;
-
-        --addr output with read.....
-        output_addr(test_addr1, '1');
-
-        --ack wait.
-        ack_wait;
-
-        --data input
-        i2c_sda <= 'Z';
-        input_data;
-
-        --send ack.
         i2c_sda <= '0';
 
-        --stop seq...
-        wait for i2c_clock_time;
-        i2c_sda <= '0';
-        wait for i2c_clock_time * 1 / 2;
-        i2c_sda <= '1';
-        wait for i2c_clock_time;
+        wait for i2c_clock_time * 5;
 
 
         wait;
 
-    end process;
-
-    start_p2 : process
-    begin
-            i2c_scl <= '1';
-            wait for i2c_clock_time / 2;
-            i2c_scl <= '0';
-            wait for i2c_clock_time / 2;
     end process;
 
 end stimulus;

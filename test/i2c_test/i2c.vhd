@@ -29,7 +29,7 @@ architecture rtl of i2c_slave is
 
 
 type i2c_sp_stat is (
-    stop, start
+    stop, start, restart
     );
 
 type i2c_bus_stat is (
@@ -46,10 +46,8 @@ signal reg_cur_state      : i2c_bus_stat;
 signal reg_next_state     : i2c_bus_stat;
 
 signal reg_i2c_cmd_addr         : std_logic_vector(6 downto 0);
-signal reg_i2c_cmd_r_nw           : std_logic;
+signal reg_i2c_cmd_r_nw         : std_logic;
 signal reg_i2c_cmd_in_data      : std_logic_vector(7 downto 0);
-
-signal reg_ack_in_data          : std_logic_vector(7 downto 0);
 
 begin
 
@@ -78,6 +76,12 @@ begin
                 when start =>
                     if (pi_i2c_scl = '1' and reg_old_sda = '0' and pio_i2c_sda = '1') then
                         reg_next_sp <= stop;
+                    elsif (pi_i2c_scl = '1' and reg_old_sda = '1' and pio_i2c_sda = '0') then
+                        reg_next_sp <= restart;
+                    end if;
+                when restart =>
+                    if (reg_old_sda = '0' and pio_i2c_sda = '1') then
+                        reg_next_sp <= start;
                     end if;
             end case;
         end if;--if (pi_rst_n = '0') then
@@ -152,6 +156,7 @@ begin
     end process;
 
     --i2c addr/data set.
+    po_slave_in_data <= reg_i2c_cmd_in_data;
     set_addr : process (pi_rst_n, pi_i2c_scl)
     begin
         if (pi_rst_n = '0') then
@@ -198,18 +203,6 @@ begin
         end if;--if (pi_rst_n = '0') then
     end process;
 
-    po_slave_in_data <= reg_ack_in_data;
-    acknowledged_in_data : process (pi_rst_n, pi_base_clk)
-    begin
-        if (pi_rst_n = '0') then
-            reg_ack_in_data <= (others => '0');
-        elsif (rising_edge(pi_base_clk)) then
-            if (reg_cur_state = d_ack and reg_i2c_cmd_r_nw = '0' and pi_i2c_scl = '1') then
-                reg_ack_in_data <= reg_i2c_cmd_in_data;
-            end if;
-        end if;--if (pi_rst_n = '0') then
-    end process;
-    
     --output (ack and read response: output) i2c bus.
     out_data : process (pi_rst_n, pi_base_clk)
     begin
@@ -224,7 +217,13 @@ begin
                     po_i2c_status(0) <= '0';
                 end if;
 
-                po_i2c_status(1) <= reg_i2c_cmd_r_nw;
+                po_i2c_status(2) <= reg_i2c_cmd_r_nw;
+                
+                if (reg_cur_state = d_ack and pi_i2c_scl = '1') then
+                    po_i2c_status(1) <= '1';
+                else
+                    po_i2c_status(1) <= '0';
+                end if;
 
                 --addr ack reply.
                 if (reg_cur_state = rw and pi_i2c_scl = '0') then

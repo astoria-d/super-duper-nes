@@ -31,7 +31,7 @@ add wave -label reg_cur_state           sim:/testbench_i2c_test/sim_board/i2c_sl
 add wave -label reg_i2c_cmd_addr        -radix hex  sim:/testbench_i2c_test/sim_board/i2c_slave_inst/reg_i2c_cmd_addr
 add wave -label reg_i2c_cmd_r_nw                    sim:/testbench_i2c_test/sim_board/i2c_slave_inst/reg_i2c_cmd_r_nw
 add wave -label reg_i2c_cmd_in_data     -radix hex  sim:/testbench_i2c_test/sim_board/i2c_slave_inst/reg_i2c_cmd_in_data
-add wave -label reg_ack_in_data         -radix hex  sim:/testbench_i2c_test/sim_board/i2c_slave_inst/reg_ack_in_data
+add wave -label reg_slave_status                    sim:/testbench_i2c_test/sim_board/reg_slave_status
 
 add wave -label rd_data                 -radix hex  sim:/testbench_i2c_test/rd_data
 
