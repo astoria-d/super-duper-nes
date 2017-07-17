@@ -223,6 +223,7 @@ end;
 
         wait for i2c_clock_time * 5;
 
+        i2c_sda <= '0';
         start_scl <= '1';
         wait;
 

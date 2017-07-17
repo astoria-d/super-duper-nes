@@ -40,7 +40,7 @@ view signals
 
 #run -all
 
-run 350 us
+run 450 us
 wave zoom full
-run 550 us
+#run 550 us
 

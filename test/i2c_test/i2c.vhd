@@ -80,7 +80,7 @@ begin
                         reg_next_sp <= restart;
                     end if;
                 when restart =>
-                    if (reg_old_sda = '0' and pio_i2c_sda = '1') then
+                    if (pi_i2c_scl = '0') then
                         reg_next_sp <= start;
                     end if;
             end case;
