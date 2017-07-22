@@ -40,7 +40,10 @@ type i2c_bus_stat is (
 
 signal reg_cur_sp       : i2c_sp_stat;
 signal reg_next_sp      : i2c_sp_stat;
+signal reg_old_scl      : std_logic;
 signal reg_old_sda      : std_logic;
+signal reg_restarted    : boolean;
+
 
 signal reg_cur_state      : i2c_bus_stat;
 signal reg_next_state     : i2c_bus_stat;
@@ -56,9 +59,11 @@ begin
     begin
         if (pi_rst_n = '0') then
             reg_cur_sp <= stop;
+            reg_old_scl <= '1';
             reg_old_sda <= '1';
         elsif (rising_edge(pi_base_clk)) then
             reg_cur_sp <= reg_next_sp;
+            reg_old_scl <= pi_i2c_scl;
             reg_old_sda <= pio_i2c_sda;
         end if;--if (pi_rst_n = '0') then
     end process;
@@ -67,6 +72,7 @@ begin
     begin
         if (pi_rst_n = '0') then
             reg_next_sp <= stop;
+            reg_restarted <= false;
         elsif (rising_edge(pi_base_clk)) then
             case reg_cur_sp is
                 when stop =>
@@ -78,6 +84,9 @@ begin
                         reg_next_sp <= stop;
                     elsif (pi_i2c_scl = '1' and reg_old_sda = '1' and pio_i2c_sda = '0') then
                         reg_next_sp <= restart;
+                        reg_restarted <= true;
+                    elsif (reg_restarted = true and reg_old_scl = '0' and pi_i2c_scl = '1') then
+                        reg_restarted <= false;
                     end if;
                 when restart =>
                     if (pi_i2c_scl = '0') then
@@ -102,54 +111,126 @@ begin
     end process;
 
     --state change to next.
-    next_stat_p : process (reg_cur_state, reg_i2c_cmd_r_nw, pio_i2c_sda)
+    next_stat_p : process (reg_cur_state, reg_i2c_cmd_r_nw, pio_i2c_sda, reg_restarted)
     begin
         case reg_cur_state is
             when idle =>
                 reg_next_state <= a6;
             when a6 =>
-                reg_next_state <= a5;
+                if (reg_restarted = true) then
+                    reg_next_state <= a6;
+                else
+                    reg_next_state <= a5;
+                end if;
             when a5 =>
-                reg_next_state <= a4;
+                if (reg_restarted = true) then
+                    reg_next_state <= a6;
+                else
+                    reg_next_state <= a4;
+                end if;
             when a4 =>
-                reg_next_state <= a3;
+                if (reg_restarted = true) then
+                    reg_next_state <= a6;
+                else
+                    reg_next_state <= a3;
+                end if;
             when a3 =>
-                reg_next_state <= a2;
+                if (reg_restarted = true) then
+                    reg_next_state <= a6;
+                else
+                    reg_next_state <= a2;
+                end if;
             when a2 =>
-                reg_next_state <= a1;
+                if (reg_restarted = true) then
+                    reg_next_state <= a6;
+                else
+                    reg_next_state <= a1;
+                end if;
             when a1 =>
-                reg_next_state <= a0;
+                if (reg_restarted = true) then
+                    reg_next_state <= a6;
+                else
+                    reg_next_state <= a0;
+                end if;
             when a0 =>
+                if (reg_restarted = true) then
+                    reg_next_state <= a6;
+                else
+                end if;
                 reg_next_state <= rw;
             when rw =>
-                reg_next_state <= a_ack;
-            when a_ack =>
-                reg_next_state <= d7;
-            when d7 =>
-                reg_next_state <= d6;
-            when d6 =>
-                reg_next_state <= d5;
-            when d5 =>
-                reg_next_state <= d4;
-            when d4 =>
-                reg_next_state <= d3;
-            when d3 =>
-                reg_next_state <= d2;
-            when d2 =>
-                reg_next_state <= d1;
-            when d1 =>
-                reg_next_state <= d0;
-            when d0 =>
-                reg_next_state <= d_ack;
-            when d_ack =>
-                if (reg_i2c_cmd_r_nw = '0') then
-                    reg_next_state <= d7;
+                if (reg_restarted = true) then
+                    reg_next_state <= a6;
                 else
-                    --wait for ack.
-                    if (pio_i2c_sda = '0') then
+                    reg_next_state <= a_ack;
+                end if;
+            when a_ack =>
+                if (reg_restarted = true) then
+                    reg_next_state <= a6;
+                else
+                    reg_next_state <= d7;
+                end if;
+            when d7 =>
+                if (reg_restarted = true) then
+                    reg_next_state <= a6;
+                else
+                    reg_next_state <= d6;
+                end if;
+            when d6 =>
+                if (reg_restarted = true) then
+                    reg_next_state <= a6;
+                else
+                    reg_next_state <= d5;
+                end if;
+            when d5 =>
+                if (reg_restarted = true) then
+                    reg_next_state <= a6;
+                else
+                    reg_next_state <= d4;
+                end if;
+            when d4 =>
+                if (reg_restarted = true) then
+                    reg_next_state <= a6;
+                else
+                    reg_next_state <= d3;
+                end if;
+            when d3 =>
+                if (reg_restarted = true) then
+                    reg_next_state <= a6;
+                else
+                    reg_next_state <= d2;
+                end if;
+            when d2 =>
+                if (reg_restarted = true) then
+                    reg_next_state <= a6;
+                else
+                    reg_next_state <= d1;
+                end if;
+            when d1 =>
+                if (reg_restarted = true) then
+                    reg_next_state <= a6;
+                else
+                    reg_next_state <= d0;
+                end if;
+            when d0 =>
+                if (reg_restarted = true) then
+                    reg_next_state <= a6;
+                else
+                    reg_next_state <= d_ack;
+                end if;
+            when d_ack =>
+                if (reg_restarted = true) then
+                    reg_next_state <= a6;
+                else
+                    if (reg_i2c_cmd_r_nw = '0') then
                         reg_next_state <= d7;
                     else
-                        reg_next_state <= reg_cur_state;
+                        --wait for ack.
+                        if (pio_i2c_sda = '0') then
+                            reg_next_state <= d7;
+                        else
+                            reg_next_state <= reg_cur_state;
+                        end if;
                     end if;
                 end if;
         end case;
