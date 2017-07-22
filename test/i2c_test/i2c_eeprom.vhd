@@ -26,7 +26,6 @@ architecture rtl of i2c_eeprom is
 -----ram is initialized with 0.
 --signal work_ram : ram_array := (others => (others => '0'));
 
-signal reg_i2c_addr_set     : integer range 0 to 1;
 signal reg_write_cnt        : std_logic_vector(15 downto 0);
 signal reg_eeprom_addr      : std_logic_vector(15 downto 0);
 signal reg_eeprom_data      : std_logic_vector(7 downto 0);
@@ -36,7 +35,6 @@ begin
     addr_set_p : process (pi_rst_n, pi_i2c_clk)
     begin
         if (pi_rst_n = '0') then
-            reg_i2c_addr_set <= 0;
             reg_write_cnt <= (others => '0');
             reg_eeprom_addr <= (others => '0');
         elsif (falling_edge(pi_i2c_clk)) then

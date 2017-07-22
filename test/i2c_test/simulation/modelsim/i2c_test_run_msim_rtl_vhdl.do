@@ -46,6 +46,8 @@ add wave -label po_bus_ack      sim:/testbench_i2c_test/sim_board/i2c_eeprom_ins
 add wave -label pi_data -radix hex  sim:/testbench_i2c_test/sim_board/i2c_eeprom_inst/pi_data
 add wave -label po_data -radix hex  sim:/testbench_i2c_test/sim_board/i2c_eeprom_inst/po_data
 
+add wave -label reg_write_cnt -radix decimal   sim:/testbench_i2c_test/sim_board/i2c_eeprom_inst/reg_write_cnt
+add wave -label reg_eeprom_addr -radix hex              sim:/testbench_i2c_test/sim_board/i2c_eeprom_inst/reg_eeprom_addr
 
 view structure
 view signals

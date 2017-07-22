@@ -147,15 +147,16 @@ begin
     i2c_sda <= data(1);
     wait for i2c_clock_time;
     i2c_sda <= data(0);
-    wait for i2c_clock_time ;
+    wait for i2c_clock_time / 2;
 end;
 
 procedure ack_wait is
 begin
     i2c_sda <= 'Z';
-    wait until i2c_sda'event and i2c_sda='0' for i2c_clock_time * 10;
+    wait until i2c_sda'event and i2c_sda='0';
     wait for i2c_clock_time;
 end;
+
 
 procedure input_data is
 begin
@@ -175,7 +176,6 @@ begin
     rd_data(1) <= i2c_sda;
     wait for i2c_clock_time;
     rd_data(0) <= i2c_sda;
-    wait for i2c_clock_time / 2;
 end;
 
     begin
@@ -196,25 +196,30 @@ end;
         --addr output with write.....
         --0x44 = 100 0101.
         output_addr(conv_std_logic_vector(16#44#, 7), '0');
-
         --ack wait.
         ack_wait;
 
         --addr low
+        wait for i2c_clock_time / 4;
         output_data(conv_std_logic_vector(16#00#, 8));
         ack_wait;
 
         --addr high
+        wait for i2c_clock_time / 4;
         output_data(conv_std_logic_vector(16#00#, 8));
         ack_wait;
 
         --data set
+        wait for i2c_clock_time / 4;
         output_data(conv_std_logic_vector(16#54#, 8));
         ack_wait;
+        wait for i2c_clock_time / 4;
         output_data(conv_std_logic_vector(16#68#, 8));
         ack_wait;
+        wait for i2c_clock_time / 4;
         output_data(conv_std_logic_vector(16#69#, 8));
         ack_wait;
+        wait for i2c_clock_time / 4;
         output_data(conv_std_logic_vector(16#73#, 8));
         ack_wait;
 
@@ -228,7 +233,13 @@ end;
         start_scl <= '1';
 
         wait for i2c_clock_time * 1.5;
-        output_addr(conv_std_logic_vector(16#44#, 7), '0');
+        wait for i2c_clock_time / 4;
+        output_addr(conv_std_logic_vector(16#44#, 7), '1');
+        ack_wait;
+
+
+        i2c_sda <= 'Z';
+        input_data;
 
         wait;
 
