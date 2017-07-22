@@ -45,21 +45,33 @@ port (
     );
 end component;
 
+component i2c_eeprom
+    generic (abus_size : integer := 16);
+    port (
+        pi_rst_n        : in std_logic;
+        pi_i2c_clk      : in std_logic;
+        pi_bus_xfer     : in std_logic;
+        pi_r_nw         : in std_logic;
+        pi_bus_ack      : in std_logic;
+        po_bus_ack      : out std_logic;
+        pi_data         : in std_logic_vector (7 downto 0);
+        po_data         : out std_logic_vector (7 downto 0)
+    );
+end component;
 
 signal reg_dbg_cnt          : std_logic_vector (63 downto 0);
 signal reg_slave_in_data    : std_logic_vector (7 downto 0);
 signal reg_slave_out_data   : std_logic_vector (7 downto 0);
 signal reg_slave_status     : std_logic_vector (2 downto 0);
+signal reg_slave_addr_ack   : std_logic;
 
 
 begin
 
     po_led <= reg_dbg_cnt(32 downto 23);
     po_dbg_cnt <= reg_dbg_cnt;
-    reg_slave_out_data <= conv_std_logic_vector(16#c3#, 8);
+    --reg_slave_out_data <= conv_std_logic_vector(16#c3#, 8);
     
-    ---slow i2c clock for debugging...
---    po_i2c_scl <= reg_dbg_cnt(23);
     i2c_slave_inst : i2c_slave
     port map (
         pi_reset_n,
@@ -68,6 +80,18 @@ begin
         pi_i2c_scl,
         pio_i2c_sda,
         reg_slave_status,
+        reg_slave_in_data,
+        reg_slave_out_data
+    );
+
+    i2c_eeprom_inst : i2c_eeprom generic map (4)
+    port map (
+        pi_reset_n,
+        pi_i2c_scl,
+        reg_slave_status(0),
+        reg_slave_status(2),
+        reg_slave_status(1),
+        reg_slave_addr_ack,
         reg_slave_in_data,
         reg_slave_out_data
     );

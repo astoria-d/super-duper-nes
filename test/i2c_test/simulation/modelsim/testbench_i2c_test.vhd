@@ -200,31 +200,36 @@ end;
         --ack wait.
         ack_wait;
 
-        --data output 
+        --addr low
         output_data(conv_std_logic_vector(16#00#, 8));
-
-        --ack wait.
         ack_wait;
 
-        --data output 
+        --addr high
         output_data(conv_std_logic_vector(16#00#, 8));
+        ack_wait;
 
-        --ack wait.
+        --data set
+        output_data(conv_std_logic_vector(16#54#, 8));
+        ack_wait;
+        output_data(conv_std_logic_vector(16#68#, 8));
+        ack_wait;
+        output_data(conv_std_logic_vector(16#69#, 8));
+        ack_wait;
+        output_data(conv_std_logic_vector(16#73#, 8));
         ack_wait;
 
         start_scl <= '0';
         i2c_sda <= '1';
 
-        wait for i2c_clock_time / 2;
+        wait for i2c_clock_time * 5.5;
 
-
-        wait for i2c_clock_time;
-
-
-        wait for i2c_clock_time * 5;
-
+        --restart again..
         i2c_sda <= '0';
         start_scl <= '1';
+
+        wait for i2c_clock_time * 1.5;
+        output_addr(conv_std_logic_vector(16#44#, 7), '0');
+
         wait;
 
     end process;

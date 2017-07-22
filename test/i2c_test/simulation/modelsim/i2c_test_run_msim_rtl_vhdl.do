@@ -7,6 +7,7 @@ vmap work rtl_work
 
 vcom -93 -work work {D:/daisuke/nes/repo/super-duper-nes/test/i2c_test/i2c.vhd}
 vcom -93 -work work {D:/daisuke/nes/repo/super-duper-nes/test/i2c_test/i2c_test.vhd}
+vcom -93 -work work {D:/daisuke/nes/repo/super-duper-nes/test/i2c_test/i2c_eeprom.vhd}
 
 vcom -93 -work work {D:/daisuke/nes/repo/super-duper-nes/test/i2c_test/simulation/modelsim/testbench_i2c_test.vhd}
 
@@ -34,7 +35,17 @@ add wave -label reg_i2c_cmd_r_nw                    sim:/testbench_i2c_test/sim_
 add wave -label reg_i2c_cmd_in_data     -radix hex  sim:/testbench_i2c_test/sim_board/i2c_slave_inst/reg_i2c_cmd_in_data
 add wave -label reg_slave_status                    sim:/testbench_i2c_test/sim_board/reg_slave_status
 
-add wave -label rd_data                 -radix hex  sim:/testbench_i2c_test/rd_data
+#add wave -label rd_data                 -radix hex  sim:/testbench_i2c_test/rd_data
+
+add wave -divider i2c_eeprom
+add wave -label pi_bus_xfer     sim:/testbench_i2c_test/sim_board/i2c_eeprom_inst/pi_bus_xfer
+add wave -label pi_r_nw         sim:/testbench_i2c_test/sim_board/i2c_eeprom_inst/pi_r_nw
+add wave -label pi_bus_ack      sim:/testbench_i2c_test/sim_board/i2c_eeprom_inst/pi_bus_ack
+add wave -label po_bus_ack      sim:/testbench_i2c_test/sim_board/i2c_eeprom_inst/po_bus_ack
+
+add wave -label pi_data -radix hex  sim:/testbench_i2c_test/sim_board/i2c_eeprom_inst/pi_data
+add wave -label po_data -radix hex  sim:/testbench_i2c_test/sim_board/i2c_eeprom_inst/po_data
+
 
 view structure
 view signals

@@ -5,7 +5,7 @@ use ieee.std_logic_arith.conv_std_logic_vector;
 use ieee.std_logic_unsigned.all;
 
 
----po_i2c_status(0): '1' = started, '0' = stopped.
+---po_i2c_status(0): '1' = bus transfering, '0' = stopped.
 ---po_i2c_status(1): '1' = acknowleged, '0' = not acknowleged.
 ---po_i2c_status(2): '1' = read, '0' = write.
 entity i2c_slave is 
@@ -292,7 +292,15 @@ begin
             po_i2c_status <= (others => '0');
         elsif (rising_edge(pi_base_clk)) then
             if (reg_i2c_cmd_addr = pi_slave_addr) then
-                if (reg_cur_sp = start) then
+                if (reg_cur_state = d7 or
+                    reg_cur_state = d6 or
+                    reg_cur_state = d5 or
+                    reg_cur_state = d4 or
+                    reg_cur_state = d3 or
+                    reg_cur_state = d2 or
+                    reg_cur_state = d1 or
+                    reg_cur_state = d0 or
+                    reg_cur_state = d_ack) then
                     po_i2c_status(0) <= '1';
                 else
                     po_i2c_status(0) <= '0';
@@ -300,7 +308,7 @@ begin
 
                 po_i2c_status(2) <= reg_i2c_cmd_r_nw;
                 
-                if (reg_cur_state = d_ack and pi_i2c_scl = '1') then
+                if (reg_cur_state = d_ack) then
                     po_i2c_status(1) <= '1';
                 else
                     po_i2c_status(1) <= '0';
