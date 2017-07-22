@@ -56,5 +56,5 @@ view signals
 
 run 450 us
 wave zoom full
-run 550 us
+run 1000 us
 

@@ -176,6 +176,13 @@ begin
     rd_data(1) <= i2c_sda;
     wait for i2c_clock_time;
     rd_data(0) <= i2c_sda;
+    wait for i2c_clock_time / 2;
+end;
+
+procedure ack_respond is
+begin
+    i2c_sda <= '0';
+    wait for i2c_clock_time;
 end;
 
     begin
@@ -234,12 +241,50 @@ end;
 
         wait for i2c_clock_time * 1.5;
         wait for i2c_clock_time / 4;
+        output_addr(conv_std_logic_vector(16#44#, 7), '0');
+        ack_wait;
+
+        wait for i2c_clock_time / 4;
+        output_data(conv_std_logic_vector(16#00#, 8));
+        ack_wait;
+        wait for i2c_clock_time / 4;
+        output_data(conv_std_logic_vector(16#00#, 8));
+        ack_wait;
+
+        --change direction...
+        start_scl <= '0';
+        i2c_sda <= '1';
+
+        wait for i2c_clock_time * 1.5;
+
+        --restart again..
+        i2c_sda <= '0';
+        start_scl <= '1';
+
+        wait for i2c_clock_time * 1.5;
+        wait for i2c_clock_time / 4;
         output_addr(conv_std_logic_vector(16#44#, 7), '1');
         ack_wait;
 
+        i2c_sda <= 'Z';
+        input_data;
+        ack_respond;
+        i2c_sda <= 'Z';
 
         i2c_sda <= 'Z';
         input_data;
+        ack_respond;
+        i2c_sda <= 'Z';
+
+        i2c_sda <= 'Z';
+        input_data;
+        ack_respond;
+        i2c_sda <= 'Z';
+
+        i2c_sda <= 'Z';
+        input_data;
+        ack_respond;
+        i2c_sda <= 'Z';
 
         wait;
 
