@@ -218,73 +218,73 @@ end;
 
         --data set
         wait for i2c_clock_time / 4;
-        output_data(conv_std_logic_vector(16#54#, 8));
-        ack_wait;
-        wait for i2c_clock_time / 4;
-        output_data(conv_std_logic_vector(16#68#, 8));
-        ack_wait;
-        wait for i2c_clock_time / 4;
-        output_data(conv_std_logic_vector(16#69#, 8));
-        ack_wait;
-        wait for i2c_clock_time / 4;
-        output_data(conv_std_logic_vector(16#73#, 8));
+        output_data(conv_std_logic_vector(16#64#, 8));
         ack_wait;
 
         start_scl <= '0';
         i2c_sda <= '1';
 
-        wait for i2c_clock_time * 5.5;
+        wait for i2c_clock_time * 4;
 
         --restart again..
         i2c_sda <= '0';
         start_scl <= '1';
-
-        wait for i2c_clock_time * 1.5;
-        wait for i2c_clock_time / 4;
+        wait for i2c_clock_time * 1.2;
         output_addr(conv_std_logic_vector(16#44#, 7), '0');
         ack_wait;
 
-        wait for i2c_clock_time / 4;
-        output_data(conv_std_logic_vector(16#00#, 8));
-        ack_wait;
+        --addr low
         wait for i2c_clock_time / 4;
         output_data(conv_std_logic_vector(16#00#, 8));
         ack_wait;
 
-        --change direction...
+        --addr high
+        wait for i2c_clock_time / 4;
+        output_data(conv_std_logic_vector(16#01#, 8));
+        ack_wait;
+
+        --data set
+        wait for i2c_clock_time / 4;
+        output_data(conv_std_logic_vector(16#75#, 8));
+        ack_wait;
+
         start_scl <= '0';
         i2c_sda <= '1';
 
-        wait for i2c_clock_time * 1.5;
-
-        --restart again..
-        i2c_sda <= '0';
-        start_scl <= '1';
-
-        wait for i2c_clock_time * 1.5;
-        wait for i2c_clock_time / 4;
-        output_addr(conv_std_logic_vector(16#44#, 7), '1');
-        ack_wait;
-
-        i2c_sda <= 'Z';
-        input_data;
-        ack_respond;
-        i2c_sda <= 'Z';
-
-        i2c_sda <= 'Z';
-        input_data;
-        ack_respond;
-        i2c_sda <= 'Z';
-
-        i2c_sda <= 'Z';
-        input_data;
-        ack_respond;
-        i2c_sda <= 'Z';
-
-        i2c_sda <= 'Z';
-        input_data;
-        ack_respond;
-        i2c_sda <= 'Z';
+--        --change direction...
+--        start_scl <= '0';
+--        i2c_sda <= '1';
+--
+--        wait for i2c_clock_time * 1.5;
+--
+--        --restart again..
+--        i2c_sda <= '0';
+--        start_scl <= '1';
+--
+--        wait for i2c_clock_time * 1.5;
+--        wait for i2c_clock_time / 4;
+--        output_addr(conv_std_logic_vector(16#44#, 7), '1');
+--        ack_wait;
+--
+--        i2c_sda <= 'Z';
+--        input_data;
+--        ack_respond;
+--        i2c_sda <= 'Z';
+--
+--        i2c_sda <= 'Z';
+--        input_data;
+--        ack_respond;
+--        i2c_sda <= 'Z';
+--
+--        i2c_sda <= 'Z';
+--        input_data;
+--        ack_respond;
+--        i2c_sda <= 'Z';
+--
+--        i2c_sda <= 'Z';
+--        input_data;
+--        ack_respond;
+--        i2c_sda <= 'Z';
 
         wait;
 

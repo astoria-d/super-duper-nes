@@ -38,6 +38,7 @@ add wave -label reg_slave_status                    sim:/testbench_i2c_test/sim_
 #add wave -label rd_data                 -radix hex  sim:/testbench_i2c_test/rd_data
 
 add wave -divider i2c_eeprom
+add wave -label pi_rst_n        sim:/testbench_i2c_test/sim_board/i2c_eeprom_inst/pi_rst_n
 add wave -label pi_bus_xfer     sim:/testbench_i2c_test/sim_board/i2c_eeprom_inst/pi_bus_xfer
 add wave -label pi_r_nw         sim:/testbench_i2c_test/sim_board/i2c_eeprom_inst/pi_r_nw
 add wave -label pi_bus_ack      sim:/testbench_i2c_test/sim_board/i2c_eeprom_inst/pi_bus_ack
@@ -56,5 +57,5 @@ view signals
 
 run 450 us
 wave zoom full
-run 1000 us
+run 400 us
 
