@@ -26,7 +26,6 @@ add wave -label pi_i2c_scl      sim:/testbench_i2c_test/sim_board/pi_i2c_scl
 add wave -divider i2c_slave
 #add wave -label reg_next_sp            sim:/testbench_i2c_test/sim_board/i2c_slave_inst/reg_next_sp
 add wave -label reg_cur_sp              sim:/testbench_i2c_test/sim_board/i2c_slave_inst/reg_cur_sp
-add wave -label reg_restarted           sim:/testbench_i2c_test/sim_board/i2c_slave_inst/reg_restarted
 add wave -label reg_cur_state           sim:/testbench_i2c_test/sim_board/i2c_slave_inst/reg_cur_state
 
 

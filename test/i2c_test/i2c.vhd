@@ -41,8 +41,6 @@ type i2c_bus_stat is (
 signal reg_cur_sp       : i2c_sp_stat;
 signal reg_next_sp      : i2c_sp_stat;
 signal reg_old_sda      : std_logic;
-signal reg_restarted    : boolean;
-
 
 signal reg_cur_state      : i2c_bus_stat;
 signal reg_next_state     : i2c_bus_stat;
@@ -69,26 +67,19 @@ begin
     begin
         if (pi_rst_n = '0') then
             reg_next_sp <= stop;
-            reg_restarted <= false;
         elsif (rising_edge(pi_base_clk)) then
             case reg_cur_sp is
                 when stop =>
                     if (reg_old_sda = '1' and pio_i2c_sda = '0' and pi_i2c_scl = '1') then
                         reg_next_sp <= start;
                     end if;
-                    reg_restarted <= false;
                 when start =>
                     if (reg_old_sda = '0' and pio_i2c_sda = '1' and pi_i2c_scl = '1') then
                         reg_next_sp <= stop;
                     elsif (reg_old_sda = '1' and pio_i2c_sda = '0' and pi_i2c_scl = '1') then
                         reg_next_sp <= restart;
                     end if;
-
-                    if (pi_i2c_scl = '1') then
-                        reg_restarted <= false;
-                    end if;
                 when restart =>
-                    reg_restarted <= true;
                     if (pi_i2c_scl = '0') then
                         reg_next_sp <= start;
                     end if;
@@ -97,9 +88,11 @@ begin
     end process;
 
     --i2c bus state machine (state transition)...
-    set_stat_p : process (pi_rst_n, pi_i2c_scl)
+    set_stat_p : process (pi_rst_n, reg_cur_sp, pi_i2c_scl)
     begin
         if (pi_rst_n = '0') then
+            reg_cur_state <= idle;
+        elsif (reg_cur_sp = stop or reg_cur_sp = restart) then
             reg_cur_state <= idle;
         elsif (rising_edge(pi_i2c_scl)) then
             reg_cur_state <= reg_next_state;
@@ -107,20 +100,14 @@ begin
     end process;
 
     --state change to next.
-    next_stat_p : process (reg_cur_sp, reg_cur_state, reg_i2c_cmd_r_nw, pio_i2c_sda, reg_restarted)
+    next_stat_p : process (reg_cur_state, reg_i2c_cmd_r_nw, pio_i2c_sda)
 
 procedure set_next_stat
 (
     pi_stat    : in i2c_bus_stat
 ) is
 begin
-    if (reg_cur_sp = stop) then
-        reg_next_state <= idle;
-    elsif (reg_restarted = true) then
-        reg_next_state <= a6;
-    else
-        reg_next_state <= pi_stat;
-    end if;--if (reg_cur_sp = stop) then
+    reg_next_state <= pi_stat;
 end;
 
 
