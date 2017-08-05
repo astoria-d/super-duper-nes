@@ -221,8 +221,12 @@ end;
         output_data(conv_std_logic_vector(16#64#, 8));
         ack_wait;
 
+        i2c_sda <= '0';
         start_scl <= '0';
+
+        wait for i2c_clock_time;
         i2c_sda <= '1';
+
 
         wait for i2c_clock_time * 4;
 
