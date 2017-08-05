@@ -171,10 +171,6 @@ set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[37]
 set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_TRIGGER_BITS=38" -section_id auto_signaltap_0
 set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_INVERSION_MASK=00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000" -section_id auto_signaltap_0
 set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_INVERSION_MASK_LENGTH=140" -section_id auto_signaltap_0
-set_global_assignment -name VHDL_FILE i2c_eeprom.vhd
-set_global_assignment -name VHDL_FILE i2c.vhd
-set_global_assignment -name VHDL_FILE i2c_test.vhd
-set_global_assignment -name SIGNALTAP_FILE i2c_test.stp
 set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[0] -to "i2c_eeprom:i2c_eeprom_inst|pi_data[0]" -section_id auto_signaltap_0
 set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[1] -to "i2c_eeprom:i2c_eeprom_inst|pi_data[1]" -section_id auto_signaltap_0
 set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[2] -to "i2c_eeprom:i2c_eeprom_inst|pi_data[2]" -section_id auto_signaltap_0
@@ -287,5 +283,10 @@ set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[108] -
 set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_DATA_BITS=109" -section_id auto_signaltap_0
 set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_NODE_CRC_LOWORD=5259" -section_id auto_signaltap_0
 set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_NODE_CRC_HIWORD=19473" -section_id auto_signaltap_0
+set_global_assignment -name SDC_FILE i2c_test.sdc
+set_global_assignment -name VHDL_FILE i2c_eeprom.vhd
+set_global_assignment -name VHDL_FILE i2c.vhd
+set_global_assignment -name VHDL_FILE i2c_test.vhd
+set_global_assignment -name SIGNALTAP_FILE i2c_test.stp
 set_global_assignment -name SLD_FILE "D:/daisuke/nes/repo/super-duper-nes/test/i2c_test/i2c_test_auto_stripped.stp"
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
