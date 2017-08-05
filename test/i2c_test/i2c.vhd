@@ -237,13 +237,13 @@ begin
     end process;
 
     --i2c addr/data set.
-    po_slave_in_data <= reg_i2c_cmd_in_data;
     set_addr : process (pi_rst_n, pi_i2c_scl)
     begin
         if (pi_rst_n = '0') then
             reg_i2c_cmd_addr <= (others => '0');
             reg_i2c_cmd_r_nw <= '1';
             reg_i2c_cmd_in_data <= (others => '0');
+            po_slave_in_data <= (others => '0');
         elsif (rising_edge(pi_i2c_scl)) then
             --address sequence.
             if (reg_cur_sp = start and reg_cur_state = idle) then
@@ -280,6 +280,7 @@ begin
                 reg_i2c_cmd_in_data (1) <= pio_i2c_sda;
             elsif (reg_cur_state = d1 and reg_i2c_cmd_r_nw = '0') then
                 reg_i2c_cmd_in_data (0) <= pio_i2c_sda;
+                po_slave_in_data <= reg_i2c_cmd_in_data (7 downto 1) & pio_i2c_sda;
             end if;
         end if;--if (pi_rst_n = '0') then
     end process;

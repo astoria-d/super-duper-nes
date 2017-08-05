@@ -44,7 +44,8 @@ begin
                         if (reg_write_cnt = "00000000") then
                             reg_eeprom_addr(7 downto 0) <= pi_data;
                         elsif (reg_write_cnt = "00000001") then
-                            reg_eeprom_addr(15 downto 8) <= pi_data;
+                            reg_eeprom_addr(15 downto 8) <= reg_eeprom_addr(7 downto 0);
+                            reg_eeprom_addr(7 downto 0) <= pi_data;
                         else
                             reg_eeprom_addr <= reg_eeprom_addr + 1;
                         end if;
@@ -64,7 +65,7 @@ begin
     begin
     if (rising_edge(pi_bus_ack)) then
         if (pi_bus_xfer = '1' and pi_r_nw = '0' and reg_write_cnt > 1) then
-            work_ram(conv_integer(reg_eeprom_addr)) <= pi_data;
+            work_ram(conv_integer(reg_eeprom_addr(abus_size -1 downto 0))) <= pi_data;
         end if;
     end if;
     end process;
