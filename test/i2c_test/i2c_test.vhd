@@ -51,7 +51,7 @@ component i2c_eeprom
     generic (abus_size : integer := 16);
     port (
         pi_rst_n        : in std_logic;
-        pi_i2c_clk      : in std_logic;
+        pi_base_clk     : in std_logic;
         pi_bus_xfer     : in std_logic;
         pi_r_nw         : in std_logic;
         pi_bus_ack      : in std_logic;
@@ -89,7 +89,7 @@ begin
     i2c_eeprom_inst : i2c_eeprom generic map (4)
     port map (
         pi_reset_n,
-        pi_i2c_scl,
+        pi_base_clk,
         reg_slave_status(0),
         reg_slave_status(2),
         reg_slave_status(1),

@@ -15,7 +15,6 @@ vsim -t 1ps -L altera -L lpm -L sgate -L altera_mf -L altera_lnsim -L cyclonev -
 
 #add wave *
 add wave -label pi_reset_n      sim:/testbench_i2c_test/sim_board/pi_reset_n
-#add wave -label pi_base_clk    sim:/testbench_i2c_test/sim_board/pi_base_clk
 
 add wave -label pio_i2c_sda     sim:/testbench_i2c_test/sim_board/pio_i2c_sda
 #add wave -label reg_old_sda     sim:/testbench_i2c_test/sim_board/i2c_slave_inst/reg_old_sda
@@ -38,6 +37,7 @@ add wave -label reg_slave_status                    sim:/testbench_i2c_test/sim_
 
 add wave -divider i2c_eeprom
 add wave -label pi_rst_n        sim:/testbench_i2c_test/sim_board/i2c_eeprom_inst/pi_rst_n
+#add wave -label pi_base_clk     sim:/testbench_i2c_test/sim_board/pi_base_clk
 add wave -label pi_bus_xfer     sim:/testbench_i2c_test/sim_board/i2c_eeprom_inst/pi_bus_xfer
 add wave -label pi_r_nw         sim:/testbench_i2c_test/sim_board/i2c_eeprom_inst/pi_r_nw
 add wave -label pi_bus_ack      sim:/testbench_i2c_test/sim_board/i2c_eeprom_inst/pi_bus_ack
@@ -46,8 +46,11 @@ add wave -label po_bus_ack      sim:/testbench_i2c_test/sim_board/i2c_eeprom_ins
 add wave -label pi_data -radix hex  sim:/testbench_i2c_test/sim_board/i2c_eeprom_inst/pi_data
 add wave -label po_data -radix hex  sim:/testbench_i2c_test/sim_board/i2c_eeprom_inst/po_data
 
+add wave -label reg_ack_edge    sim:/testbench_i2c_test/sim_board/i2c_eeprom_inst/reg_ack_edge
 add wave -label reg_write_cnt -radix decimal   sim:/testbench_i2c_test/sim_board/i2c_eeprom_inst/reg_write_cnt
 add wave -label reg_eeprom_addr -radix hex              sim:/testbench_i2c_test/sim_board/i2c_eeprom_inst/reg_eeprom_addr
+
+
 
 view structure
 view signals

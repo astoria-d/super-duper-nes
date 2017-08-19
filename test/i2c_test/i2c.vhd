@@ -232,7 +232,8 @@ end;
                     reg_cur_state = d3 or
                     reg_cur_state = d2 or
                     reg_cur_state = d1 or
-                    reg_cur_state = d0) then
+                    reg_cur_state = d0 or
+                    reg_cur_state = d_ack) then
                     po_i2c_status(0) <= '1';
                 else
                     po_i2c_status(0) <= '0';
