@@ -253,6 +253,22 @@ end;
                         pio_i2c_sda <= pi_slave_out_data(7);
                     end if;
 
+                --data output.
+                elsif (reg_cur_state = d7 and reg_i2c_cmd_r_nw = '1') then
+                    pio_i2c_sda <= pi_slave_out_data(6);
+                elsif (reg_cur_state = d6 and reg_i2c_cmd_r_nw = '1') then
+                    pio_i2c_sda <= pi_slave_out_data(5);
+                elsif (reg_cur_state = d5 and reg_i2c_cmd_r_nw = '1') then
+                    pio_i2c_sda <= pi_slave_out_data(4);
+                elsif (reg_cur_state = d4 and reg_i2c_cmd_r_nw = '1') then
+                    pio_i2c_sda <= pi_slave_out_data(3);
+                elsif (reg_cur_state = d3 and reg_i2c_cmd_r_nw = '1') then
+                    pio_i2c_sda <= pi_slave_out_data(2);
+                elsif (reg_cur_state = d2 and reg_i2c_cmd_r_nw = '1') then
+                    pio_i2c_sda <= pi_slave_out_data(1);
+                elsif (reg_cur_state = d1 and reg_i2c_cmd_r_nw = '1') then
+                    pio_i2c_sda <= pi_slave_out_data(0);
+
                 elsif (reg_cur_state = d0) then
                     --data ack reply.
                     if (reg_i2c_cmd_r_nw = '0') then
@@ -261,22 +277,6 @@ end;
                     --yield bus for incoming data.
                         pio_i2c_sda <= 'Z';
                     end if;
-
-                --data output.
-                elsif (reg_cur_state = d1 and reg_i2c_cmd_r_nw = '1') then
-                    pio_i2c_sda <= pi_slave_out_data(0);
-                elsif (reg_cur_state = d2 and reg_i2c_cmd_r_nw = '1') then
-                    pio_i2c_sda <= pi_slave_out_data(1);
-                elsif (reg_cur_state = d3 and reg_i2c_cmd_r_nw = '1') then
-                    pio_i2c_sda <= pi_slave_out_data(2);
-                elsif (reg_cur_state = d4 and reg_i2c_cmd_r_nw = '1') then
-                    pio_i2c_sda <= pi_slave_out_data(3);
-                elsif (reg_cur_state = d5 and reg_i2c_cmd_r_nw = '1') then
-                    pio_i2c_sda <= pi_slave_out_data(4);
-                elsif (reg_cur_state = d6 and reg_i2c_cmd_r_nw = '1') then
-                    pio_i2c_sda <= pi_slave_out_data(5);
-                elsif (reg_cur_state = d7 and reg_i2c_cmd_r_nw = '1') then
-                    pio_i2c_sda <= pi_slave_out_data(6);
 
                 elsif (reg_cur_state = d_ack) then
                     pio_i2c_sda <= 'Z';
