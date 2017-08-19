@@ -70,11 +70,13 @@ begin
 
     --start/stop w/ edge detect.
     edge_detect_p : process (pi_rst_n, pi_base_clk)
-    variable reg_temp_sda2   : std_logic;
+    variable reg_temp_sda2  : std_logic;
+    variable reg_temp_st    : i2c_sp_stat;
     begin
         if (pi_rst_n = '0') then
             reg_temp_sda2 := '0';
             reg_cur_sp <= stop;
+            reg_temp_st := stop;
         elsif (rising_edge(pi_base_clk)) then
             if (reg_bsyn_scl = '1' and reg_bsyn_sda = '0' and reg_temp_sda2 = '1'
                 and reg_cur_sp = stop) then
@@ -85,8 +87,11 @@ begin
             elsif (reg_bsyn_scl = '1' and reg_bsyn_sda = '1' and reg_temp_sda2 = '0'
                 and reg_cur_sp = start) then
                 reg_cur_sp <= stop;
+            elsif (reg_temp_st = restart) then
+                reg_cur_sp <= start;
             end if;
             reg_temp_sda2 := reg_bsyn_sda;
+            reg_temp_st := reg_cur_sp;
         end if;--if (pi_rst_n = '0') then
     end process;
 
