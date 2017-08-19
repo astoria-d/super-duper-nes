@@ -39,8 +39,7 @@ type i2c_bus_stat is (
     );
 
 signal reg_cur_sp       : i2c_sp_stat;
-signal reg_next_sp      : i2c_sp_stat;
-signal reg_old_sda      : std_logic;
+signal reg_sda_up       : std_logic;
 
 signal reg_cur_state      : i2c_bus_stat;
 signal reg_next_state     : i2c_bus_stat;
@@ -51,69 +50,36 @@ signal reg_i2c_cmd_in_data      : std_logic_vector(6 downto 0);
 
 begin
 
-    --start/stop status.
-    set_sp : process (pi_rst_n, pi_base_clk)
+    --set sda on rising edge.
+    set_up_sda : process (pi_rst_n, pi_i2c_scl)
     begin
         if (pi_rst_n = '0') then
-            reg_cur_sp <= stop;
-            reg_old_sda <= '1';
-        elsif (rising_edge(pi_base_clk)) then
-            reg_cur_sp <= reg_next_sp;
-            reg_old_sda <= pio_i2c_sda;
+            reg_sda_up <= '1';
+        elsif (rising_edge(pi_i2c_scl)) then
+            reg_sda_up <= pio_i2c_sda;
         end if;--if (pi_rst_n = '0') then
     end process;
 
---    next_sp : process (pi_rst_n, pi_base_clk)
---    begin
---        if (pi_rst_n = '0') then
---            reg_next_sp <= stop;
---        elsif (rising_edge(pi_base_clk)) then
---            case reg_cur_sp is
---                when stop =>
---                    if (reg_old_sda = '1' and pio_i2c_sda = '0' and pi_i2c_scl = '1') then
---                        reg_next_sp <= start;
---                    end if;
---                when start =>
---                    if (reg_old_sda = '0' and pio_i2c_sda = '1' and pi_i2c_scl = '1') then
---                        reg_next_sp <= stop;
---                    elsif (reg_old_sda = '1' and pio_i2c_sda = '0' and pi_i2c_scl = '1') then
---                        reg_next_sp <= restart;
---                    end if;
---                when restart =>
---                    if (pi_i2c_scl = '0') then
---                        reg_next_sp <= start;
---                    end if;
---            end case;
---        end if;--if (pi_rst_n = '0') then
---    end process;
---
-    next_sp : process (pi_rst_n, reg_old_sda, pio_i2c_sda, pi_i2c_scl)
+    --set start/stop status on falling edge.
+    set_sp : process (pi_rst_n, pi_i2c_scl)
     begin
         if (pi_rst_n = '0') then
-            reg_next_sp <= stop;
-        elsif (pi_i2c_scl = '1') then
-            if (reg_old_sda = '1' and pio_i2c_sda = '0') then
-                if (reg_cur_sp = start) then
-                    reg_next_sp <= restart;
-                else
-                    reg_next_sp <= start;
-                end if;
-            elsif (reg_old_sda = '0' and pio_i2c_sda = '1') then
-                reg_next_sp <= stop;
-            end if;
-        elsif (pi_i2c_scl = '0') then
-            if (reg_cur_sp = restart) then
-                reg_next_sp <= start;
+            reg_cur_sp <= stop;
+        elsif (falling_edge(pi_i2c_scl)) then
+            if (reg_sda_up = '1' and pio_i2c_sda = '0' and reg_cur_sp = stop) then
+                reg_cur_sp <= start;
+            elsif (reg_sda_up = '1' and pio_i2c_sda = '0' and reg_cur_sp = start) then
+                reg_cur_sp <= restart;
+            elsif (reg_sda_up = '0' and pio_i2c_sda = '1') then
+                reg_cur_sp <= stop;
             end if;
         end if;--if (pi_rst_n = '0') then
     end process;
 
     --i2c bus state machine (state transition)...
-    set_stat_p : process (pi_rst_n, reg_cur_sp, pi_i2c_scl)
+    set_stat_p : process (pi_rst_n, pi_i2c_scl)
     begin
         if (pi_rst_n = '0') then
-            reg_cur_state <= idle;
-        elsif (reg_cur_sp = stop or reg_cur_sp = restart) then
             reg_cur_state <= idle;
         elsif (rising_edge(pi_i2c_scl)) then
             reg_cur_state <= reg_next_state;
@@ -121,14 +87,18 @@ begin
     end process;
 
     --state change to next.
-    next_stat_p : process (reg_cur_state, reg_i2c_cmd_r_nw, pio_i2c_sda)
+    next_stat_p : process (reg_cur_sp, reg_cur_state, reg_i2c_cmd_r_nw, pio_i2c_sda)
 
 procedure set_next_stat
 (
     pi_stat    : in i2c_bus_stat
 ) is
 begin
-    reg_next_state <= pi_stat;
+    if (reg_cur_sp = start) then
+        reg_next_state <= pi_stat;
+    else
+        reg_next_state <= idle;
+    end if;
 end;
 
     begin
@@ -322,4 +292,5 @@ end;
 
         end if;--if (pi_rst_n = '0') then
     end process;
+
 end rtl;
