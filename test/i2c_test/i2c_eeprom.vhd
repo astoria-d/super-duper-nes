@@ -61,9 +61,9 @@ begin
         end if;--if (pi_rst_n = '0') then
     end process;
 
-    p_write : process (pi_bus_ack)
+    p_write : process (pi_i2c_clk)
     begin
-    if (rising_edge(pi_bus_ack)) then
+    if (rising_edge(pi_i2c_clk)) then
         if (pi_bus_xfer = '1' and pi_r_nw = '0' and reg_write_cnt > 1) then
             work_ram(conv_integer(reg_eeprom_addr(abus_size -1 downto 0))) <= pi_data;
         end if;

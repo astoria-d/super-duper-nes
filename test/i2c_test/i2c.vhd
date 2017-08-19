@@ -223,7 +223,7 @@ end;
     begin
         if (pi_rst_n = '0') then
             po_i2c_status <= (others => '0');
-        elsif (falling_edge(pi_i2c_scl)) then
+        elsif (rising_edge(pi_i2c_scl)) then
             if (reg_i2c_cmd_addr = pi_slave_addr) then
                 if (reg_cur_state = d7 or
                     reg_cur_state = d6 or
@@ -232,8 +232,7 @@ end;
                     reg_cur_state = d3 or
                     reg_cur_state = d2 or
                     reg_cur_state = d1 or
-                    reg_cur_state = d0 or
-                    reg_cur_state = d_ack) then
+                    reg_cur_state = d0) then
                     po_i2c_status(0) <= '1';
                 else
                     po_i2c_status(0) <= '0';
@@ -241,8 +240,12 @@ end;
 
                 po_i2c_status(2) <= reg_i2c_cmd_r_nw;
                 
-                if (reg_cur_state = d_ack) then
+                if (reg_cur_state = d_ack and reg_i2c_cmd_r_nw = '0') then
+                    --write
                     po_i2c_status(1) <= '1';
+                elsif (reg_cur_state = d_ack and reg_i2c_cmd_r_nw = '1') then
+                    --read
+                    po_i2c_status(1) <= not pio_i2c_sda;
                 else
                     po_i2c_status(1) <= '0';
                 end if;
