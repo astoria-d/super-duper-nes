@@ -155,18 +155,18 @@ end;
             when d1 =>
                 set_next_stat(d0);
             when d0 =>
-                set_next_stat(d_ack);
-            when d_ack =>
                 if (reg_i2c_cmd_r_nw = '0') then
-                    set_next_stat(d7);
+                    set_next_stat(d_ack);
                 else
                     --wait for ack.
                     if (pio_i2c_sda = '0') then
-                        set_next_stat(d7);
+                        set_next_stat(d_ack);
                     else
-                        reg_next_state <= d_ack;
+                        set_next_stat(d0);
                     end if;
                 end if;
+            when d_ack =>
+                set_next_stat(d7);
         end case;
     end process;
 
