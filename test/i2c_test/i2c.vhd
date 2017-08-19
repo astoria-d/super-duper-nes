@@ -11,6 +11,7 @@ use ieee.std_logic_unsigned.all;
 entity i2c_slave is 
     port (
         pi_rst_n            : in    std_logic;
+        pi_base_clk         : in    std_logic;
 
         ---i2c bus lines...
         pi_slave_addr       : in    std_logic_vector (6 downto 0);
@@ -38,7 +39,8 @@ type i2c_bus_stat is (
     );
 
 signal reg_cur_sp       : i2c_sp_stat;
-signal reg_sda_up       : std_logic;
+signal reg_bsyn_sda     : std_logic;
+signal reg_bsyn_scl     : std_logic;
 
 signal reg_cur_state      : i2c_bus_stat;
 signal reg_next_state     : i2c_bus_stat;
@@ -49,29 +51,42 @@ signal reg_i2c_cmd_in_data      : std_logic_vector(6 downto 0);
 
 begin
 
-    --set sda on rising edge.
-    set_up_sda : process (pi_rst_n, pi_i2c_scl)
+    --for metastability, synchronize with two stages intermediate FF.
+    bsync_p : process (pi_rst_n, pi_base_clk)
+    variable reg_temp_sda   : std_logic_vector(2 downto 0);
+    variable reg_temp_scl   : std_logic_vector(2 downto 0);
     begin
         if (pi_rst_n = '0') then
-            reg_sda_up <= '1';
-        elsif (rising_edge(pi_i2c_scl)) then
-            reg_sda_up <= pio_i2c_sda;
+            reg_temp_sda := (others => '0');
+            reg_temp_scl := (others => '0');
+        elsif (rising_edge(pi_base_clk)) then
+            --shift two stage register.
+            reg_temp_sda := pio_i2c_sda & reg_temp_sda(2 downto 1);
+            reg_temp_scl := pi_i2c_scl & reg_temp_scl(2 downto 1);
+            reg_bsyn_sda <= reg_temp_sda(0);
+            reg_bsyn_scl <= reg_temp_scl(0);
         end if;--if (pi_rst_n = '0') then
     end process;
 
-    --set start/stop status on falling edge.
-    set_sp : process (pi_rst_n, pi_i2c_scl)
+    --start/stop w/ edge detect.
+    edge_detect_p : process (pi_rst_n, pi_base_clk)
+    variable reg_temp_sda2   : std_logic;
     begin
         if (pi_rst_n = '0') then
+            reg_temp_sda2 := '0';
             reg_cur_sp <= stop;
-        elsif (falling_edge(pi_i2c_scl)) then
-            if (reg_sda_up = '1' and pio_i2c_sda = '0' and reg_cur_sp = stop) then
+        elsif (rising_edge(pi_base_clk)) then
+            if (reg_bsyn_scl = '1' and reg_bsyn_sda = '0' and reg_temp_sda2 = '1'
+                and reg_cur_sp = stop) then
                 reg_cur_sp <= start;
-            elsif (reg_sda_up = '1' and pio_i2c_sda = '0' and reg_cur_sp = start) then
+            elsif (reg_bsyn_scl = '1' and reg_bsyn_sda = '0' and reg_temp_sda2 = '1'
+                and reg_cur_sp = start) then
                 reg_cur_sp <= restart;
-            elsif (reg_sda_up = '0' and pio_i2c_sda = '1') then
+            elsif (reg_bsyn_scl = '1' and reg_bsyn_sda = '1' and reg_temp_sda2 = '0'
+                and reg_cur_sp = start) then
                 reg_cur_sp <= stop;
             end if;
+            reg_temp_sda2 := reg_bsyn_sda;
         end if;--if (pi_rst_n = '0') then
     end process;
 

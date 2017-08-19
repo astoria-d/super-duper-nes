@@ -35,9 +35,12 @@ architecture rtl of i2c_test is
 component i2c_slave
 port (
     pi_rst_n            : in    std_logic;
+    pi_base_clk         : in    std_logic;
+    ---i2c bus lines...
     pi_slave_addr       : in    std_logic_vector (6 downto 0);
     pi_i2c_scl          : in    std_logic;
     pio_i2c_sda         : inout std_logic;
+    ---i2c bus contoler internal lines...
     po_i2c_status       : out   std_logic_vector (2 downto 0);
     po_slave_in_data    : out   std_logic_vector (7 downto 0);
     pi_slave_out_data   : in    std_logic_vector (7 downto 0)
@@ -74,6 +77,7 @@ begin
     i2c_slave_inst : i2c_slave
     port map (
         pi_reset_n,
+        pi_base_clk,
         conv_std_logic_vector(16#44#, 7),
         pi_i2c_scl,
         pio_i2c_sda,
