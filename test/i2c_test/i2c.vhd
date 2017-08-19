@@ -91,9 +91,11 @@ begin
     end process;
 
     --i2c bus state machine (state transition)...
-    set_stat_p : process (pi_rst_n, pi_i2c_scl)
+    set_stat_p : process (pi_rst_n, reg_cur_sp, pi_i2c_scl)
     begin
         if (pi_rst_n = '0') then
+            reg_cur_state <= idle;
+        elsif (reg_cur_sp = stop or reg_cur_sp = restart) then
             reg_cur_state <= idle;
         elsif (rising_edge(pi_i2c_scl)) then
             reg_cur_state <= reg_next_state;
@@ -101,18 +103,14 @@ begin
     end process;
 
     --state change to next.
-    next_stat_p : process (reg_cur_sp, reg_cur_state, reg_i2c_cmd_r_nw, pio_i2c_sda)
+    next_stat_p : process (reg_cur_state, reg_i2c_cmd_r_nw, pio_i2c_sda)
 
 procedure set_next_stat
 (
     pi_stat    : in i2c_bus_stat
 ) is
 begin
-    if (reg_cur_sp = start) then
-        reg_next_state <= pi_stat;
-    else
-        reg_next_state <= idle;
-    end if;
+    reg_next_state <= pi_stat;
 end;
 
     begin
