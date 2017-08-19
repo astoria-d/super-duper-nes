@@ -11,7 +11,6 @@ use ieee.std_logic_unsigned.all;
 entity i2c_slave is 
     port (
         pi_rst_n            : in    std_logic;
-        pi_base_clk         : in    std_logic;
 
         ---i2c bus lines...
         pi_slave_addr       : in    std_logic_vector (6 downto 0);
@@ -201,13 +200,12 @@ end;
         end if;--if (pi_rst_n = '0') then
     end process;
 
-    --output (ack and read response: output) i2c bus.
-    out_data : process (pi_rst_n, pi_base_clk)
+    --output status.
+    out_stat : process (pi_rst_n, pi_i2c_scl)
     begin
         if (pi_rst_n = '0') then
-            pio_i2c_sda <= 'Z';
             po_i2c_status <= (others => '0');
-        elsif (rising_edge(pi_base_clk)) then
+        elsif (falling_edge(pi_i2c_scl)) then
             if (reg_i2c_cmd_addr = pi_slave_addr) then
                 if (reg_cur_state = d7 or
                     reg_cur_state = d6 or
@@ -230,50 +228,32 @@ end;
                 else
                     po_i2c_status(1) <= '0';
                 end if;
+            else
+                po_i2c_status <= (others => '0');
+            end if;--if (reg_i2c_cmd_addr = pi_slave_addr) then
+        end if;--if (pi_rst_n = '0') then
+    end process;
 
-                --addr ack reply.
-                if (reg_cur_state = rw and pi_i2c_scl = '0') then
+    --output (ack and read response: output) i2c bus.
+    out_data : process (pi_rst_n, pi_i2c_scl)
+    begin
+        if (pi_rst_n = '0') then
+            pio_i2c_sda <= 'Z';
+        elsif (falling_edge(pi_i2c_scl)) then
+            if (reg_i2c_cmd_addr = pi_slave_addr) then
+                if (reg_cur_state = rw) then
+                    --addr ack reply.
                     pio_i2c_sda <= '0';
-                elsif (reg_cur_state = a_ack and pi_i2c_scl = '0') then
+                elsif (reg_cur_state = a_ack) then
                     --data input.
                     if (reg_i2c_cmd_r_nw = '0') then
                         pio_i2c_sda <= 'Z';
                     --data output.
-                    elsif (pi_i2c_scl = '0') then
+                    else
                         pio_i2c_sda <= pi_slave_out_data(7);
                     end if;
-                
-                --data output.
-                elsif (reg_cur_state = d7 and reg_i2c_cmd_r_nw = '1') then
-                    if (pi_i2c_scl = '0') then
-                        pio_i2c_sda <= pi_slave_out_data(6);
-                    end if;
-                elsif (reg_cur_state = d6 and reg_i2c_cmd_r_nw = '1') then
-                    if (pi_i2c_scl = '0') then
-                        pio_i2c_sda <= pi_slave_out_data(5);
-                    end if;
-                elsif (reg_cur_state = d5 and reg_i2c_cmd_r_nw = '1') then
-                    if (pi_i2c_scl = '0') then
-                        pio_i2c_sda <= pi_slave_out_data(4);
-                    end if;
-                elsif (reg_cur_state = d4 and reg_i2c_cmd_r_nw = '1') then
-                    if (pi_i2c_scl = '0') then
-                        pio_i2c_sda <= pi_slave_out_data(3);
-                    end if;
-                elsif (reg_cur_state = d3 and reg_i2c_cmd_r_nw = '1') then
-                    if (pi_i2c_scl = '0') then
-                        pio_i2c_sda <= pi_slave_out_data(2);
-                    end if;
-                elsif (reg_cur_state = d2 and reg_i2c_cmd_r_nw = '1') then
-                    if (pi_i2c_scl = '0') then
-                        pio_i2c_sda <= pi_slave_out_data(1);
-                    end if;
-                elsif (reg_cur_state = d1 and reg_i2c_cmd_r_nw = '1') then
-                    if (pi_i2c_scl = '0') then
-                        pio_i2c_sda <= pi_slave_out_data(0);
-                    end if;
 
-                elsif (reg_cur_state = d0 and pi_i2c_scl = '0') then
+                elsif (reg_cur_state = d0) then
                     --data ack reply.
                     if (reg_i2c_cmd_r_nw = '0') then
                         pio_i2c_sda <= '0';
@@ -281,15 +261,30 @@ end;
                     --yield bus for incoming data.
                         pio_i2c_sda <= 'Z';
                     end if;
-                elsif (reg_cur_state = d_ack and pi_i2c_scl = '0') then
+
+                --data output.
+                elsif (reg_cur_state = d1 and reg_i2c_cmd_r_nw = '1') then
+                    pio_i2c_sda <= pi_slave_out_data(0);
+                elsif (reg_cur_state = d2 and reg_i2c_cmd_r_nw = '1') then
+                    pio_i2c_sda <= pi_slave_out_data(1);
+                elsif (reg_cur_state = d3 and reg_i2c_cmd_r_nw = '1') then
+                    pio_i2c_sda <= pi_slave_out_data(2);
+                elsif (reg_cur_state = d4 and reg_i2c_cmd_r_nw = '1') then
+                    pio_i2c_sda <= pi_slave_out_data(3);
+                elsif (reg_cur_state = d5 and reg_i2c_cmd_r_nw = '1') then
+                    pio_i2c_sda <= pi_slave_out_data(4);
+                elsif (reg_cur_state = d6 and reg_i2c_cmd_r_nw = '1') then
+                    pio_i2c_sda <= pi_slave_out_data(5);
+                elsif (reg_cur_state = d7 and reg_i2c_cmd_r_nw = '1') then
+                    pio_i2c_sda <= pi_slave_out_data(6);
+
+                elsif (reg_cur_state = d_ack) then
                     pio_i2c_sda <= 'Z';
 
                 end if;
             else
-                po_i2c_status <= (others => '0');
                 pio_i2c_sda <= 'Z';
-            end if;--if (reg_cur_state = rw and pi_i2c_scl = '0') then
-
+            end if;--reg_i2c_cmd_addr = pi_slave_addr
         end if;--if (pi_rst_n = '0') then
     end process;
 
