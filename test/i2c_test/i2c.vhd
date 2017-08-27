@@ -244,7 +244,7 @@ end;
                 if (reg_cur_state = d_ack and reg_i2c_cmd_r_nw = '0') then
                     --write
                     po_i2c_status(1) <= '1';
-                elsif (reg_cur_state = d_ack and reg_i2c_cmd_r_nw = '1') then
+                elsif (reg_cur_state = d0 and reg_i2c_cmd_r_nw = '1') then
                     --read
                     po_i2c_status(1) <= not pio_i2c_sda;
                 else
@@ -301,8 +301,13 @@ end;
                     end if;
 
                 elsif (reg_cur_state = d_ack) then
-                    pio_i2c_sda <= 'Z';
-
+                    --data receive.
+                    if (reg_i2c_cmd_r_nw = '0') then
+                        pio_i2c_sda <= 'Z';
+                    else
+                        --data out.
+                        pio_i2c_sda <= pi_slave_out_data(7);
+                    end if;
                 end if;
             else
                 pio_i2c_sda <= 'Z';
