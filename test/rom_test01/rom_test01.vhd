@@ -193,21 +193,13 @@ use ieee.std_logic_unsigned.all;
 
 
     po_dbg_cnt <= reg_dbg_cnt;
-    deb_cnt_p : process (pi_phi2, reg_reset_n)
+    deb_cnt_p : process (pi_base_clk, pi_reset_n)
 use ieee.std_logic_unsigned.all;
-    variable cnt : integer;
     begin
         if (reg_reset_n = '0') then
             reg_dbg_cnt <= (others => '0');
-            cnt := 0;
-        elsif (rising_edge(pi_phi2)) then
-            if (cnt = 0) then
-                --debug count is half cycle because too fast to capture in st ii.
-                reg_dbg_cnt <= reg_dbg_cnt + 1;
-                cnt := 1;
-            else
-                cnt := 0;
-            end if;
+        elsif (rising_edge(pi_base_clk)) then
+            reg_dbg_cnt <= reg_dbg_cnt + 1;
         end if;
     end process;
 end rtl;
