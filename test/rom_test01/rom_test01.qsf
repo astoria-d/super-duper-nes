@@ -59,6 +59,7 @@ set_global_assignment -name STRATIX_CONFIGURATION_DEVICE EPCS4
 
 ##pin asignment.
 set_location_assignment PIN_L1 -to pi_base_clk
+set_location_assignment PIN_P22 -to pi_reset_n
 
 ##set_location_assignment PIN_T21 -to pi_btn_n[3]
 ##set_location_assignment PIN_T22 -to pi_btn_n[2]
@@ -170,6 +171,9 @@ set_location_assignment PIN_H17 -to pi_phi2
 #set_location_assignment PIN_N15 -to 
 #set_location_assignment PIN_P17 -to 
 #set_location_assignment PIN_P18 -to 
+
+set_location_assignment PIN_T19 -to pi_i2c_scl
+set_location_assignment PIN_T17 -to pio_i2c_sda
 
 
 ##global clock set.

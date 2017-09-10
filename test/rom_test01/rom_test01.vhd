@@ -7,11 +7,14 @@ use ieee.std_logic_unsigned.all;
 --entity rom_test01 is 
 entity rom_test01_de0_cv is 
     port (
-        pi_base_clk    : in std_logic;
+        pi_reset_n      : in std_logic;
+        pi_base_clk     : in std_logic;
 --        pi_sw          : in std_logic_vector(9 downto 0);
 --        pi_btn_n       : in std_logic_vector(3 downto 0);
 --        po_led_r       : out std_logic_vector(9 downto 0);
 --        po_led_g       : out std_logic_vector(7 downto 0);
+
+        --nes side
         pi_phi2             : in std_logic;
         pi_prg_ce_n         : in std_logic;
         pi_prg_r_nw         : in std_logic;
@@ -22,8 +25,13 @@ entity rom_test01_de0_cv is
         pi_chr_we_n         : in std_logic;
         pi_chr_addr         : in std_logic_vector(12 downto 0);
         po_chr_data         : out std_logic_vector(7 downto 0);
+
+        --i2c side
+        pi_i2c_scl      : in    std_logic;
+        pio_i2c_sda     : inout std_logic;
+
         po_dbg_cnt          : out std_logic_vector (63 downto 0)
-         );
+        );
 --end rom_test01;
 end rom_test01_de0_cv;
 
@@ -48,6 +56,35 @@ component chr_rom port (
     );
 end component;
 
+component i2c_slave
+port (
+    pi_rst_n            : in    std_logic;
+    pi_base_clk         : in    std_logic;
+    ---i2c bus lines...
+    pi_slave_addr       : in    std_logic_vector (6 downto 0);
+    pi_i2c_scl          : in    std_logic;
+    pio_i2c_sda         : inout std_logic;
+    ---i2c bus contoler internal lines...
+    po_i2c_status       : out   std_logic_vector (2 downto 0);
+    po_slave_in_data    : out   std_logic_vector (7 downto 0);
+    pi_slave_out_data   : in    std_logic_vector (7 downto 0)
+    );
+end component;
+
+component i2c_eeprom
+    generic (abus_size : integer := 16);
+    port (
+        pi_rst_n        : in std_logic;
+        pi_base_clk     : in std_logic;
+        pi_bus_xfer     : in std_logic;
+        pi_r_nw         : in std_logic;
+        pi_bus_ack      : in std_logic;
+        po_bus_ack      : out std_logic;
+        pi_data         : in std_logic_vector (7 downto 0);
+        po_data         : out std_logic_vector (7 downto 0)
+    );
+end component;
+
 --signal wk_chr_ce_n  : std_logic;
 --signal wk_phi2_n        : std_logic;
 signal reg_reset_n      : std_logic;
@@ -56,6 +93,12 @@ signal reg_dbg_cnt      : std_logic_vector (63 downto 0);
 
 --2, 4, 8, 16, 32 divide counter.
 signal reg_divide_cnt      : std_logic_vector (4 downto 0);
+
+--i2c registers.
+signal reg_slave_in_data    : std_logic_vector (7 downto 0);
+signal reg_slave_out_data   : std_logic_vector (7 downto 0);
+signal reg_slave_status     : std_logic_vector (2 downto 0);
+signal reg_slave_addr_ack   : std_logic;
 
 begin
 
@@ -96,6 +139,29 @@ use ieee.std_logic_unsigned.all;
         po_chr_data
     );
 
+    i2c_slave_inst : i2c_slave
+    port map (
+        pi_reset_n,
+        pi_base_clk,
+        conv_std_logic_vector(16#44#, 7),
+        pi_i2c_scl,
+        pio_i2c_sda,
+        reg_slave_status,
+        reg_slave_in_data,
+        reg_slave_out_data
+    );
+
+    i2c_eeprom_inst : i2c_eeprom generic map (8)
+    port map (
+        pi_reset_n,
+        pi_base_clk,
+        reg_slave_status(0),
+        reg_slave_status(2),
+        reg_slave_status(1),
+        reg_slave_addr_ack,
+        reg_slave_in_data,
+        reg_slave_out_data
+    );
 
     reset_p : process (pi_base_clk)
 use ieee.std_logic_unsigned.all;
