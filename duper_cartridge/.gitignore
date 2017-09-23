@@ -1,0 +1,10 @@
+*.bak
+*.json
+*_dump.txt
+*.qdf
+*.sft
+*.vho
+*.xrf
+db/*
+incremental_db/*
+output_files/*
