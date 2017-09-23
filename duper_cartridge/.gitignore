@@ -2,6 +2,7 @@
 *.json
 *_dump.txt
 *.qdf
+*.qws
 *.sft
 *.vho
 *.xrf

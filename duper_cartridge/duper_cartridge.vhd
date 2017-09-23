@@ -38,14 +38,19 @@ end duper_cartridge;
 --architecture rtl of rom_test01 is
 architecture rtl of duper_cartridge is
 
-component prg_rom port (
-    pi_base_clk 	: in std_logic;
+component duper_prg_rom port (  
+    pi_base_clk     : in std_logic;
     pi_ce_n         : in std_logic;
     pi_oe_n         : in std_logic;
+    pi_we_n         : in std_logic;
     pi_addr         : in std_logic_vector (14 downto 0);
-    po_data         : out std_logic_vector (7 downto 0)
+    pio_data        : out std_logic_vector (7 downto 0);
+
+    po_push_fifo    : out std_logic_vector (7 downto 0);
+    pi_pop_fifo     : in std_logic_vector (7 downto 0);
+    pi_fifo_stat    : in std_logic_vector (7 downto 0)
     );
-end component;
+end component ;
 
 component chr_rom port (
     pi_base_clk 	: in std_logic;
@@ -100,6 +105,11 @@ signal reg_slave_out_data   : std_logic_vector (7 downto 0);
 signal reg_slave_status     : std_logic_vector (2 downto 0);
 signal reg_slave_addr_ack   : std_logic;
 
+signal reg_nr               : std_logic;
+signal reg_to_bbb_fifo      : std_logic_vector (7 downto 0);
+signal reg_from_bbb_fifo    : std_logic_vector (7 downto 0);
+signal reg_fifo_status      : std_logic_vector (7 downto 0);
+
 begin
 
 --    wk_phi2_n <= not pi_phi2;
@@ -112,22 +122,20 @@ use ieee.std_logic_unsigned.all;
         end if;
     end process;
 
---    chr_addr_p : process (pi_base_clk)
---    begin
---        if (rising_edge(pi_base_clk)) then
---            if (pi_chr_ce_n = '0') then
---                reg_chr_addr <= pi_chr_addr(11 downto 0);
---            end if;
---        end if;
---    end process;
-
     --program rom
-    prom_inst : prg_rom port map (
+    reg_nr <= not pi_prg_r_nw;
+    reg_from_bbb_fifo <= "11110000";
+    reg_fifo_status <= "11000100";
+    prom_inst : duper_prg_rom port map (
         pi_base_clk,
         pi_prg_ce_n,
-        pi_prg_ce_n,
+        reg_nr,
+        pi_prg_r_nw,
         pi_prg_addr,
-        po_prg_data
+        po_prg_data,
+        reg_to_bbb_fifo,
+        reg_from_bbb_fifo,
+        reg_fifo_status
     );
 
     --character rom

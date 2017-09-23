@@ -192,11 +192,6 @@ set_location_assignment PIN_F15 -to pi_phi2
 ##set_location_assignment PIN_K16
 
 ##project files
-set_global_assignment -name SDC_FILE duper_cartridge.sdc
-set_global_assignment -name VHDL_FILE prg_rom.vhd
-set_global_assignment -name VHDL_FILE i2c_eeprom.vhd
-set_global_assignment -name VHDL_FILE i2c.vhd
-set_global_assignment -name VHDL_FILE duper_cartridge.vhd
 
 
 #########
@@ -228,3 +223,8 @@ set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 
 set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
 
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
+set_global_assignment -name VHDL_FILE prg_rom.vhd
+set_global_assignment -name VHDL_FILE i2c_eeprom.vhd
+set_global_assignment -name VHDL_FILE i2c.vhd
+set_global_assignment -name VHDL_FILE duper_cartridge.vhd
+set_global_assignment -name SDC_FILE duper_cartridge.sdc
