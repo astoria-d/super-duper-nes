@@ -471,12 +471,12 @@ init_funcs:
     lda #11
     cmp kb_select
     bcc :+
-    jmp @end
+    jmp @kb_end
 :
     lda #$7f
     cmp kb_select
     bne :+
-    jmp @end
+    jmp @kb_end
 :
     ;;move cursor up.
     lda kb_cur_pos
@@ -522,7 +522,7 @@ init_funcs:
     lda #$00
     sta jp_status
 
-    jmp @end
+    jmp @kb_end
 
 @down:
     ;;case down
@@ -575,7 +575,7 @@ init_funcs:
     lda #$00
     sta jp_status
 
-    jmp @end
+    jmp @kb_end
 
 @left:
     ;;case left
@@ -608,7 +608,7 @@ init_funcs:
     lda #$7f
     cmp kb_select
     bne :+
-    jmp @end
+    jmp @kb_end
 :
     ;;move cursor left.
     lda kb_cur_pos
@@ -649,7 +649,7 @@ init_funcs:
     lda #$00
     sta jp_status
 
-    jmp @end
+    jmp @kb_end
 
 @rtn_btn:
     ;;move cursor to return button pos.
@@ -684,7 +684,7 @@ init_funcs:
     lda #$00
     sta jp_status
 
-    jmp @end
+    jmp @kb_end
 
 @right:
     ;;case down
@@ -698,22 +698,22 @@ init_funcs:
     lda #11
     cmp kb_select
     bne :+
-    jmp @end
+    jmp @kb_end
 :
     lda #23
     cmp kb_select
     bne :+
-    jmp @end
+    jmp @kb_end
 :
     lda #35
     cmp kb_select
     bne :+
-    jmp @end
+    jmp @kb_end
 :
     lda #47
     cmp kb_select
     bne :+
-    jmp @end
+    jmp @kb_end
 :
     lda #$7f
     cmp kb_select
@@ -754,7 +754,7 @@ init_funcs:
     lda #$00
     sta jp_status
 
-    jmp @end
+    jmp @kb_end
 
 @back_to_kb:
     ;;return from back btn.
@@ -789,7 +789,7 @@ init_funcs:
     lda #$00
     sta jp_status
 
-    jmp @end
+    jmp @kb_end
 
 @b:
     ;;case b
@@ -803,7 +803,7 @@ init_funcs:
     ;;max input text is 60 chars.
     cmp in_text_carret
     bne :+
-    jmp @end
+    jmp @kb_end
 :
     lda #$7f
     cmp kb_select
@@ -872,7 +872,7 @@ init_funcs:
     ;;invalidate jp input for a while.
     lda #$00
     sta jp_status
-    jmp @end
+    jmp @kb_end
 
 @end_shell:
     ;;close all window.
@@ -898,7 +898,7 @@ init_funcs:
     ;;invalidate jp input for a while.
     lda #$00
     sta jp_status
-    jmp @end
+    jmp @kb_end
 
 @sft_btn:
     lda kb_sft_status
@@ -951,7 +951,7 @@ init_funcs:
 
     lda #$00
     sta jp_status
-    jmp @end
+    jmp @kb_end
 @s_on:
     ;;case shift on.
     lda #$22
@@ -1000,13 +1000,13 @@ init_funcs:
 
     lda #$00
     sta jp_status
-    jmp @end
+    jmp @kb_end
 
 @bs_btn:
     ;;backspace.
     lda in_text_carret
     bne :+
-    jmp @end
+    jmp @kb_end
 :
 
     dec in_text_carret
@@ -1037,13 +1037,13 @@ init_funcs:
 
     lda #$00
     sta jp_status
-    jmp @end
+    jmp @kb_end
 
 @a:
     ;;case a..
     lda #$01
     bit jp1_data
-    beq @end
+    beq @kb_end
 
     ;;reset carret.
     lda #$22
@@ -1075,7 +1075,27 @@ init_funcs:
     lda #$00
     sta jp_status
 
-@end:
+@kb_end:
+
+    ;;check i2c input data...
+    lda #$10
+    and fifo_stat
+    beq :+
+    lda fifo_data
+    sta $00
+    inc output_pos
+
+
+    lda #$20
+    sta $02
+    lda #$42
+    clc
+    adc output_pos
+    sta $03
+    jsr print_chr
+
+    inc output_pos
+:
     rts
 .endproc
 
@@ -1812,6 +1832,21 @@ init_funcs:
 .endproc
 
 
+;;;param $00 = char to display.
+;;;param $02, $03 = vram pos
+;;;print character at the pos specified in the parameter.
+.proc print_chr
+    lda $02
+    sta $2006
+    lda $03
+    sta $2006
+
+    lda $00
+    sta $00
+
+    rts
+.endproc
+
 ;;;param $00, $01 = msg addr.
 ;;;param $02, $03 = vram pos
 ;;;print string at the pos specified in the parameter.
@@ -2220,11 +2255,21 @@ carret_pos:
 ;;in_text_carret is the offset in from the text buffer top.
 in_text_carret:
     .byte   $00
-:
+
 ;;input text buffer is 2 lines (60 char + null char.)
 in_text_buf:
     .byte   $8a
 .repeat 63
+    .byte   $00
+.endrepeat
+
+output_pos:
+    .byte   $00
+    .byte   $00
+
+;;output text buffer is 28 x 15 (420 chars.)
+out_text_buf:
+.repeat 420
     .byte   $00
 .endrepeat
 

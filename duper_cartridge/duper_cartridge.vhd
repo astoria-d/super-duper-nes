@@ -124,7 +124,7 @@ use ieee.std_logic_unsigned.all;
 
     --program rom
     reg_nr <= not pi_prg_r_nw;
-    reg_from_bbb_fifo <= "11110000";
+    reg_from_bbb_fifo <= "01000100"; --0x44 = "D"
     reg_fifo_status <= "11000100";
     prom_inst : duper_prg_rom port map (
         pi_base_clk,

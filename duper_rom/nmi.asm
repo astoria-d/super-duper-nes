@@ -4,6 +4,8 @@
 .export nmi_proc
 .export jp1_data
 .export jp_suspend_cnt
+.export fifo_stat
+.export fifo_data
 
 .segment "STARTUP"
 
@@ -87,10 +89,37 @@
     sta jp1_data
 :
 
+    ;;check i2c queue.
+
+;;0xfff9	w: push fifo register
+;;	r: pop fifo register
+;;0xfff8	fifo status register
+
+;;firo status register
+;;bit	
+;;0	write fifo empty
+;;1	write fifo full
+;;2	always 0
+;;3	always 0
+;;4	read fifo empty
+;;5	read fifo full
+;;6	always 0
+;;7	always 0
+
+    lda #$10
+    and $fff8
+    sta fifo_stat
+    beq :+
+    lda $fff9
+    sta fifo_data
+    jmp @need_update
+:
+
     ;;check jp1 status...
     lda jp_status
     beq @no_update
     
+@need_update:
     jsr update_screen
     jmp @update_done
 
@@ -150,4 +179,9 @@ jp1_data:
     .byte   $00
 
 jp_suspend_cnt:
+    .byte   $00
+
+fifo_stat:
+    .byte   $00
+fifo_data:
     .byte   $00
