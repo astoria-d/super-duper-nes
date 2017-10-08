@@ -42,7 +42,7 @@ int mp_set_debugger(mp_dbg_get_byte_t byte_func, mp_dbg_get_short_t short_func) 
 }
 
 unsigned char mp_dbg_get_byte(unsigned short offset) {
-    printf("mapper debugger...\n");
+/*    printf("mapper debugger...\n");*/
     return (*rom_dbg_get_byte)(offset);
 }
 
