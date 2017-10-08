@@ -11,6 +11,8 @@ all :	$(OBJECTS) $(LIBRARIES)
 #	cp sample1-chr-4k.hex ../duper_cartridge/
 	cp sample1-prg-8k.hex ../duper_cartridge/
 #	ld65 -o duper-rom.nes --dbgfile duper-rom.dbg -vm --mapfile duper-rom.map  --config linker.cfg --obj $(OBJECTS)
+	 cp duper-rom.nes ../../motonesemu/bin/
+
 
 run : all
 	date; VirtuaNES.exe duper-rom.nes
