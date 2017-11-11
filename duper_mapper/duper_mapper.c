@@ -121,7 +121,9 @@ status bit...
 
         /*TODO: check write full*/
 
+/*        
         printf("duper mapper get fifo status: %02x\n", fifo_status_reg);
+*/        
         return fifo_status_reg;
     }
     else {

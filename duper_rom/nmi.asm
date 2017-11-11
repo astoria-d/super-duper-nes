@@ -109,7 +109,7 @@
     lda #$10
     and $fff8
     sta fifo_stat
-    beq :+
+    bne :+
     lda $fff9
     sta fifo_data
     jmp @need_update
