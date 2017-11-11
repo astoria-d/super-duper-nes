@@ -1078,9 +1078,11 @@ init_funcs:
 @kb_end:
 
     ;;check i2c input data...
-    lda #$10
-    and fifo_stat
-    beq :+
+    ;;check fifo_stat empty bit.
+    lda fifo_stat
+    bne :+
+
+;;;must rework here... not working!!
     lda fifo_data
     sta $00
     inc output_pos
