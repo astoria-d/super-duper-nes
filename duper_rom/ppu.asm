@@ -1081,26 +1081,39 @@ init_funcs:
     ;;check fifo_stat empty bit.
     lda fifo_stat
     bne :+
-
-;;;must rework here... not working!!
-    lda fifo_data
-    sta $00
-    inc output_pos
-
-
-    lda #$20
-    sta $02
-    lda #$42
-    clc
-    adc output_pos
-    sta $03
-    jsr print_chr
-
-    inc output_pos
+    jsr print_i2c
 :
     rts
 .endproc
 
+.proc print_i2c
+;;;must rework here... not working!!
+    lda output_pos
+    sta $02
+    lda #$42
+    sta $03
+    lda top_menu1
+    sta $00
+    lda top_menu1+1
+    sta $01
+    jsr print_str
+
+;;    lda fifo_data
+;;    sta $00
+;;    inc output_pos
+;;
+;;
+;;    lda #$20
+;;    sta $02
+;;    lda #$42
+;;    clc
+;;    adc output_pos
+;;    sta $03
+;;    jsr print_chr
+;;
+;;    inc output_pos
+    rts
+.endproc
 
 .proc inet_screen_init
     ;;create box.
@@ -1190,6 +1203,11 @@ init_funcs:
     sta inet_menu_select
     lda #1
     sta screen_status
+
+    lda #$20
+    sta output_pos
+    lda #$42
+    sta output_pos+1
 
     rts
 .endproc

@@ -1,0 +1,176 @@
+8031: 4c 31 80    JMP   $8031
+8031: 4c 31 80    JMP   $8031
+8031: 4c 31 80    JMP   $8031
+8031: 4c 31 80    JMP   $8031
+8fde: a9 80       LDA   #$80
+8fe0: 4d 00 03    EOR   $0300
+8fe3: 8d 00 03    STA   $0300
+8fe6: 8d 00 20    STA   $2000
+8fe9: a9 18       LDA   #$18
+8feb: 4d 01 03    EOR   $0301
+8fee: 8d 01 20    STA   $2001
+8ff1: 8d 01 03    STA   $0301
+8ff4: a9 00       LDA   #$00
+8ff6: 8d fc 04    STA   $04fc
+8ff9: a9 01       LDA   #$01
+8ffb: 8d 16 40    STA   $4016
+8ffe: a9 00       LDA   #$00
+9000: 8d 16 40    STA   $4016
+9003: a9 01       LDA   #$01
+9005: 2c 16 40    BIT   $4016
+9008: f0 05       BEQ   #  +5
+900f: a9 01       LDA   #$01
+9011: 2c 16 40    BIT   $4016
+9014: f0 05       BEQ   #  +5
+901b: a9 01       LDA   #$01
+901d: 2c 16 40    BIT   $4016
+9020: f0 05       BEQ   #  +5
+9027: a9 01       LDA   #$01
+9029: 2c 16 40    BIT   $4016
+902c: f0 05       BEQ   #  +5
+9033: a9 01       LDA   #$01
+9035: 2c 16 40    BIT   $4016
+9038: f0 05       BEQ   #  +5
+903f: a9 01       LDA   #$01
+9041: 2c 16 40    BIT   $4016
+9044: f0 05       BEQ   #  +5
+904b: a9 01       LDA   #$01
+904d: 2c 16 40    BIT   $4016
+9050: f0 05       BEQ   #  +5
+9057: a9 01       LDA   #$01
+9059: 2c 16 40    BIT   $4016
+905c: f0 05       BEQ   #  +5
+9063: a9 10       LDA   #$10
+9065: 2d f8 ff    AND   $fff8
+9068: 8d fe 04    STA   $04fe
+906b: d0 09       BNE   #  +9
+906d: ad f9 ff    LDA   $fff9
+duper mapper get fifo: 61
+9070: 8d ff 04    STA   $04ff
+9073: 4c 7b 90    JMP   $907b
+907b: 20 bc 80    JSR   $80bc
+80bc: ad 04 03    LDA   $0304
+80bf: 0a          ASL
+80c0: a8          TAY
+80c1: b9 ac 80    LDA   $80ac, y
+80c4: 85 02       STA   $02
+80c6: c8          INY
+80c7: b9 ac 80    LDA   $80ac, y
+80ca: 85 03       STA   $03
+80cc: 6c 02 00    JMP   ($0002)
+837b: a9 10       LDA   #$10
+837d: 2c fc 04    BIT   $04fc
+8380: f0 6a       BEQ   #+106
+83ec: a9 20       LDA   #$20
+83ee: 2c fc 04    BIT   $04fc
+83f1: d0 03       BNE   #  +3
+83f3: 4c 4a 84    JMP   $844a
+844a: a9 40       LDA   #$40
+844c: 2c fc 04    BIT   $04fc
+844f: d0 03       BNE   #  +3
+8451: 4c 11 85    JMP   $8511
+8511: a9 80       LDA   #$80
+8513: 2c fc 04    BIT   $04fc
+8516: d0 03       BNE   #  +3
+8518: 4c d0 85    JMP   $85d0
+85d0: a9 02       LDA   #$02
+85d2: 2c fc 04    BIT   $04fc
+85d5: d0 03       BNE   #  +3
+85d7: 4c 85 87    JMP   $8785
+8785: a9 01       LDA   #$01
+8787: 2c fc 04    BIT   $04fc
+878a: f0 36       BEQ   # +54
+87c2: ad fe 04    LDA   $04fe
+87c5: d0 03       BNE   #  +3
+87c7: 20 cb 87    JSR   $87cb
+87cb: ad 54 03    LDA   $0354
+87ce: 85 02       STA   $02
+87d0: a9 42       LDA   #$42
+87d2: 85 03       STA   $03
+87d4: ad 0f 8e    LDA   $8e0f
+87d7: 85 00       STA   $00
+87d9: ad 10 8e    LDA   $8e10
+87dc: 85 01       STA   $01
+87de: 20 c4 8c    JSR   $8cc4
+8cc4: a5 02       LDA   $02
+8cc6: 8d 06 20    STA   $2006
+8cc9: a5 03       LDA   $03
+8ccb: 8d 06 20    STA   $2006
+8cce: a0 00       LDY   #$00
+8cd0: b1 00       LDA   ($00), y
+8cd2: f0 07       BEQ   #  +7
+8cd4: 8d 07 20    STA   $2007
+invalid vram write!!!!
+8cd7: c8          INY
+8cd8: 4c d0 8c    JMP   $8cd0
+8cd0: b1 00       LDA   ($00), y
+8cd2: f0 07       BEQ   #  +7
+8cd4: 8d 07 20    STA   $2007
+invalid vram write!!!!
+8cd7: c8          INY
+8cd8: 4c d0 8c    JMP   $8cd0
+8cd0: b1 00       LDA   ($00), y
+8cd2: f0 07       BEQ   #  +7
+8cd4: 8d 07 20    STA   $2007
+invalid vram write!!!!
+8cd7: c8          INY
+8cd8: 4c d0 8c    JMP   $8cd0
+8cd0: b1 00       LDA   ($00), y
+8cd2: f0 07       BEQ   #  +7
+8cd4: 8d 07 20    STA   $2007
+invalid vram write!!!!
+8cd7: c8          INY
+8cd8: 4c d0 8c    JMP   $8cd0
+8cd0: b1 00       LDA   ($00), y
+8cd2: f0 07       BEQ   #  +7
+8cd4: 8d 07 20    STA   $2007
+invalid vram write!!!!
+8cd7: c8          INY
+8cd8: 4c d0 8c    JMP   $8cd0
+8cd0: b1 00       LDA   ($00), y
+8cd2: f0 07       BEQ   #  +7
+8cd4: 8d 07 20    STA   $2007
+invalid vram write!!!!
+8cd7: c8          INY
+8cd8: 4c d0 8c    JMP   $8cd0
+8cd0: b1 00       LDA   ($00), y
+8cd2: f0 07       BEQ   #  +7
+8cd4: 8d 07 20    STA   $2007
+invalid vram write!!!!
+8cd7: c8          INY
+8cd8: 4c d0 8c    JMP   $8cd0
+8cd0: b1 00       LDA   ($00), y
+8cd2: f0 07       BEQ   #  +7
+8cdb: 60          RTS
+87e1: 60          RTS
+87ca: 60          RTS
+907e: 4c 96 90    JMP   $9096
+9096: ad 02 20    LDA   $2002
+9099: a9 00       LDA   #$00
+909b: 8d 06 20    STA   $2006
+909e: 8d 06 20    STA   $2006
+90a1: 8d 05 20    STA   $2005
+90a4: 8d 05 20    STA   $2005
+90a7: a9 18       LDA   #$18
+90a9: 0d 01 03    ORA   $0301
+90ac: 8d 01 20    STA   $2001
+90af: 8d 01 03    STA   $0301
+90b2: a9 80       LDA   #$80
+90b4: 0d 00 03    ORA   $0300
+90b7: 8d 00 03    STA   $0300
+90ba: 8d 00 20    STA   $2000
+90bd: 40          RTI
+8031: 4c 31 80    JMP   $8031
+8031: 4c 31 80    JMP   $8031
+8031: 4c 31 80    JMP   $8031
+8031: 4c 31 80    JMP   $8031
+8031: 4c 31 80    JMP   $8031
+8031: 4c 31 80    JMP   $8031
+8031: 4c 31 80    JMP   $8031
+8031: 4c 31 80    JMP   $8031
+8031: 4c 31 80    JMP   $8031
+8031: 4c 31 80    JMP   $8031
+8031: 4c 31 80    JMP   $8031
+8031: 4c 31 80    JMP   $8031
+8031: 4c 31 80    JMP   $8031
+8031: 4c 31 80    JMP   $8031
