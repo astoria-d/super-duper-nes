@@ -1090,7 +1090,7 @@ init_funcs:
 ;;;must rework here... not working!!
     lda output_pos
     sta $02
-    lda #$42
+    lda output_pos+1
     sta $03
     lda top_menu1
     sta $00
@@ -1098,20 +1098,8 @@ init_funcs:
     sta $01
     jsr print_str
 
-;;    lda fifo_data
-;;    sta $00
-;;    inc output_pos
-;;
-;;
-;;    lda #$20
-;;    sta $02
-;;    lda #$42
-;;    clc
-;;    adc output_pos
-;;    sta $03
-;;    jsr print_chr
-;;
-;;    inc output_pos
+    inc output_pos+1
+
     rts
 .endproc
 
@@ -1203,11 +1191,6 @@ init_funcs:
     sta inet_menu_select
     lda #1
     sta screen_status
-
-    lda #$20
-    sta output_pos
-    lda #$42
-    sta output_pos+1
 
     rts
 .endproc
@@ -1969,6 +1952,12 @@ init_funcs:
     sta vram_current
     lda #$00
     sta vram_current + 1
+
+    ;;init shell i2c display pos.
+    lda #$20
+    sta output_pos
+    lda #$42
+    sta output_pos+1
 
     ;ppu register initialize.
     lda    #$00
