@@ -1089,7 +1089,6 @@ init_funcs:
 .proc print_i2c
 ;;get i2c char..
     lda fifo_data
-;;    lda #$61
     sta out_text_buf
 
     lda out_text_buf_addr

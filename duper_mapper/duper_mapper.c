@@ -4,6 +4,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <stdlib.h>
 
 #define __mapper_impl__
 
@@ -24,8 +25,14 @@ static unsigned char fifo_read_reg;
 static unsigned char fifo_write_reg;
 static unsigned char fifo_status_reg;
 
-#define I2C_INPUT   "i2c_in"
+static int in_fifo;
+static int fifo_data_len;
+static unsigned char* fifo;
+static unsigned char* fifo_head;
 
+
+#define I2C_INPUT   "i2c_in"
+#define FIFO_MAX    1024
 /*
 0xfff9	w: push fifo register
 	r: pop fifo register
@@ -51,8 +58,8 @@ int mp_init(mp_set_addr_t set_a_func, mp_get_data_t get_d_func, mp_set_data_t se
     printf("duper mapper i2c emuration:\n");
     printf("    to send a data to NES: [i2c_in].\n");
     printf("    to receive a data from NES: [i2c_out].\n");
-    printf("    you can send i2c one character at a time.\n");
-    printf("    > echo -n \"a\" > i2c_in\n");
+    printf("    you can send i2c more than one character at a time.\n");
+    printf("    > echo -n \"abc\" > i2c_in\n");
     printf("    you can receive from i2c\n");
     printf("    > cat i2c_out\n");
     printf(" #write fifo empty/full is not implemented.\n");
@@ -69,10 +76,22 @@ int mp_init(mp_set_addr_t set_a_func, mp_get_data_t get_d_func, mp_set_data_t se
     fifo_read_reg = 0;
     fifo_write_reg = 0;
     fifo_status_reg = 0;
+
+    in_fifo = -1;
+    fifo_data_len = 0;
+    fifo = NULL;
 }
 
 void mp_clean(void) {
     printf("duper mapper clean...\n");
+    if (in_fifo != -1) {
+        close(in_fifo);
+        free (fifo);
+        fifo = NULL;
+    }
+    if (fifo != NULL) {
+        free (fifo);
+    }
 }
 
 
@@ -83,17 +102,28 @@ void mp_set_addr(unsigned short addr) {
 }
 
 unsigned char mp_get_data(void) {
-    int in_fifo;
-
     if (mapper_access_addr == 0x7FF9) {
         /*read fifo reg.*/
 
-        in_fifo = open(I2C_INPUT, O_RDONLY);
         if (in_fifo != -1) {
-            read(in_fifo, &fifo_read_reg, 1);
-            close(in_fifo);
-            /*clean up fifo.*/
-            remove(I2C_INPUT);
+            if (fifo_data_len <= 0) {
+                fifo = malloc(FIFO_MAX);
+                fifo_data_len = read(in_fifo, fifo, FIFO_MAX);
+                fifo_head = fifo;
+            }
+            fifo_read_reg = *fifo_head++;
+            fifo_data_len--;
+            if (fifo_data_len <= 0) {
+                close(in_fifo);
+                /*clean up fifo.*/
+                remove(I2C_INPUT);
+                free (fifo);
+                fifo = NULL;
+                in_fifo = -1;
+/*
+            printf("data consumed. remove i2c file...\n");
+*/
+            }
         }
 
         printf("duper mapper get fifo: %02x\n", fifo_read_reg);
@@ -106,17 +136,19 @@ status bit...
 4	read fifo empty
 5	read fifo full
 */
-        in_fifo = open(I2C_INPUT, O_RDONLY);
+        if (in_fifo == -1) {
+            in_fifo = open(I2C_INPUT, O_RDONLY);
+/*
+            if (in_fifo != -1) printf("new data arrived..\n");
+*/
+        }
         if (in_fifo == -1) {
             /*fifo empty.*/
             fifo_status_reg |= 0x10;
         }
         else {
-/*
-            printf("fifo input...\n");
-*/
+            /*data arrival.*/
             fifo_status_reg &= ~0x10;
-            close(in_fifo);
         }
 
         /*TODO: check write full*/
