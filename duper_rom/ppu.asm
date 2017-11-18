@@ -1087,15 +1087,23 @@ init_funcs:
 .endproc
 
 .proc print_i2c
-;;;must rework here... not working!!
+;;get i2c char..
+    lda fifo_data
+;;    lda #$61
+    sta out_text_buf
+
+    lda out_text_buf_addr
+    sta $00
+    lda out_text_buf_addr+1
+    sta $01
+
+;;set cursor pos.
     lda output_pos
     sta $02
     lda output_pos+1
     sta $03
-    lda top_menu1
-    sta $00
-    lda top_menu1+1
-    sta $01
+
+
     jsr print_str
 
     inc output_pos+1
@@ -2205,6 +2213,10 @@ text_kb_matrix_s:
     .byte   $0
     .byte   " ZXCVBNM<>? "
 
+out_text_buf_addr:
+    .addr   out_text_buf
+
+
 ;;;;r/w global variables.
 .segment "BSS"
 vram_current:
@@ -2281,7 +2293,6 @@ out_text_buf:
 .repeat 420
     .byte   $00
 .endrepeat
-
 
 ;;input ready: 1
 ;;input suspend: 0
