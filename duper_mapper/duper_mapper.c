@@ -25,7 +25,7 @@ static unsigned char fifo_read_reg;
 static unsigned char fifo_write_reg;
 static unsigned char fifo_status_reg;
 
-static int in_fifo;
+/*incoming data fifo.*/
 static int fifo_data_len;
 static unsigned char* fifo;
 static unsigned char* fifo_head;
@@ -77,18 +77,12 @@ int mp_init(mp_set_addr_t set_a_func, mp_get_data_t get_d_func, mp_set_data_t se
     fifo_write_reg = 0;
     fifo_status_reg = 0;
 
-    in_fifo = -1;
     fifo_data_len = 0;
     fifo = NULL;
 }
 
 void mp_clean(void) {
     printf("duper mapper clean...\n");
-    if (in_fifo != -1) {
-        close(in_fifo);
-        free (fifo);
-        fifo = NULL;
-    }
     if (fifo != NULL) {
         free (fifo);
     }
@@ -105,23 +99,15 @@ unsigned char mp_get_data(void) {
     if (mapper_access_addr == 0x7FF9) {
         /*read fifo reg.*/
 
-        if (in_fifo != -1) {
-            if (fifo_data_len <= 0) {
-                fifo = malloc(FIFO_MAX);
-                fifo_data_len = read(in_fifo, fifo, FIFO_MAX);
-                fifo_head = fifo;
-            }
+        if (fifo != NULL) {
             fifo_read_reg = *fifo_head++;
             fifo_data_len--;
             if (fifo_data_len <= 0) {
-                close(in_fifo);
                 /*clean up fifo.*/
-                remove(I2C_INPUT);
                 free (fifo);
                 fifo = NULL;
-                in_fifo = -1;
+                printf("data consumed. fifo empty.\n");
 /*
-            printf("data consumed. remove i2c file...\n");
 */
             }
         }
@@ -136,18 +122,31 @@ status bit...
 4	read fifo empty
 5	read fifo full
 */
-        if (in_fifo == -1) {
+        if (fifo == NULL) {
+            int in_fifo;
             in_fifo = open(I2C_INPUT, O_RDONLY);
+            if (in_fifo != -1) {
+                fifo = malloc(FIFO_MAX);
+                if (fifo == NULL) {
+                    printf("duper mapper fifo allocation failed...\n");
+                }
+                else {
+                    fifo_data_len = read(in_fifo, fifo, FIFO_MAX);
+                    fifo_head = fifo;
+                }
+                close(in_fifo);
+                remove(I2C_INPUT);
+                printf("new data arrived..\n");
 /*
-            if (in_fifo != -1) printf("new data arrived..\n");
 */
+            }
         }
-        if (in_fifo == -1) {
+        if (fifo == NULL) {
             /*fifo empty.*/
             fifo_status_reg |= 0x10;
         }
         else {
-            /*data arrival.*/
+            /*data ready.*/
             fifo_status_reg &= ~0x10;
         }
 
