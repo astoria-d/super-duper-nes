@@ -1045,6 +1045,10 @@ init_funcs:
     bit jp1_data
     beq @kb_end
 
+
+    ;;send input line to i2c...
+    jsr send_i2c
+
     ;;reset carret.
     lda #$22
     sta $02
@@ -1085,6 +1089,13 @@ init_funcs:
 :
     rts
 .endproc
+
+
+.proc send_i2c
+;;;TODO i2c buffer send...
+    rts
+.endproc
+
 
 .proc print_i2c
 ;;get i2c char..
@@ -2177,14 +2188,6 @@ kb_4_s:
     .byte   $89
     .byte   $00
 
-in_text_line:
-    .addr   :+
-:
-.repeat 30
-    .byte   $80
-.endrepeat
-    .byte   $00
-
 in_text_buf_addr:
     .addr   in_text_buf
 
@@ -2278,7 +2281,7 @@ in_text_carret:
 
 ;;input text buffer is 2 lines (60 char + null char.)
 in_text_buf:
-    .byte   $8a
+    .byte   $8a     ;; 0x8a is carret chr code.
 .repeat 63
     .byte   $00
 .endrepeat
