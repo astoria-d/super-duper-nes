@@ -32,6 +32,7 @@ static unsigned char* fifo_head;
 
 
 #define I2C_INPUT   "i2c_in"
+#define I2C_OUTPUT  "i2c_out"
 #define FIFO_MAX    1024
 /*
 0xfff9	w: push fifo register
@@ -58,7 +59,7 @@ int mp_init(mp_set_addr_t set_a_func, mp_get_data_t get_d_func, mp_set_data_t se
     printf("duper mapper i2c emuration:\n");
     printf("    to send a data to NES: [i2c_in].\n");
     printf("    to receive a data from NES: [i2c_out].\n");
-    printf("    you can send i2c more than one character at a time.\n");
+    printf("    you can send i2c more than one character at a time (max %d bytes).\n", FIFO_MAX);
     printf("    > echo -n \"abc\" > i2c_in\n");
     printf("    you can receive from i2c\n");
     printf("    > cat i2c_out\n");
@@ -152,9 +153,9 @@ status bit...
 
         /*TODO: check write full*/
 
-/*        
+/*
         printf("duper mapper get fifo status: %02x\n", fifo_status_reg);
-*/        
+*/
         return fifo_status_reg;
     }
     else {
@@ -169,6 +170,12 @@ status bit...
 void mp_set_data(unsigned char data) {
     if (mapper_access_addr == 0x7FF9) {
         /*write fifo reg.*/
+        int out_fifo;
+        out_fifo = open(I2C_OUTPUT, O_WRONLY | O_APPEND | O_CREAT);
+        if (out_fifo != -1) {
+            write(out_fifo, &data, 1);
+            close(out_fifo);
+        }
         printf("duper mapper set data: %02x\n", data);/**/
         fifo_write_reg = data;
     }
