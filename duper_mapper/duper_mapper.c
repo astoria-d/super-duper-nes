@@ -21,9 +21,6 @@ static mp_dbg_get_short_t rom_dbg_get_short;
 
 
 static unsigned short mapper_access_addr;
-static unsigned char fifo_read_reg;
-static unsigned char fifo_write_reg;
-static unsigned char fifo_status_reg;
 
 /*incoming data fifo.*/
 static int fifo_data_len;
@@ -74,9 +71,6 @@ int mp_init(mp_set_addr_t set_a_func, mp_get_data_t get_d_func, mp_set_data_t se
     rom_dbg_get_short = NULL;
 
     mapper_access_addr = 0;
-    fifo_read_reg = 0;
-    fifo_write_reg = 0;
-    fifo_status_reg = 0;
 
     fifo_data_len = 0;
     fifo = NULL;
@@ -97,7 +91,10 @@ void mp_set_addr(unsigned short addr) {
 }
 
 unsigned char mp_get_data(void) {
+
     if (mapper_access_addr == 0x7FF9) {
+        unsigned char fifo_read_reg;
+        fifo_read_reg = 0;
         /*read fifo reg.*/
 
         if (fifo != NULL) {
@@ -117,6 +114,8 @@ unsigned char mp_get_data(void) {
         return fifo_read_reg;
     }
     else if (mapper_access_addr == 0x7FF8) {
+        unsigned char fifo_status_reg;
+        fifo_status_reg = 0;
 
 /*
 status bit...
@@ -169,15 +168,15 @@ status bit...
 
 void mp_set_data(unsigned char data) {
     if (mapper_access_addr == 0x7FF9) {
-        /*write fifo reg.*/
         int out_fifo;
+
+        /*i2c output.*/
         out_fifo = open(I2C_OUTPUT, O_WRONLY | O_APPEND | O_CREAT);
         if (out_fifo != -1) {
             write(out_fifo, &data, 1);
             close(out_fifo);
         }
         printf("duper mapper set data: %02x\n", data);/**/
-        fifo_write_reg = data;
     }
     else {
         /*write rom.*/
