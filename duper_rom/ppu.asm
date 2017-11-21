@@ -1092,12 +1092,35 @@ init_funcs:
 
 
 .proc send_i2c
-;;;TODO i2c buffer send...
+    ;;in_text_carret holds offset from the head.
+    ldx in_text_carret
+    ;;the tail char is a carret '|', must -1
+    dex
+    ldy #0
+
+    lda in_text_buf_addr
+    sta $00
+    lda in_text_buf_addr+1
+    sta $01
+
+:
+    ;;write i2c fifo
+    lda ($00), y
+    sta $fff9
+    iny
+    dex
+    bpl :-
+
     rts
 .endproc
 
 
 .proc print_i2c
+
+;;TODO:
+;;new line feed,
+;;page boarder handling
+
 ;;get i2c char..
     lda fifo_data
     sta out_text_buf
@@ -1112,7 +1135,6 @@ init_funcs:
     sta $02
     lda output_pos+1
     sta $03
-
 
     jsr print_str
 
