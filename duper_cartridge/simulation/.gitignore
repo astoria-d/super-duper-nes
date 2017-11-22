@@ -1,0 +1,10 @@
+rtl_work
+work
+*.bak*
+*transcript
+*.rpt
+*.mti
+*.wlf
+*.sft
+*.vho
+*.xrf
