@@ -6,7 +6,7 @@ vlib rtl_work
 vmap work rtl_work
 
 vcom -93 -work work {../i2c.vhd}
-vcom -93 -work work {./i2c_test.vhd}
+vcom -93 -work work {../duper_cartridge.vhd}
 vcom -93 -work work {../i2c_eeprom.vhd}
 
 vcom -93 -work work {./testbench_i2c_test.vhd}
@@ -59,5 +59,5 @@ view signals
 
 run 450 us
 wave zoom full
-run 400 us
+--run 400 us
 

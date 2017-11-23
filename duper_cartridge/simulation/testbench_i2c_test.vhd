@@ -22,43 +22,81 @@ architecture stimulus of testbench_i2c_test is
     --i2c normal clock speed 100 KHz
     constant i2c_clock_time : time := 10 us;
 
-    component i2c_test 
+    component duper_cartridge
     port (
-        pi_base_clk     : in    std_logic;
-        pi_reset_n      : in    std_logic;
-        pi_key          : in    std_logic_vector(3 downto 0);
-        pi_sw           : in    std_logic_vector(9 downto 0);
-        po_led          : out   std_logic_vector(9 downto 0);
+        pi_reset_n      : in std_logic;
+        pi_base_clk     : in std_logic;
+--        pi_sw          : in std_logic_vector(9 downto 0);
+--        pi_btn_n       : in std_logic_vector(3 downto 0);
+--        po_led_r       : out std_logic_vector(9 downto 0);
+--        po_led_g       : out std_logic_vector(7 downto 0);
 
+        --nes side
+        pi_phi2             : in std_logic;
+        pi_prg_ce_n         : in std_logic;
+        pi_prg_r_nw         : in std_logic;
+        pi_prg_addr         : in std_logic_vector(14 downto 0);
+        po_prg_data         : out std_logic_vector(7 downto 0);
+        pi_chr_ce_n         : in std_logic;
+        pi_chr_oe_n         : in std_logic;
+        pi_chr_we_n         : in std_logic;
+        pi_chr_addr         : in std_logic_vector(12 downto 0);
+        po_chr_data         : out std_logic_vector(7 downto 0);
+
+        --i2c side
         pi_i2c_scl      : in    std_logic;
         pio_i2c_sda     : inout std_logic;
 
         po_dbg_cnt          : out std_logic_vector (63 downto 0)
-         );
-    end component;
+    );
+    end component ;
 
-    signal base_clk         : std_logic;
     signal reset_input      : std_logic;
-    signal key              : std_logic_vector(3 downto 0);
-    signal sw               : std_logic_vector(9 downto 0);
-    signal led              : std_logic_vector(9 downto 0);
+    signal base_clk         : std_logic;
+
+    signal phi2             : std_logic;
+    signal prg_ce_n         : std_logic;
+    signal prg_r_nw         : std_logic;
+    signal prg_addr         : std_logic_vector(14 downto 0);
+    signal prg_data         : std_logic_vector(7 downto 0);
+    signal chr_ce_n         : std_logic;
+    signal chr_oe_n         : std_logic;
+    signal chr_we_n         : std_logic;
+    signal chr_addr         : std_logic_vector(12 downto 0);
+    signal chr_data         : std_logic_vector(7 downto 0);
+
     signal i2c_scl          : std_logic;
     signal i2c_sda          : std_logic;
     signal dbg_cnt          : std_logic_vector (63 downto 0);
     
     signal rd_data          : std_logic_vector (7 downto 0);
-
     signal start_scl        : std_logic;
 
 begin
 
+    ---chrrom side disabled..
+    chr_ce_n <= 'Z';
+    chr_oe_n <= 'Z';
+    chr_we_n <= 'Z';
+    chr_addr <= (others => 'Z');
+    chr_data <= (others => 'Z');
 
-    sim_board : i2c_test port map (
-    base_clk, 
-    reset_input, 
-    key,
-    sw,
-    led,
+    sim_board : duper_cartridge port map (
+    reset_input,
+    base_clk,
+
+    phi2,
+    prg_ce_n,
+    prg_r_nw,
+    prg_addr,
+    prg_data,
+
+    chr_ce_n,
+    chr_oe_n,
+    chr_we_n,
+    chr_addr,
+    chr_data,
+
     i2c_scl,
     i2c_sda,
     dbg_cnt);
