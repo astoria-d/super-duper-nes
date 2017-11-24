@@ -135,10 +135,11 @@ begin
         wait for nes_clock_time / 2;
     end process;
 
-    --
+    --rom save register...
     romreg_p : process (phi2)
     begin
         if (rising_edge(phi2)) then
+            --bus cycle is 1 cycle delayed.
             if (step_cnt mod bus_cycle = 1) then
                 reg_rom_data <= prg_data;
             end if;

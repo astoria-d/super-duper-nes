@@ -8,6 +8,7 @@ vmap work rtl_work
 vcom -93 -work work {../i2c.vhd}
 vcom -93 -work work {../duper_cartridge.vhd}
 vcom -93 -work work {../i2c_eeprom.vhd}
+vcom -93 -work work {../fifo.vhd}
 vcom -93 -work work {../prg_rom.vhd}
 vcom -93 -work work {./testbench_duper_cartridge.vhd}
 
@@ -24,7 +25,10 @@ add wave -label reg_rom_data    -radix hex  sim:/testbench_i2c_test/reg_rom_data
 
 
 #add wave -divider prgrom
-#add wave -label prom_inst    -radix hex  sim:/testbench_i2c_test/sim_board/prom_inst/*
+#add wave -label pi_ce_n     sim:/testbench_i2c_test/sim_board/prom_inst/pi_ce_n
+#add wave -label pi_oe_n     sim:/testbench_i2c_test/sim_board/prom_inst/pi_oe_n
+#add wave -label pi_addr     -radix hex  sim:/testbench_i2c_test/sim_board/prom_inst/pi_addr
+#add wave -label po_data     -radix hex  sim:/testbench_i2c_test/sim_board/prom_inst/po_data
 
 
 add wave -divider i2c
@@ -46,20 +50,20 @@ add wave -label reg_slave_status                    sim:/testbench_i2c_test/sim_
 
 #add wave -label rd_data                 -radix hex  sim:/testbench_i2c_test/rd_data
 
-add wave -divider i2c_eeprom
-add wave -label pi_rst_n        sim:/testbench_i2c_test/sim_board/i2c_eeprom_inst/pi_rst_n
-#add wave -label pi_base_clk     sim:/testbench_i2c_test/sim_board/pi_base_clk
-add wave -label pi_bus_xfer     sim:/testbench_i2c_test/sim_board/i2c_eeprom_inst/pi_bus_xfer
-add wave -label pi_r_nw         sim:/testbench_i2c_test/sim_board/i2c_eeprom_inst/pi_r_nw
-add wave -label pi_bus_ack      sim:/testbench_i2c_test/sim_board/i2c_eeprom_inst/pi_bus_ack
-add wave -label po_bus_ack      sim:/testbench_i2c_test/sim_board/i2c_eeprom_inst/po_bus_ack
-
-add wave -label pi_data -radix hex  sim:/testbench_i2c_test/sim_board/i2c_eeprom_inst/pi_data
-add wave -label po_data -radix hex  sim:/testbench_i2c_test/sim_board/i2c_eeprom_inst/po_data
-
-add wave -label reg_ack_edge    sim:/testbench_i2c_test/sim_board/i2c_eeprom_inst/reg_ack_edge
-add wave -label reg_write_cnt -radix decimal   sim:/testbench_i2c_test/sim_board/i2c_eeprom_inst/reg_write_cnt
-add wave -label reg_eeprom_addr -radix hex              sim:/testbench_i2c_test/sim_board/i2c_eeprom_inst/reg_eeprom_addr
+--add wave -divider i2c_eeprom
+--add wave -label pi_rst_n        sim:/testbench_i2c_test/sim_board/i2c_eeprom_inst/pi_rst_n
+--#add wave -label pi_base_clk     sim:/testbench_i2c_test/sim_board/pi_base_clk
+--add wave -label pi_bus_xfer     sim:/testbench_i2c_test/sim_board/i2c_eeprom_inst/pi_bus_xfer
+--add wave -label pi_r_nw         sim:/testbench_i2c_test/sim_board/i2c_eeprom_inst/pi_r_nw
+--add wave -label pi_bus_ack      sim:/testbench_i2c_test/sim_board/i2c_eeprom_inst/pi_bus_ack
+--add wave -label po_bus_ack      sim:/testbench_i2c_test/sim_board/i2c_eeprom_inst/po_bus_ack
+--
+--add wave -label pi_data -radix hex  sim:/testbench_i2c_test/sim_board/i2c_eeprom_inst/pi_data
+--add wave -label po_data -radix hex  sim:/testbench_i2c_test/sim_board/i2c_eeprom_inst/po_data
+--
+--add wave -label reg_ack_edge    sim:/testbench_i2c_test/sim_board/i2c_eeprom_inst/reg_ack_edge
+--add wave -label reg_write_cnt -radix decimal   sim:/testbench_i2c_test/sim_board/i2c_eeprom_inst/reg_write_cnt
+--add wave -label reg_eeprom_addr -radix hex              sim:/testbench_i2c_test/sim_board/i2c_eeprom_inst/reg_eeprom_addr
 
 
 

@@ -9,17 +9,17 @@ entity duper_cartridge is
     port (
         pi_reset_n      : in std_logic;
         pi_base_clk     : in std_logic;
---        pi_sw          : in std_logic_vector(9 downto 0);
---        pi_btn_n       : in std_logic_vector(3 downto 0);
---        po_led_r       : out std_logic_vector(9 downto 0);
---        po_led_g       : out std_logic_vector(7 downto 0);
 
         --nes side
         pi_phi2             : in std_logic;
+
+        --prgrom
         pi_prg_ce_n         : in std_logic;
         pi_prg_r_nw         : in std_logic;
         pi_prg_addr         : in std_logic_vector(14 downto 0);
         pio_prg_data        : inout std_logic_vector(7 downto 0);
+
+        --chrrom
         pi_chr_ce_n         : in std_logic;
         pi_chr_oe_n         : in std_logic;
         pi_chr_we_n         : in std_logic;
@@ -49,6 +49,15 @@ component duper_prg_rom port (
     po_push_fifo    : out std_logic_vector (7 downto 0);
     pi_pop_fifo     : in std_logic_vector (7 downto 0);
     pi_fifo_stat    : in std_logic_vector (7 downto 0)
+    );
+end component ;
+
+component prg_rom port (
+    pi_base_clk     : in std_logic;
+    pi_ce_n         : in std_logic;
+    pi_oe_n         : in std_logic;
+    pi_addr         : in std_logic_vector (14 downto 0);
+    po_data         : out std_logic_vector (7 downto 0)
     );
 end component ;
 
@@ -122,20 +131,22 @@ use ieee.std_logic_unsigned.all;
         end if;
     end process;
 
-    --program rom
-    reg_nr <= not pi_prg_r_nw;
-    reg_from_bbb_fifo <= "01000100"; --0x44 = "D"
-    reg_fifo_status <= "11000100";
-    dp_rom_inst : duper_prg_rom port map (
+    reg_p : process (pi_base_clk)
+    begin
+        if (rising_edge(pi_base_clk)) then
+            reg_nr <= not pi_prg_r_nw;
+            reg_from_bbb_fifo <= "01000100"; --0x44 = "D"
+            reg_fifo_status <= "11000100";
+        end if;
+    end process;
+
+    --prg rom
+    prom_inst : prg_rom port map (
         pi_base_clk,
         pi_prg_ce_n,
         reg_nr,
-        pi_prg_r_nw,
         pi_prg_addr,
-        pio_prg_data,
-        reg_to_bbb_fifo,
-        reg_from_bbb_fifo,
-        reg_fifo_status
+        pio_prg_data
     );
 
     --character rom
@@ -147,6 +158,7 @@ use ieee.std_logic_unsigned.all;
         po_chr_data
     );
 
+    --i2c slave
     i2c_slave_inst : i2c_slave
     port map (
         pi_reset_n,
@@ -159,18 +171,19 @@ use ieee.std_logic_unsigned.all;
         reg_slave_out_data
     );
 
-    i2c_eeprom_inst : i2c_eeprom generic map (8)
-    port map (
-        pi_reset_n,
-        pi_base_clk,
-        reg_slave_status(0),
-        reg_slave_status(2),
-        reg_slave_status(1),
-        reg_slave_addr_ack,
-        reg_slave_in_data,
-        reg_slave_out_data
-    );
+--    i2c_eeprom_inst : i2c_eeprom generic map (8)
+--    port map (
+--        pi_reset_n,
+--        pi_base_clk,
+--        reg_slave_status(0),
+--        reg_slave_status(2),
+--        reg_slave_status(1),
+--        reg_slave_addr_ack,
+--        reg_slave_in_data,
+--        reg_slave_out_data
+--    );
 
+    --nes reset signal emulation.
     reset_p : process (pi_base_clk)
 use ieee.std_logic_unsigned.all;
     variable cnt1, cnt2 : integer;
