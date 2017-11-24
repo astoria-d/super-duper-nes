@@ -9,7 +9,7 @@ vcom -93 -work work {../i2c.vhd}
 vcom -93 -work work {../duper_cartridge.vhd}
 vcom -93 -work work {../i2c_eeprom.vhd}
 
-vcom -93 -work work {./testbench_i2c_test.vhd}
+vcom -93 -work work {./testbench_duper_cartridge.vhd}
 
 vsim -t 1ps -L altera -L lpm -L sgate -L altera_mf -L altera_lnsim -L cyclonev -L rtl_work -L work -voptargs="ê "  testbench_i2c_test
 
