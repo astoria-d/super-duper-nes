@@ -10,11 +10,7 @@ architecture stimulus of testbench_i2c_test is
 
     constant powerup_time   : time := 2 us;
     constant reset_time     : time := 890 ns;
-
     constant start_time     : time := 12 us;
-
-    ---clock frequency = 21,477,270 (21 MHz)
-    --constant base_clock_time : time := 46 ns;
 
     --DE1 base clock = 50 MHz
     constant base_clock_time : time := 20 ns;
@@ -22,14 +18,14 @@ architecture stimulus of testbench_i2c_test is
     --i2c normal clock speed 100 KHz
     constant i2c_clock_time : time := 10 us;
 
+    ---https://wiki.nesdev.com/w/index.php/Clock_rate
+    --nes cpu clock = 1.789773 MHz
+    constant nes_clock_time : time := 558 ns;
+
     component duper_cartridge
     port (
         pi_reset_n      : in std_logic;
         pi_base_clk     : in std_logic;
---        pi_sw          : in std_logic_vector(9 downto 0);
---        pi_btn_n       : in std_logic_vector(3 downto 0);
---        po_led_r       : out std_logic_vector(9 downto 0);
---        po_led_g       : out std_logic_vector(7 downto 0);
 
         --nes side
         pi_phi2             : in std_logic;
@@ -115,7 +111,7 @@ begin
     end process;
 
     --- generate base clock.
-    clock_p: process
+    clock_p1 : process
     begin
         base_clk <= '1';
         wait for base_clock_time / 2;
@@ -123,6 +119,16 @@ begin
         wait for base_clock_time / 2;
     end process;
 
+    --- nes clock.
+    clock_p2 : process
+    begin
+        phi2 <= '1';
+        wait for nes_clock_time / 2;
+        phi2 <= '0';
+        wait for nes_clock_time / 2;
+    end process;
+
+    --- i2c clock, clock generation under the condition
     scl_p : process
     begin
         if(start_scl = '1') then

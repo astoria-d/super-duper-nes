@@ -14,11 +14,18 @@ vcom -93 -work work {./testbench_i2c_test.vhd}
 vsim -t 1ps -L altera -L lpm -L sgate -L altera_mf -L altera_lnsim -L cyclonev -L rtl_work -L work -voptargs="ê "  testbench_i2c_test
 
 #add wave *
-add wave -label pi_reset_n      sim:/testbench_i2c_test/sim_board/pi_reset_n
+add wave -divider nes_cpu
+add wave -label phi2                    sim:/testbench_i2c_test/sim_board/pi_phi2
+add wave -label prg_ce_n                sim:/testbench_i2c_test/sim_board/pi_prg_ce_n
+add wave -label prg_r_nw                sim:/testbench_i2c_test/sim_board/pi_prg_r_nw
+add wave -label prg_addr    -radix hex  sim:/testbench_i2c_test/sim_board/pi_prg_addr
+add wave -label prg_data    -radix hex  sim:/testbench_i2c_test/sim_board/po_prg_data
 
+
+
+add wave -divider i2c
 add wave -label pio_i2c_sda     sim:/testbench_i2c_test/sim_board/pio_i2c_sda
 #add wave -label reg_old_sda     sim:/testbench_i2c_test/sim_board/i2c_slave_inst/reg_old_sda
-
 add wave -label pi_i2c_scl      sim:/testbench_i2c_test/sim_board/pi_i2c_scl
 
 
@@ -57,7 +64,7 @@ view signals
 
 #run -all
 
-run 450 us
+run 10 us
 wave zoom full
 --run 400 us
 
