@@ -8,8 +8,8 @@ end testbench_i2c_test;
 
 architecture stimulus of testbench_i2c_test is 
 
-    constant powerup_time   : time := 2 us;
-    constant reset_time     : time := 890 ns;
+    constant powerup_time   : time := 200 ns;
+    constant reset_time     : time := 800 ns;
     constant start_time     : time := 12 us;
 
     --DE1 base clock = 50 MHz
@@ -130,11 +130,53 @@ begin
 
     --- cpu bus emulation...
     emu_cpu : process
+
+procedure mem_write
+(
+    addr    : in std_logic_vector (14 downto 0);
+    data    : in std_logic_vector (7 downto 0)
+) is
+begin
+    prg_ce_n  <= '0';
+    prg_r_nw  <= '0';
+    prg_addr  <= addr;
+    prg_data  <= data;
+end;
+
+procedure mem_read
+(
+    addr    : in std_logic_vector (14 downto 0)
+) is
+begin
+    prg_ce_n  <= '0';
+    prg_r_nw  <= '1';
+    prg_addr  <= addr;
+    prg_data  <= (others => 'Z');
+end;
+
+procedure bus_wait is
+begin
+    prg_ce_n  <= '1';
+    prg_r_nw  <= 'Z';
+    prg_addr  <= (others => 'Z');
+    prg_data  <= (others => 'Z');
+end;
+
     variable stage_cnt :    integer := 0;
     variable step_cnt :     integer := 0;
+    constant bus_cycle : integer := 3;
+
     begin
         if (stage_cnt = 0) then
-            if (step_cnt <= 10) then
+            wait for powerup_time + reset_time;
+            stage_cnt := stage_cnt + 1;
+        elsif (stage_cnt = 1) then
+            if (step_cnt <= bus_cycle * 10) then
+                if (step_cnt mod bus_cycle = 0) then
+                    mem_read (conv_std_logic_vector(16#ffff#, 15));
+                else
+                    bus_wait;
+                end if;
                 step_cnt := step_cnt + 1;
             else
                 step_cnt := 0;
