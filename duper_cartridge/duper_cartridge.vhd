@@ -19,7 +19,7 @@ entity duper_cartridge is
         pi_prg_ce_n         : in std_logic;
         pi_prg_r_nw         : in std_logic;
         pi_prg_addr         : in std_logic_vector(14 downto 0);
-        po_prg_data         : out std_logic_vector(7 downto 0);
+        pio_prg_data        : inout std_logic_vector(7 downto 0);
         pi_chr_ce_n         : in std_logic;
         pi_chr_oe_n         : in std_logic;
         pi_chr_we_n         : in std_logic;
@@ -44,7 +44,7 @@ component duper_prg_rom port (
     pi_oe_n         : in std_logic;
     pi_we_n         : in std_logic;
     pi_addr         : in std_logic_vector (14 downto 0);
-    pio_data        : out std_logic_vector (7 downto 0);
+    pio_data        : inout std_logic_vector (7 downto 0);
 
     po_push_fifo    : out std_logic_vector (7 downto 0);
     pi_pop_fifo     : in std_logic_vector (7 downto 0);
@@ -132,7 +132,7 @@ use ieee.std_logic_unsigned.all;
         reg_nr,
         pi_prg_r_nw,
         pi_prg_addr,
-        po_prg_data,
+        pio_prg_data,
         reg_to_bbb_fifo,
         reg_from_bbb_fifo,
         reg_fifo_status

@@ -32,7 +32,7 @@ architecture stimulus of testbench_i2c_test is
         pi_prg_ce_n         : in std_logic;
         pi_prg_r_nw         : in std_logic;
         pi_prg_addr         : in std_logic_vector(14 downto 0);
-        po_prg_data         : out std_logic_vector(7 downto 0);
+        pio_prg_data        : inout std_logic_vector(7 downto 0);
         pi_chr_ce_n         : in std_logic;
         pi_chr_oe_n         : in std_logic;
         pi_chr_we_n         : in std_logic;
@@ -173,7 +173,7 @@ end;
         elsif (stage_cnt = 1) then
             if (step_cnt <= bus_cycle * 10) then
                 if (step_cnt mod bus_cycle = 0) then
-                    mem_read (conv_std_logic_vector(16#ffff#, 15));
+                    mem_read (conv_std_logic_vector(16#fff8#, 15));
                 else
                     bus_wait;
                 end if;
