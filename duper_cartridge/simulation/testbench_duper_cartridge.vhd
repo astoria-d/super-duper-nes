@@ -22,6 +22,8 @@ architecture stimulus of testbench_i2c_test is
     --nes cpu clock = 1.789773 MHz
     constant nes_clock_time : time := 558 ns;
 
+    constant bus_cycle : integer := 3;
+
     component duper_cartridge
     port (
         pi_reset_n      : in std_logic;
@@ -67,6 +69,11 @@ architecture stimulus of testbench_i2c_test is
     
     signal rd_data          : std_logic_vector (7 downto 0);
     signal start_scl        : std_logic;
+
+
+    signal reg_rom_data     : std_logic_vector(7 downto 0);
+
+    signal step_cnt         : integer := 0;
 
 begin
 
@@ -128,6 +135,16 @@ begin
         wait for nes_clock_time / 2;
     end process;
 
+    --
+    romreg_p : process (phi2)
+    begin
+        if (rising_edge(phi2)) then
+            if (step_cnt mod bus_cycle = 1) then
+                reg_rom_data <= prg_data;
+            end if;
+        end if;
+    end process;
+
     --- cpu bus emulation...
     emu_cpu : process
 
@@ -163,13 +180,12 @@ begin
 end;
 
     variable stage_cnt :    integer := 0;
-    variable step_cnt :     integer := 0;
-    constant bus_cycle : integer := 3;
 
     begin
         if (stage_cnt = 0) then
             wait for powerup_time + reset_time;
             stage_cnt := stage_cnt + 1;
+            step_cnt <= 0;
         elsif (stage_cnt = 1) then
             if (step_cnt <= bus_cycle * 10) then
                 if (step_cnt mod bus_cycle = 0) then
@@ -177,9 +193,9 @@ end;
                 else
                     bus_wait;
                 end if;
-                step_cnt := step_cnt + 1;
+                step_cnt <= step_cnt + 1;
             else
-                step_cnt := 0;
+                step_cnt <= 0;
                 stage_cnt := stage_cnt + 1;
             end if;
         else
