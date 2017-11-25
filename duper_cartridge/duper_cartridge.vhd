@@ -38,8 +38,6 @@ end duper_cartridge;
 --architecture rtl of rom_test01 is
 architecture rtl of duper_cartridge is
 
-
-
 -------------------------------------------
 -------------------------------------------
 ------------- definitions.... -------------
@@ -112,20 +110,6 @@ component fifo
     );
 end component;
 
-component i2c_eeprom
-    generic (abus_size : integer := 16);
-    port (
-        pi_rst_n        : in std_logic;
-        pi_base_clk     : in std_logic;
-        pi_bus_xfer     : in std_logic;
-        pi_r_nw         : in std_logic;
-        pi_bus_ack      : in std_logic;
-        po_bus_ack      : out std_logic;
-        pi_data         : in std_logic_vector (7 downto 0);
-        po_data         : out std_logic_vector (7 downto 0)
-    );
-end component;
-
 ---firo status register
 ---bit	
 ---0	write fifo empty
@@ -141,6 +125,14 @@ constant wfifo_full_bit     : integer := 1;
 constant rfifo_empty_bit    : integer := 4;
 constant rfifo_full_bit     : integer := 5;
 
+
+type duper_state_machine is (
+    idle,
+    rom_read,
+    fifo_status_read,
+    fifo_read1, fifo_read2,
+    fifo_write1, fifo_write2
+    );
 
 -------------------------------------------
 -------------------------------------------
@@ -244,18 +236,6 @@ begin
         reg_prg_addr,
         reg_prg_data_out
     );
-
---    i2c_eeprom_inst : i2c_eeprom generic map (8)
---    port map (
---        pi_reset_n,
---        pi_base_clk,
---        reg_slave_status(0),
---        reg_slave_status(2),
---        reg_slave_status(1),
---        reg_slave_addr_ack,
---        reg_slave_in_data,
---        reg_slave_out_data
---    );
 
     --i2c incoming fifo.
     rd_fifo_inst : fifo generic map (8)
