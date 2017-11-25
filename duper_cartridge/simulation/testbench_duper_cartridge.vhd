@@ -93,6 +93,7 @@ architecture stimulus of testbench_i2c_test is
     signal step_cnt         : integer := 0;
     signal stage_cnt        : integer := 0;
 
+    signal i2c_step_cnt     : integer := 0;
 
 begin
 
@@ -260,6 +261,22 @@ end;
             wait for i2c_clock_time / 2;
         end if;
     end process;
+
+
+    --- i2c data generation....
+    i2c_p : process
+    begin
+        if (stage_cnt = 2) then
+            start_scl <= '1';
+            i2c_step_cnt <= i2c_step_cnt + 1;
+        else
+            start_scl <= '0';
+            i2c_step_cnt <= 0;
+        end if;
+        wait for i2c_clock_time;
+    end process;
+
+
 
 --    --- sda data generation....
 --    sda_p : process
