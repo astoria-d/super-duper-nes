@@ -107,8 +107,8 @@ component fifo
         pi_we_n         : in std_logic;
         pi_data         : in std_logic_vector (7 downto 0);
         po_data         : out std_logic_vector (7 downto 0);
-        po_stat_empty   : in std_logic;
-        po_stat_full    : in std_logic
+        po_stat_empty   : out std_logic;
+        po_stat_full    : out std_logic
     );
 end component;
 
