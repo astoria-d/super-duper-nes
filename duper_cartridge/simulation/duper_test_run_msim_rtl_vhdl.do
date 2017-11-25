@@ -24,7 +24,7 @@ add wave -label prg_ce_n                sim:/testbench_i2c_test/sim_board/pi_prg
 add wave -label prg_r_nw                sim:/testbench_i2c_test/sim_board/pi_prg_r_nw
 add wave -label prg_addr    -radix hex  sim:/testbench_i2c_test/sim_board/pi_prg_addr
 add wave -label prg_data    -radix hex  sim:/testbench_i2c_test/sim_board/pio_prg_data
-add wave -label reg_rom_data    -radix hex  sim:/testbench_i2c_test/reg_rom_data
+#add wave -label reg_rom_data    -radix hex  sim:/testbench_i2c_test/reg_rom_data
 
 add wave -divider duper_regs
 add wave -label cur_state               sim:/testbench_i2c_test/sim_board/reg_cur_state
@@ -86,7 +86,7 @@ view signals
 
 #run -all
 
-run 10 us
+run 15 us
 wave zoom full
 --run 400 us
 

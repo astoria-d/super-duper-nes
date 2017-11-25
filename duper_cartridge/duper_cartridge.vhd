@@ -129,6 +129,7 @@ constant rfifo_full_bit     : integer := 5;
 type duper_state_machine is (
     idle,
     rom_read,
+    rom_read_ok,
     fifo_status_read,
     nes_fifo_read,
     nes_fifo_pop,
@@ -271,7 +272,14 @@ begin
 
             when rom_read =>
                 if (reg_prg_ce_n = '0' and reg_prg_r_nw = '1' and reg_prg_addr(14 downto 1) /= "11111111111100") then
-                    reg_next_state <= rom_read;
+                    reg_next_state <= rom_read_ok;
+                else
+                    reg_next_state <= idle;
+                end if;
+
+            when rom_read_ok =>
+                if (reg_prg_ce_n = '0' and reg_prg_r_nw = '1' and reg_prg_addr(14 downto 1) /= "11111111111100") then
+                    reg_next_state <= rom_read_ok;
                 else
                     reg_next_state <= idle;
                 end if;
@@ -315,7 +323,7 @@ begin
     set_nes_out_p : process (reg_cur_state)
     begin
         case reg_cur_state is
-            when rom_read =>
+            when rom_read_ok =>
                 reg_prg_data_out <= wr_prg_data_out;
 
             when fifo_status_read =>
