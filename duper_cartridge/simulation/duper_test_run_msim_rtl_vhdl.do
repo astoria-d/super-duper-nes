@@ -15,7 +15,9 @@ vcom -93 -work work {./testbench_duper_cartridge.vhd}
 
 vsim -t 1ps -L altera -L lpm -L sgate -L altera_mf -L altera_lnsim -L cyclonev -L rtl_work -L work -voptargs="ê "  testbench_i2c_test
 
-#add wave *
+add wave -label stage_cnt   -radix unsigned        sim:/testbench_i2c_test/stage_cnt
+add wave -label step_cnt    -radix unsigned        sim:/testbench_i2c_test/step_cnt
+
 add wave -divider nes_cpu
 add wave -label phi2                    sim:/testbench_i2c_test/sim_board/pi_phi2
 add wave -label prg_ce_n                sim:/testbench_i2c_test/sim_board/pi_prg_ce_n
@@ -23,6 +25,9 @@ add wave -label prg_r_nw                sim:/testbench_i2c_test/sim_board/pi_prg
 add wave -label prg_addr    -radix hex  sim:/testbench_i2c_test/sim_board/pi_prg_addr
 add wave -label prg_data    -radix hex  sim:/testbench_i2c_test/sim_board/pio_prg_data
 add wave -label reg_rom_data    -radix hex  sim:/testbench_i2c_test/reg_rom_data
+
+add wave -divider duper_regs
+add wave -label cur_state               sim:/testbench_i2c_test/sim_board/reg_cur_state
 
 
 #add wave -divider prgrom

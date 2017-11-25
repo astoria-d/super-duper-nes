@@ -91,6 +91,8 @@ architecture stimulus of testbench_i2c_test is
     signal reg_rom_data     : std_logic_vector(7 downto 0);
 
     signal step_cnt         : integer := 0;
+    signal stage_cnt        : integer := 0;
+
 
 begin
 
@@ -197,15 +199,20 @@ begin
     prg_data  <= (others => 'Z');
 end;
 
-    variable stage_cnt :    integer := 0;
-
     begin
         if (stage_cnt = 0) then
             wait for powerup_time + reset_time;
-            stage_cnt := stage_cnt + 1;
+            stage_cnt <= stage_cnt + 1;
             step_cnt <= 0;
         elsif (stage_cnt = 1) then
-            if (step_cnt <= bus_cycle * 1) then
+            if (step_cnt < bus_cycle * 1) then
+                if (step_cnt mod bus_cycle = 0) then
+                    mem_read (conv_std_logic_vector(16#fffc#, 15));
+                else
+                    bus_wait;
+                end if;
+                step_cnt <= step_cnt + 1;
+            elsif (step_cnt < bus_cycle * 2) then
                 if (step_cnt mod bus_cycle = 0) then
                     mem_read (conv_std_logic_vector(16#fff8#, 15));
                 else
@@ -215,7 +222,7 @@ end;
             else
                 bus_wait;
                 step_cnt <= 0;
-                stage_cnt := stage_cnt + 1;
+                stage_cnt <= stage_cnt + 1;
             end if;
         elsif (stage_cnt = 2) then
             if (reg_rom_data (rfifo_empty_bit) = '1') then
@@ -228,11 +235,11 @@ end;
             else
                 bus_wait;
                 step_cnt <= 0;
-                stage_cnt := stage_cnt + 1;
+                stage_cnt <= stage_cnt + 1;
             end if;
         else
             bus_wait;
-            stage_cnt := stage_cnt + 1;
+            stage_cnt <= stage_cnt + 1;
         end if;
         wait for nes_clock_time;
     end process;

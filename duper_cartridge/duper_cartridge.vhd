@@ -130,8 +130,14 @@ type duper_state_machine is (
     idle,
     rom_read,
     fifo_status_read,
-    fifo_read1, fifo_read2,
-    fifo_write1, fifo_write2
+    nes_fifo_read,
+    nes_fifo_pop,
+    nes_fifo_read_ok,
+    nes_fifo_write,
+    nes_fifo_push,
+    nes_fifo_write_ok,
+    bbb_fifo_read,
+    bbb_fifo_write
     );
 
 -------------------------------------------
@@ -147,12 +153,17 @@ signal reg_prg_ce_n         : std_logic;
 signal reg_prg_r_nw         : std_logic;
 signal reg_prg_addr         : std_logic_vector(14 downto 0);
 signal reg_prg_data_in      : std_logic_vector(7 downto 0);
-signal reg_prg_data_out     : std_logic_vector(7 downto 0);
 signal reg_chr_ce_n         : std_logic;
 signal reg_chr_oe_n         : std_logic;
 signal reg_chr_we_n         : std_logic;
 signal reg_chr_addr         : std_logic_vector(12 downto 0);
 
+signal wr_prg_data_out      : std_logic_vector(7 downto 0);
+signal reg_prg_data_out     : std_logic_vector(7 downto 0);
+
+--duper state machine..
+signal reg_cur_state        : duper_state_machine;
+signal reg_next_state       : duper_state_machine;
 
 --prgrom reg
 signal reg_prom_oe_n        : std_logic;
@@ -210,9 +221,6 @@ begin
             reg_prom_oe_n <= '1';
             reg_fifo_status <= "00010001";
             reg_rd_fifo_data <= (others => '0');
-            reg_fifo_ce_n <= '1';
-            reg_fifo_oe_n <= '1';
-            reg_fifo_we_n <= '1';
 
         elsif (rising_edge(pi_base_clk)) then
             reg_prom_oe_n <= not reg_prg_r_nw;
@@ -226,15 +234,107 @@ begin
         end if;
     end process;
 
+    --state transition process...
+    set_stat_p : process (pi_reset_n, pi_base_clk)
+    begin
+        if (pi_reset_n = '0') then
+            reg_cur_state <= idle;
+        elsif (rising_edge(pi_base_clk)) then
+            reg_cur_state <= reg_next_state;
+        end if;--if (pi_rst_n = '0') then
+    end process;
+
+    --state change to next.
+    vac_next_stat_p : process (reg_cur_state, reg_prg_ce_n, reg_prg_r_nw, reg_prg_addr)
+    begin
+        case reg_cur_state is
+            when idle =>
+                --rom read 0x7ff9: fifo read.
+                if (reg_prg_ce_n = '0' and reg_prg_r_nw = '1' and reg_prg_addr = "111111111111001") then
+                    reg_next_state <= nes_fifo_read;
+
+                --rom write 0x7ff9: fifo write.
+                elsif (reg_prg_ce_n = '0' and reg_prg_r_nw = '0' and reg_prg_addr = "111111111111001") then
+                    reg_next_state <= nes_fifo_write;
+
+                --rom read 0x7ff8: fifo status read.
+                elsif (reg_prg_ce_n = '0' and reg_prg_r_nw = '1' and reg_prg_addr = "111111111111000") then
+                    reg_next_state <= fifo_status_read;
+
+                --other rom read.
+                elsif (reg_prg_ce_n = '0' and reg_prg_r_nw = '1') then
+                    reg_next_state <= rom_read;
+
+                else
+                    reg_next_state <= idle;
+                end if;
+
+            when rom_read =>
+                if (reg_prg_ce_n = '0' and reg_prg_r_nw = '1' and reg_prg_addr(14 downto 1) /= "11111111111100") then
+                    reg_next_state <= rom_read;
+                else
+                    reg_next_state <= idle;
+                end if;
+
+            when fifo_status_read =>
+                if (reg_prg_ce_n = '0' and reg_prg_r_nw = '1' and reg_prg_addr = "111111111111000") then
+                    reg_next_state <= fifo_status_read;
+                else
+                    reg_next_state <= idle;
+                end if;
+
+            when nes_fifo_read =>
+                reg_next_state <= nes_fifo_pop;
+
+            when nes_fifo_pop =>
+                reg_next_state <= nes_fifo_read_ok;
+
+            when nes_fifo_read_ok =>
+                reg_next_state <= nes_fifo_read_ok;
+
+            when nes_fifo_write =>
+                reg_next_state <= idle;
+
+            when nes_fifo_push =>
+                reg_next_state <= idle;
+
+            when nes_fifo_write_ok =>
+                reg_next_state <= idle;
+
+            when bbb_fifo_read =>
+                reg_next_state <= idle;
+
+            when bbb_fifo_write =>
+                reg_next_state <= idle;
+        end case;
+    end process;
+
     --prg rom
     pio_prg_data <= reg_prg_data_out;
+
+    set_nes_out_p : process (reg_cur_state)
+    begin
+        case reg_cur_state is
+            when rom_read =>
+                reg_prg_data_out <= wr_prg_data_out;
+
+            when fifo_status_read =>
+                reg_prg_data_out <= reg_fifo_status;
+
+            when nes_fifo_read_ok =>
+                reg_prg_data_out <= wr_rd_fifo_data;
+
+            when others =>
+                reg_prg_data_out <= (others => 'Z');
+        end case;
+    end process;
 
     prom_inst : prg_rom port map (
         pi_base_clk,
         reg_prg_ce_n,
         reg_prom_oe_n,
         reg_prg_addr,
-        reg_prg_data_out
+        wr_prg_data_out
     );
 
     --i2c incoming fifo.
