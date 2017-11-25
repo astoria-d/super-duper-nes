@@ -31,6 +31,14 @@ add wave -label reg_rom_data    -radix hex  sim:/testbench_i2c_test/reg_rom_data
 #add wave -label pi_addr     -radix hex  sim:/testbench_i2c_test/sim_board/prom_inst/pi_addr
 #add wave -label po_data     -radix hex  sim:/testbench_i2c_test/sim_board/prom_inst/po_data
 
+add wave -divider rd_fifo
+add wave -label pi_ce_n     sim:/testbench_i2c_test/sim_board/rd_fifo_inst/pi_ce_n
+add wave -label pi_oe_n     sim:/testbench_i2c_test/sim_board/rd_fifo_inst/pi_oe_n
+add wave -label pi_we_n     sim:/testbench_i2c_test/sim_board/rd_fifo_inst/pi_we_n
+add wave -label pi_data     -radix hex  sim:/testbench_i2c_test/sim_board/rd_fifo_inst/pi_data
+add wave -label po_data     -radix hex  sim:/testbench_i2c_test/sim_board/rd_fifo_inst/po_data
+add wave -label po_stat_empty   sim:/testbench_i2c_test/sim_board/rd_fifo_inst/po_stat_empty
+add wave -label po_stat_full    sim:/testbench_i2c_test/sim_board/rd_fifo_inst/po_stat_full
 
 add wave -divider i2c
 add wave -label pio_i2c_sda     sim:/testbench_i2c_test/sim_board/pio_i2c_sda
