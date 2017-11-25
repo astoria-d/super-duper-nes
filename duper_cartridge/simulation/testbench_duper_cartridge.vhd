@@ -24,6 +24,23 @@ architecture stimulus of testbench_i2c_test is
 
     constant bus_cycle : integer := 3;
 
+
+---firo status register
+---bit	
+---0	write fifo empty
+---1	write fifo full
+---2	always 0
+---3	always 0
+---4	read fifo empty
+---5	read fifo full
+---6	always 0
+---7	always 0
+    constant wfifo_empty_bit    : integer := 0;
+    constant wfifo_full_bit     : integer := 1;
+    constant rfifo_empty_bit    : integer := 4;
+    constant rfifo_full_bit     : integer := 5;
+
+
     component duper_cartridge
     port (
         pi_reset_n      : in std_logic;
@@ -188,7 +205,7 @@ end;
             stage_cnt := stage_cnt + 1;
             step_cnt <= 0;
         elsif (stage_cnt = 1) then
-            if (step_cnt <= bus_cycle * 10) then
+            if (step_cnt <= bus_cycle * 1) then
                 if (step_cnt mod bus_cycle = 0) then
                     mem_read (conv_std_logic_vector(16#fff8#, 15));
                 else
@@ -196,10 +213,25 @@ end;
                 end if;
                 step_cnt <= step_cnt + 1;
             else
+                bus_wait;
+                step_cnt <= 0;
+                stage_cnt := stage_cnt + 1;
+            end if;
+        elsif (stage_cnt = 2) then
+            if (reg_rom_data (rfifo_empty_bit) = '1') then
+                if (step_cnt mod bus_cycle = 0) then
+                    mem_read (conv_std_logic_vector(16#fff8#, 15));
+                else
+                    bus_wait;
+                end if;
+                step_cnt <= step_cnt + 1;
+            else
+                bus_wait;
                 step_cnt <= 0;
                 stage_cnt := stage_cnt + 1;
             end if;
         else
+            bus_wait;
             stage_cnt := stage_cnt + 1;
         end if;
         wait for nes_clock_time;

@@ -38,19 +38,31 @@ end duper_cartridge;
 --architecture rtl of rom_test01 is
 architecture rtl of duper_cartridge is
 
-component duper_prg_rom port (  
-    pi_base_clk     : in std_logic;
-    pi_ce_n         : in std_logic;
-    pi_oe_n         : in std_logic;
-    pi_we_n         : in std_logic;
-    pi_addr         : in std_logic_vector (14 downto 0);
-    pio_data        : inout std_logic_vector (7 downto 0);
 
-    po_push_fifo    : out std_logic_vector (7 downto 0);
-    pi_pop_fifo     : in std_logic_vector (7 downto 0);
-    pi_fifo_stat    : in std_logic_vector (7 downto 0)
+
+-------------------------------------------
+-------------------------------------------
+------------- definitions.... -------------
+-------------------------------------------
+-------------------------------------------
+
+component synchronizer port (
+    pi_rst_n            : in    std_logic;
+    pi_base_clk         : in    std_logic;
+    pi_async_input      : in    std_logic;
+    po_sync_output      : out   std_logic
     );
-end component ;
+end component;
+
+component synchronized_vector
+    generic (abus_size : integer := 8);
+    port (
+        pi_rst_n            : in    std_logic;
+        pi_base_clk         : in    std_logic;
+        pi_async_input      : in    std_logic_vector(abus_size - 1 downto 0);
+        po_sync_output      : out   std_logic_vector(abus_size - 1 downto 0)
+    );
+end component;
 
 component prg_rom port (
     pi_base_clk     : in std_logic;
@@ -85,6 +97,21 @@ port (
     );
 end component;
 
+component fifo
+    generic (abus_size : integer := 8);
+    port (
+        pi_rst_n        : in std_logic;
+        pi_base_clk     : in std_logic;
+        pi_ce_n         : in std_logic;
+        pi_oe_n         : in std_logic;
+        pi_we_n         : in std_logic;
+        pi_data         : in std_logic_vector (7 downto 0);
+        po_data         : out std_logic_vector (7 downto 0);
+        po_stat_empty   : in std_logic;
+        po_stat_full    : in std_logic
+    );
+end component;
+
 component i2c_eeprom
     generic (abus_size : integer := 16);
     port (
@@ -99,14 +126,55 @@ component i2c_eeprom
     );
 end component;
 
---signal wk_chr_ce_n  : std_logic;
---signal wk_phi2_n        : std_logic;
-signal reg_reset_n      : std_logic;
-signal reg_chr_addr     : std_logic_vector(11 downto 0);
-signal reg_dbg_cnt      : std_logic_vector (63 downto 0);
+---firo status register
+---bit	
+---0	write fifo empty
+---1	write fifo full
+---2	always 0
+---3	always 0
+---4	read fifo empty
+---5	read fifo full
+---6	always 0
+---7	always 0
+constant wfifo_empty_bit    : integer := 0;
+constant wfifo_full_bit     : integer := 1;
+constant rfifo_empty_bit    : integer := 4;
+constant rfifo_full_bit     : integer := 5;
 
---2, 4, 8, 16, 32 divide counter.
-signal reg_divide_cnt      : std_logic_vector (4 downto 0);
+
+-------------------------------------------
+-------------------------------------------
+------------- declarations... -------------
+-------------------------------------------
+-------------------------------------------
+
+--synchronized input.
+--nes side
+signal reg_phi2             : std_logic;
+signal reg_prg_ce_n         : std_logic;
+signal reg_prg_r_nw         : std_logic;
+signal reg_prg_addr         : std_logic_vector(14 downto 0);
+signal reg_prg_data_in      : std_logic_vector(7 downto 0);
+signal reg_prg_data_out     : std_logic_vector(7 downto 0);
+signal reg_chr_ce_n         : std_logic;
+signal reg_chr_oe_n         : std_logic;
+signal reg_chr_we_n         : std_logic;
+signal reg_chr_addr         : std_logic_vector(12 downto 0);
+
+
+--prgrom reg
+signal reg_prom_oe_n        : std_logic;
+
+--read fifo registers.
+signal reg_fifo_ce_n        : std_logic;
+signal reg_fifo_oe_n        : std_logic;
+signal reg_fifo_we_n        : std_logic;
+signal reg_fifo_status      : std_logic_vector (7 downto 0);
+signal reg_rd_fifo_data     : std_logic_vector (7 downto 0);
+
+signal wr_rd_fifo_empty     : std_logic;
+signal wr_rd_fifo_full      : std_logic;
+signal wr_rd_fifo_data      : std_logic_vector (7 downto 0);
 
 --i2c registers.
 signal reg_slave_in_data    : std_logic_vector (7 downto 0);
@@ -114,48 +182,93 @@ signal reg_slave_out_data   : std_logic_vector (7 downto 0);
 signal reg_slave_status     : std_logic_vector (2 downto 0);
 signal reg_slave_addr_ack   : std_logic;
 
-signal reg_nr               : std_logic;
-signal reg_to_bbb_fifo      : std_logic_vector (7 downto 0);
-signal reg_from_bbb_fifo    : std_logic_vector (7 downto 0);
-signal reg_fifo_status      : std_logic_vector (7 downto 0);
+------------misc regs.
+signal reg_reset_n      : std_logic;
+signal reg_dbg_cnt      : std_logic_vector (63 downto 0);
+
+--2, 4, 8, 16, 32 divide counter.
+signal reg_divide_cnt      : std_logic_vector (4 downto 0);
+
+
+-------------------------------------------
+-------------------------------------------
+------------ implementations... -----------
+-------------------------------------------
+-------------------------------------------
+
 
 begin
 
---    wk_phi2_n <= not pi_phi2;
+    --async input to be aligned to the base clock...
+    sync00 : synchronizer port map (pi_reset_n, pi_base_clk, pi_phi2,        reg_phi2);
+    sync01 : synchronizer port map (pi_reset_n, pi_base_clk, pi_prg_ce_n,    reg_prg_ce_n);
+    sync02 : synchronizer port map (pi_reset_n, pi_base_clk, pi_prg_r_nw,    reg_prg_r_nw);
+    sync03 : synchronizer port map (pi_reset_n, pi_base_clk, pi_chr_ce_n,    reg_chr_ce_n);
+    sync04 : synchronizer port map (pi_reset_n, pi_base_clk, pi_chr_oe_n,    reg_chr_oe_n);
+    sync05 : synchronizer port map (pi_reset_n, pi_base_clk, pi_chr_we_n,    reg_chr_we_n);
 
-    divider_p : process (pi_phi2)
-use ieee.std_logic_unsigned.all;
-    begin
-        if (rising_edge(pi_phi2)) then
-            reg_divide_cnt <= reg_divide_cnt + 1;
-        end if;
-    end process;
+    sync10 : synchronized_vector generic map (15)    port map (pi_reset_n, pi_base_clk, pi_prg_addr,    reg_prg_addr);
+    sync11 : synchronized_vector generic map (8)     port map (pi_reset_n, pi_base_clk, pio_prg_data,   reg_prg_data_in);
+    sync12 : synchronized_vector generic map (13)    port map (pi_reset_n, pi_base_clk, pi_chr_addr,    reg_chr_addr);
 
-    reg_p : process (pi_base_clk)
+    --base clock synchronized registers...
+    reg_p : process (pi_base_clk, pi_reset_n)
     begin
-        if (rising_edge(pi_base_clk)) then
-            reg_nr <= not pi_prg_r_nw;
-            reg_from_bbb_fifo <= "01000100"; --0x44 = "D"
-            reg_fifo_status <= "11000100";
+        if (reg_reset_n = '0') then
+            reg_prom_oe_n <= '1';
+            reg_fifo_status <= "00010001";
+            reg_rd_fifo_data <= (others => '0');
+            reg_fifo_ce_n <= '1';
+            reg_fifo_oe_n <= '1';
+            reg_fifo_we_n <= '1';
+
+        elsif (rising_edge(pi_base_clk)) then
+            reg_prom_oe_n <= not reg_prg_r_nw;
+            reg_fifo_status(wfifo_empty_bit)    <= '1';
+            reg_fifo_status(wfifo_full_bit)     <= '0';
+            reg_fifo_status(rfifo_empty_bit)    <= wr_rd_fifo_empty;
+            reg_fifo_status(rfifo_full_bit)     <= wr_rd_fifo_full;
+            reg_fifo_status(3 downto 2) <= (others => '0');
+            reg_fifo_status(7 downto 6) <= (others => '0');
+            reg_rd_fifo_data <= wr_rd_fifo_data;
         end if;
     end process;
 
     --prg rom
+    pio_prg_data <= reg_prg_data_out;
+
     prom_inst : prg_rom port map (
         pi_base_clk,
-        pi_prg_ce_n,
-        reg_nr,
-        pi_prg_addr,
-        pio_prg_data
+        reg_prg_ce_n,
+        reg_prom_oe_n,
+        reg_prg_addr,
+        reg_prg_data_out
     );
 
-    --character rom
-    crom_inst : chr_rom port map (
-        pi_base_clk, 
-        pi_chr_ce_n,
-        pi_chr_oe_n,
-        pi_chr_addr, 
-        po_chr_data
+--    i2c_eeprom_inst : i2c_eeprom generic map (8)
+--    port map (
+--        pi_reset_n,
+--        pi_base_clk,
+--        reg_slave_status(0),
+--        reg_slave_status(2),
+--        reg_slave_status(1),
+--        reg_slave_addr_ack,
+--        reg_slave_in_data,
+--        reg_slave_out_data
+--    );
+
+    --i2c incoming fifo.
+    rd_fifo_inst : fifo generic map (8)
+    port map (
+        pi_reset_n,
+        pi_base_clk,
+        reg_fifo_ce_n,
+        reg_fifo_oe_n,
+        reg_fifo_we_n,
+        wr_rd_fifo_data,
+        reg_slave_in_data,
+        wr_rd_fifo_empty,
+        wr_rd_fifo_full
     );
 
     --i2c slave
@@ -171,17 +284,14 @@ use ieee.std_logic_unsigned.all;
         reg_slave_out_data
     );
 
---    i2c_eeprom_inst : i2c_eeprom generic map (8)
---    port map (
---        pi_reset_n,
---        pi_base_clk,
---        reg_slave_status(0),
---        reg_slave_status(2),
---        reg_slave_status(1),
---        reg_slave_addr_ack,
---        reg_slave_in_data,
---        reg_slave_out_data
---    );
+    --character rom
+    crom_inst : chr_rom port map (
+        pi_base_clk, 
+        reg_chr_ce_n,
+        reg_chr_oe_n,
+        reg_chr_addr, 
+        po_chr_data
+    );
 
     --nes reset signal emulation.
     reset_p : process (pi_base_clk)
@@ -190,10 +300,10 @@ use ieee.std_logic_unsigned.all;
     begin
         if (rising_edge(pi_base_clk)) then
             -- case addr is 0x77fc
-            if (pi_prg_addr = "111111111111100") then
+            if (reg_prg_addr = "111111111111100") then
             -- case addr is 0x77fd
                 cnt1 := cnt1 + 1;
-            elsif (pi_prg_addr = "111111111111101") then
+            elsif (reg_prg_addr = "111111111111101") then
                 cnt2 := cnt2 + 1;
             else
                 cnt1 := 0;
@@ -212,6 +322,19 @@ use ieee.std_logic_unsigned.all;
         end if;
     end process;
 
+--------------------------------------------------------------------
+--------------------------------------------------------------------
+------------------------ misc processes.... ------------------------
+--------------------------------------------------------------------
+--------------------------------------------------------------------
+
+    divider_p : process (reg_phi2)
+use ieee.std_logic_unsigned.all;
+    begin
+        if (rising_edge(reg_phi2)) then
+            reg_divide_cnt <= reg_divide_cnt + 1;
+        end if;
+    end process;
 
     po_dbg_cnt <= reg_dbg_cnt;
     deb_cnt_p : process (pi_base_clk, pi_reset_n)

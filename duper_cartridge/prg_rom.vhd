@@ -45,13 +45,13 @@ begin
 end rom_fill;
 
 --itinialize with the rom_fill function.
---signal p_rom : rom_array := rom_fill;
+signal p_rom : rom_array := rom_fill;
 --ModelSim environment ends here
 
 --for Quartus II environment
-signal p_rom : rom_array;
-attribute ram_init_file : string;
-attribute ram_init_file of p_rom : signal is "sample1-prg-8k.hex";
+--signal p_rom : rom_array;
+--attribute ram_init_file : string;
+--attribute ram_init_file of p_rom : signal is "sample1-prg-8k.hex";
 
 
 signal reg_out_n : std_logic;
