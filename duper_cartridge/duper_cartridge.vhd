@@ -271,11 +271,7 @@ begin
                 end if;
 
             when rom_read =>
-                if (reg_prg_ce_n = '0' and reg_prg_r_nw = '1' and reg_prg_addr(14 downto 1) /= "11111111111100") then
-                    reg_next_state <= rom_read_ok;
-                else
-                    reg_next_state <= idle;
-                end if;
+                reg_next_state <= rom_read_ok;
 
             when rom_read_ok =>
                 if (reg_prg_ce_n = '0' and reg_prg_r_nw = '1' and reg_prg_addr(14 downto 1) /= "11111111111100") then

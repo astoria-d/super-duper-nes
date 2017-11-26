@@ -47,11 +47,13 @@ add wave -label po_stat_full    sim:/testbench_i2c_test/sim_board/rd_fifo_inst/p
 
 add wave -divider i2c
 
-#add wave -label start_scl   sim:/testbench_i2c_test/start_scl
-#add wave -label i2c_scl     sim:/testbench_i2c_test/i2c_scl
+add wave -label start_scl       sim:/testbench_i2c_test/start_scl
+#add wave -label i2c_scl         sim:/testbench_i2c_test/i2c_scl
+add wave -label i2c_step_cnt    sim:/testbench_i2c_test/i2c_step_cnt
 
-add wave -label pio_i2c_sda     sim:/testbench_i2c_test/sim_board/pio_i2c_sda
+
 add wave -label pi_i2c_scl      sim:/testbench_i2c_test/sim_board/pi_i2c_scl
+add wave -label pio_i2c_sda     sim:/testbench_i2c_test/sim_board/pio_i2c_sda
 
 
 add wave -divider i2c_slave

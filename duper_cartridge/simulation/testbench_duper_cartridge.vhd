@@ -40,6 +40,8 @@ architecture stimulus of testbench_i2c_test is
     constant rfifo_empty_bit    : integer := 4;
     constant rfifo_full_bit     : integer := 5;
 
+    constant i2c_read       : std_logic := '1';
+    constant i2c_write      : std_logic := '0';
 
     component duper_cartridge
     port (
@@ -205,10 +207,11 @@ end;
             wait for powerup_time + reset_time;
             stage_cnt <= stage_cnt + 1;
             step_cnt <= 0;
+            start_scl <= '0';
         elsif (stage_cnt = 1) then
             if (step_cnt < bus_cycle * 1) then
                 if (step_cnt mod bus_cycle = 0) then
-                    mem_read (conv_std_logic_vector(16#fffc#, 15));
+                    mem_read (conv_std_logic_vector(16#fffa#, 15));
                 else
                     bus_wait;
                 end if;
@@ -226,6 +229,7 @@ end;
                 stage_cnt <= stage_cnt + 1;
             end if;
         elsif (stage_cnt = 2) then
+            start_scl <= '1';
             if (reg_rom_data (rfifo_empty_bit) = '1') then
                 if (step_cnt mod bus_cycle = 0) then
                     mem_read (conv_std_logic_vector(16#fff8#, 15));
@@ -239,6 +243,7 @@ end;
                 stage_cnt <= stage_cnt + 1;
             end if;
         else
+            start_scl <= '0';
             bus_wait;
             stage_cnt <= stage_cnt + 1;
         end if;
@@ -265,45 +270,76 @@ end;
 
     --- i2c data generation....
     i2c_p : process
+
+variable remaining_time : time;
+variable start_index : integer;
+
+
+procedure wait_clock
+(
+    wait_time : in time
+) is
+begin
+    wait for wait_time;
+    remaining_time := remaining_time - wait_time;
+end;
+
+procedure wait_remaining is
+begin
+    wait for remaining_time;
+end;
+
+procedure output_addr
+(
+    i       : in integer;
+    addr    : in std_logic_vector (6 downto 0)
+) is
+begin
+    i2c_sda <= addr(i);
+end;
+
     begin
+        remaining_time := i2c_clock_time;
         if (stage_cnt = 2) then
-            start_scl <= '1';
+            if (i2c_step_cnt = 0) then
+                start_index := 0;
+            elsif (i2c_step_cnt = 1) then
+                --start up seq...
+                wait_clock (i2c_clock_time / 4);
+                i2c_sda <= '0';
+
+                --set i2c addr...
+                --addr output with write.....
+                --0x44 = 100 0101.
+                start_index := i2c_step_cnt;
+                wait_clock (i2c_clock_time / 2);
+                output_addr(6 - i2c_step_cnt + start_index, conv_std_logic_vector(16#44#, 7));
+
+            elsif (i2c_step_cnt < 8) then
+                wait_clock (i2c_clock_time * 3 / 4);
+                output_addr(6 - i2c_step_cnt + start_index, conv_std_logic_vector(16#44#, 7));
+
+            elsif (i2c_step_cnt < 9) then
+                wait_clock (i2c_clock_time * 3 / 4);
+                i2c_sda <= i2c_write;
+
+            elsif (i2c_step_cnt = 11) then
+                wait_clock (i2c_clock_time / 4);
+                i2c_sda <= '1';
+            end if;
             i2c_step_cnt <= i2c_step_cnt + 1;
         else
-            start_scl <= '0';
+            --pull up.
+            i2c_sda <= '1';
             i2c_step_cnt <= 0;
         end if;
-        wait for i2c_clock_time;
+        wait_remaining;
     end process;
 
 
 
 --    --- sda data generation....
 --    sda_p : process
---
---procedure output_addr
---(
---    addr    : in std_logic_vector (6 downto 0);
---    rw      : in std_logic
---) is
---begin
---    i2c_sda <= addr(6);
---    wait for i2c_clock_time;
---    i2c_sda <= addr(5);
---    wait for i2c_clock_time;
---    i2c_sda <= addr(4);
---    wait for i2c_clock_time;
---    i2c_sda <= addr(3);
---    wait for i2c_clock_time;
---    i2c_sda <= addr(2);
---    wait for i2c_clock_time;
---    i2c_sda <= addr(1);
---    wait for i2c_clock_time;
---    i2c_sda <= addr(0);
---    wait for i2c_clock_time;
---    i2c_sda <= rw;
---    wait for i2c_clock_time / 2;
---end;
 --
 --procedure output_data
 --(
