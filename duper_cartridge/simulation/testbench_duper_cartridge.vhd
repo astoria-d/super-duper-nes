@@ -267,6 +267,15 @@ end;
         end if;
     end process;
 
+    i2c_cnt_p : process
+    begin
+        if (stage_cnt = 2) then
+            i2c_step_cnt <= i2c_step_cnt + 1;
+        else
+            i2c_step_cnt <= 0;
+        end if;
+        wait for i2c_clock_time;
+    end process;
 
     --- i2c data generation....
     i2c_p : process
@@ -298,6 +307,21 @@ begin
     i2c_sda <= addr(i);
 end;
 
+procedure ack_wait is
+begin
+    i2c_sda <= 'Z';
+end;
+
+procedure output_data
+(
+    i       : in integer;
+    data    : in std_logic_vector (7 downto 0)
+) is
+begin
+    i2c_sda <= data(i);
+end;
+
+
     begin
         remaining_time := i2c_clock_time;
         if (stage_cnt = 2) then
@@ -315,23 +339,43 @@ end;
                 wait_clock (i2c_clock_time / 2);
                 output_addr(6 - i2c_step_cnt + start_index, conv_std_logic_vector(16#44#, 7));
 
-            elsif (i2c_step_cnt < 8) then
+            elsif (i2c_step_cnt <= 7) then
                 wait_clock (i2c_clock_time * 3 / 4);
                 output_addr(6 - i2c_step_cnt + start_index, conv_std_logic_vector(16#44#, 7));
 
-            elsif (i2c_step_cnt < 9) then
+            elsif (i2c_step_cnt = 8) then
                 wait_clock (i2c_clock_time * 3 / 4);
                 i2c_sda <= i2c_write;
 
-            elsif (i2c_step_cnt = 11) then
+            elsif (i2c_step_cnt = 9) then
+                --wait ack...
+                wait_clock (i2c_clock_time * 3 / 4);
+                ack_wait;
+
+            --output data
+            elsif (i2c_step_cnt = 10) then
+                start_index := i2c_step_cnt;
+                wait_clock (i2c_clock_time * 3 / 4);
+                output_data(8 - i2c_step_cnt + start_index, conv_std_logic_vector(16#55#, 8));
+
+            elsif (i2c_step_cnt <= 17) then
+                wait_clock (i2c_clock_time * 3 / 4);
+                output_data(8 - i2c_step_cnt + start_index, conv_std_logic_vector(16#55#, 8));
+
+            elsif (i2c_step_cnt = 18) then
+                --wait ack...
+                wait_clock (i2c_clock_time * 3 / 4);
+                ack_wait;
+
+            elsif (i2c_step_cnt = 20) then
+                --stop seq...
+                i2c_sda <= '0';
                 wait_clock (i2c_clock_time / 4);
                 i2c_sda <= '1';
             end if;
-            i2c_step_cnt <= i2c_step_cnt + 1;
         else
             --pull up.
             i2c_sda <= '1';
-            i2c_step_cnt <= 0;
         end if;
         wait_remaining;
     end process;
@@ -363,14 +407,6 @@ end;
 --    i2c_sda <= data(0);
 --    wait for i2c_clock_time / 2;
 --end;
---
---procedure ack_wait is
---begin
---    i2c_sda <= 'Z';
---    wait until i2c_sda'event and i2c_sda='0';
---    wait for i2c_clock_time;
---end;
---
 --
 --procedure input_data is
 --begin

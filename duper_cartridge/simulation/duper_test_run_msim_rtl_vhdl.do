@@ -93,6 +93,6 @@ view signals
 
 run 15 us
 wave zoom full
-run 200 us
+run 250 us
 wave zoom full
 
