@@ -251,7 +251,7 @@ end;
     end process;
 
 
-    --- i2c clock, clock generation under the condition
+    --- i2c_scl process..
     scl_p : process
     begin
         if(start_scl = '1') then
@@ -261,9 +261,7 @@ end;
             wait for i2c_clock_time / 2;
         else
             i2c_scl <= '1';
-            wait for i2c_clock_time / 2;
-            i2c_scl <= '1';
-            wait for i2c_clock_time / 2;
+            wait for i2c_clock_time;
         end if;
     end process;
 
@@ -277,7 +275,7 @@ end;
         wait for i2c_clock_time;
     end process;
 
-    --- i2c data generation....
+    --- i2c_sda process..
     i2c_p : process
 
 variable remaining_time : time;
@@ -367,7 +365,7 @@ end;
                 wait_clock (i2c_clock_time * 3 / 4);
                 ack_wait;
 
-            elsif (i2c_step_cnt = 20) then
+            elsif (i2c_step_cnt = 19) then
                 --stop seq...
                 i2c_sda <= '0';
                 wait_clock (i2c_clock_time / 4);
