@@ -176,15 +176,19 @@ signal reg_fifo_we_n        : std_logic;
 signal reg_fifo_status      : std_logic_vector (7 downto 0);
 signal reg_rd_fifo_data     : std_logic_vector (7 downto 0);
 
+signal tmp_rfifo_ce1 : std_logic;
+signal tmp_rfifo_ce2 : std_logic;
+
+
 signal wr_rd_fifo_empty     : std_logic;
 signal wr_rd_fifo_full      : std_logic;
 signal wr_rd_fifo_data      : std_logic_vector (7 downto 0);
 
 --i2c registers.
-signal reg_slave_in_data    : std_logic_vector (7 downto 0);
 signal reg_slave_out_data   : std_logic_vector (7 downto 0);
-signal reg_slave_status     : std_logic_vector (2 downto 0);
 signal reg_slave_addr_ack   : std_logic;
+signal wr_slave_in_data    : std_logic_vector (7 downto 0);
+signal wr_slave_status     : std_logic_vector (2 downto 0);
 
 ------------misc regs.
 signal reg_reset_n      : std_logic;
@@ -192,7 +196,6 @@ signal reg_dbg_cnt      : std_logic_vector (63 downto 0);
 
 --2, 4, 8, 16, 32 divide counter.
 signal reg_divide_cnt      : std_logic_vector (4 downto 0);
-
 
 -------------------------------------------
 -------------------------------------------
@@ -218,10 +221,15 @@ begin
     --base clock synchronized registers...
     reg_p : process (pi_base_clk, pi_reset_n)
     begin
-        if (reg_reset_n = '0') then
+        if (pi_reset_n = '0') then
             reg_prom_oe_n <= '1';
             reg_fifo_status <= "00010001";
             reg_rd_fifo_data <= (others => '0');
+            reg_fifo_ce_n <= '1';
+            reg_fifo_oe_n <= '1';
+            reg_fifo_we_n <= '1';
+            tmp_rfifo_ce1 <= '1';
+            tmp_rfifo_ce2 <= '1';
 
         elsif (rising_edge(pi_base_clk)) then
             reg_prom_oe_n <= not reg_prg_r_nw;
@@ -232,6 +240,19 @@ begin
             reg_fifo_status(3 downto 2) <= (others => '0');
             reg_fifo_status(7 downto 6) <= (others => '0');
             reg_rd_fifo_data <= wr_rd_fifo_data;
+
+---po_i2c_status(1): '1' = acknowleged, '0' = not acknowleged.
+---po_i2c_status(2): '1' = read, '0' = write.
+            reg_fifo_we_n <= not (wr_slave_status(1) and not wr_slave_status(2));
+
+            --reg_fifo_ce_n is edge sense signal.
+            tmp_rfifo_ce1 <= not (wr_slave_status(1) and not wr_slave_status(2));
+            tmp_rfifo_ce2 <= tmp_rfifo_ce1;
+            if ((tmp_rfifo_ce1 = '0' and tmp_rfifo_ce2 = '1')) then
+                reg_fifo_ce_n <= '0';
+            else
+                reg_fifo_ce_n <= '1';
+            end if;
         end if;
     end process;
 
@@ -349,8 +370,8 @@ begin
         reg_fifo_ce_n,
         reg_fifo_oe_n,
         reg_fifo_we_n,
+        wr_slave_in_data,
         wr_rd_fifo_data,
-        reg_slave_in_data,
         wr_rd_fifo_empty,
         wr_rd_fifo_full
     );
@@ -363,8 +384,8 @@ begin
         conv_std_logic_vector(16#44#, 7),
         pi_i2c_scl,
         pio_i2c_sda,
-        reg_slave_status,
-        reg_slave_in_data,
+        wr_slave_status,
+        wr_slave_in_data,
         reg_slave_out_data
     );
 

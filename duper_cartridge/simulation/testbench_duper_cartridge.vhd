@@ -365,7 +365,7 @@ end;
                 wait_clock (i2c_clock_time * 3 / 4);
                 ack_wait;
 
-            elsif (i2c_step_cnt = 19) then
+            elsif (i2c_step_cnt = 20) then
                 --stop seq...
                 i2c_sda <= '0';
                 wait_clock (i2c_clock_time / 4);
