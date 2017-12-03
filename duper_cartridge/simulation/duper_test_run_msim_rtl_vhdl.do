@@ -46,13 +46,22 @@ add wave -label po_stat_full    sim:/testbench_i2c_test/sim_board/rd_fifo_inst/p
 add wave -label reg_fifo_size    -radix unsigned        sim:/testbench_i2c_test/sim_board/rd_fifo_inst/reg_fifo_size
 
 
-add wave -divider i2c
+add wave -divider wr_fifo
+add wave -label pi_ce_n     sim:/testbench_i2c_test/sim_board/wr_fifo_inst/pi_ce_n
+add wave -label pi_oe_n     sim:/testbench_i2c_test/sim_board/wr_fifo_inst/pi_oe_n
+add wave -label pi_we_n     sim:/testbench_i2c_test/sim_board/wr_fifo_inst/pi_we_n
+add wave -label pi_data     -radix hex  sim:/testbench_i2c_test/sim_board/wr_fifo_inst/pi_data
+add wave -label po_data     -radix hex  sim:/testbench_i2c_test/sim_board/wr_fifo_inst/po_data
+add wave -label po_stat_empty   sim:/testbench_i2c_test/sim_board/wr_fifo_inst/po_stat_empty
+add wave -label po_stat_full    sim:/testbench_i2c_test/sim_board/wr_fifo_inst/po_stat_full
+add wave -label reg_fifo_size    -radix unsigned        sim:/testbench_i2c_test/sim_board/wr_fifo_inst/reg_fifo_size
 
+
+
+add wave -divider i2c
 add wave -label start_scl       sim:/testbench_i2c_test/start_scl
 #add wave -label i2c_scl         sim:/testbench_i2c_test/i2c_scl
 add wave -label i2c_step_cnt    sim:/testbench_i2c_test/i2c_step_cnt
-
-
 add wave -label pi_i2c_scl      sim:/testbench_i2c_test/sim_board/pi_i2c_scl
 add wave -label pio_i2c_sda     sim:/testbench_i2c_test/sim_board/pio_i2c_sda
 
