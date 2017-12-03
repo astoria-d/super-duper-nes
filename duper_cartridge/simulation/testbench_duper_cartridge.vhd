@@ -274,11 +274,11 @@ end;
 
         elsif (stage_cnt = 4) then
         --push fifo to bbb..
-            if (step_cnt mod bus_cycle = 0 and step_cnt * bus_cycle < 20) then
+            if (step_cnt mod bus_cycle = 0 and step_cnt < 30) then
                 --0xfff9 is fifo write.
                 mem_write (conv_std_logic_vector(16#fff9#, 15),conv_std_logic_vector(16#77#, 8));
                 step_cnt <= step_cnt + 1;
-            elsif (step_cnt mod bus_cycle = 0 and step_cnt * bus_cycle = 20) then
+            elsif (step_cnt mod bus_cycle = 0 and step_cnt = 30) then
                 bus_wait;
                 step_cnt <= 0;
                 stage_cnt <= stage_cnt + 1;
