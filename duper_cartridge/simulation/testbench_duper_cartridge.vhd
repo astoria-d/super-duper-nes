@@ -207,7 +207,6 @@ end;
             wait for powerup_time + reset_time;
             stage_cnt <= stage_cnt + 1;
             step_cnt <= 0;
-            start_scl <= '0';
         elsif (stage_cnt = 1) then
         --pseudo rom read.
             if (step_cnt < bus_cycle * 1) then
@@ -231,7 +230,6 @@ end;
             end if;
         elsif (stage_cnt = 2) then
         --polling fifo status.
-            start_scl <= '1';
             if (reg_rom_data (rfifo_empty_bit) = '1') then
                 if (step_cnt mod bus_cycle = 0) then
                     mem_read (conv_std_logic_vector(16#fff8#, 15));
@@ -246,7 +244,6 @@ end;
             end if;
         elsif (stage_cnt = 3) then
         --read fifo..
-            start_scl <= '0';
             --wait for test pattern.
             if (reg_rom_data /= conv_std_logic_vector(16#5a#, 8)) then
                 if (step_cnt mod bus_cycle = 0) then
@@ -262,7 +259,6 @@ end;
                 stage_cnt <= stage_cnt + 1;
             end if;
         else
-            start_scl <= '0';
             bus_wait;
             stage_cnt <= stage_cnt + 1;
         end if;
@@ -288,11 +284,40 @@ end;
     begin
         if (stage_cnt = 2) then
             i2c_step_cnt <= i2c_step_cnt + 1;
+        elsif (stage_cnt = 3) then
+            if (i2c_step_cnt = 22) then
+                i2c_step_cnt <= 0;
+            else
+                i2c_step_cnt <= i2c_step_cnt + 1;
+            end if;
         else
             i2c_step_cnt <= 0;
         end if;
         wait for i2c_clock_time;
     end process;
+
+
+
+    --- i2c_scl process..
+    i2c_scl_handl_p : process
+    begin
+        if (stage_cnt = 0) then
+            start_scl <= '0';
+        elsif (stage_cnt = 2) then
+            start_scl <= '1';
+        elsif (stage_cnt = 3) then
+            if (step_cnt < 50) then
+                start_scl <= '0';
+            else
+                start_scl <= '1';
+            end if;
+        else
+            start_scl <= '0';
+        end if;
+        wait for nes_clock_time;
+    end process;
+
+
 
     --- i2c_sda process..
     i2c_p : process
@@ -390,6 +415,57 @@ end;
                 wait_clock (i2c_clock_time / 4);
                 i2c_sda <= '1';
             end if;
+
+        elsif (stage_cnt = 3) then
+            if (i2c_step_cnt = 0) then
+                start_index := 0;
+            elsif (i2c_step_cnt = 1) then
+                --start up seq...
+                wait_clock (i2c_clock_time / 4);
+                i2c_sda <= '0';
+
+                --set i2c addr...
+                --addr output with write.....
+                --0x44 = 100 0101.
+                start_index := i2c_step_cnt;
+                wait_clock (i2c_clock_time / 2);
+                output_addr(6 - i2c_step_cnt + start_index, conv_std_logic_vector(16#44#, 7));
+
+            elsif (i2c_step_cnt <= 7) then
+                wait_clock (i2c_clock_time * 3 / 4);
+                output_addr(6 - i2c_step_cnt + start_index, conv_std_logic_vector(16#44#, 7));
+
+            elsif (i2c_step_cnt = 8) then
+                wait_clock (i2c_clock_time * 3 / 4);
+                i2c_sda <= i2c_write;
+
+            elsif (i2c_step_cnt = 9) then
+                --wait ack...
+                wait_clock (i2c_clock_time * 3 / 4);
+                ack_wait;
+
+            --output data
+            elsif (i2c_step_cnt = 10) then
+                start_index := i2c_step_cnt;
+                wait_clock (i2c_clock_time * 3 / 4);
+                output_data(8 - i2c_step_cnt + start_index, conv_std_logic_vector(16#5a#, 8));
+
+            elsif (i2c_step_cnt <= 17) then
+                wait_clock (i2c_clock_time * 3 / 4);
+                output_data(8 - i2c_step_cnt + start_index, conv_std_logic_vector(16#5a#, 8));
+
+            elsif (i2c_step_cnt = 18) then
+                --wait ack...
+                wait_clock (i2c_clock_time * 3 / 4);
+                ack_wait;
+
+            elsif (i2c_step_cnt = 20) then
+                --stop seq...
+                i2c_sda <= '0';
+                wait_clock (i2c_clock_time / 4);
+                i2c_sda <= '1';
+            end if;
+
         else
             --pull up.
             i2c_sda <= '1';

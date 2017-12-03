@@ -81,4 +81,6 @@ run 15 us
 wave zoom full
 run 250 us
 wave zoom full
+run 250 us
+wave zoom full
 
