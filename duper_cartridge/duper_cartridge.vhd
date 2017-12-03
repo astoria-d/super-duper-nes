@@ -30,6 +30,10 @@ entity duper_cartridge is
         pi_i2c_scl      : in    std_logic;
         pio_i2c_sda     : inout std_logic;
 
+        --bbb gpio
+        po_nes_f_full   : out   std_logic;
+        po_bbb_f_empty  : out   std_logic;
+
         po_dbg_cnt          : out std_logic_vector (63 downto 0)
         );
 --end rom_test01;
@@ -240,6 +244,8 @@ begin
             reg_fifo_status(wfifo_empty_bit)    <= '1';
         end if;
     end process;
+    po_nes_f_full <= reg_fifo_status(rfifo_full_bit);
+    po_bbb_f_empty <= reg_fifo_status(wfifo_empty_bit);
 
     --state transition process...
     set_stat_p : process (pi_reset_n, pi_base_clk)

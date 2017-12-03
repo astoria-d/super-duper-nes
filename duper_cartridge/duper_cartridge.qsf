@@ -146,12 +146,12 @@ set_location_assignment PIN_K17 -to pi_chr_oe_n
 ##set_location_assignment PIN_R17
 ##set_location_assignment PIN_R16
 ##set_location_assignment PIN_T20
-##set_location_assignment PIN_T18
-##set_location_assignment PIN_T15
 
 set_location_assignment PIN_T19 -to pi_i2c_scl
 set_location_assignment PIN_T17 -to pio_i2c_sda
 
+set_location_assignment PIN_T18 -to po_nes_f_full
+set_location_assignment PIN_T15 -to po_bbb_f_empty
 
 
 set_location_assignment PIN_H16 -to po_prg_data[4]
@@ -224,7 +224,6 @@ set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
 
 set_global_assignment -name VHDL_FILE synchronizer.vhd
 set_global_assignment -name VHDL_FILE prg_rom.vhd
-set_global_assignment -name VHDL_FILE i2c_eeprom.vhd
 set_global_assignment -name VHDL_FILE fifo.vhd
 set_global_assignment -name VHDL_FILE i2c.vhd
 set_global_assignment -name VHDL_FILE duper_cartridge.vhd
@@ -374,5 +373,7 @@ set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_COUNTER_PIPELINE=
 set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_ADVANCED_TRIGGER_ENTITY=basic,1," -section_id auto_signaltap_0
 set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_TRIGGER_LEVEL_PIPELINE=1" -section_id auto_signaltap_0
 set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_ENABLE_ADVANCED_TRIGGER=0" -section_id auto_signaltap_0
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to po_nes_f_full
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to po_bbb_f_empty
 set_global_assignment -name SLD_FILE db/duper_cartridge_auto_stripped.stp
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

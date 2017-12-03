@@ -64,6 +64,10 @@ architecture stimulus of testbench_i2c_test is
         pi_i2c_scl      : in    std_logic;
         pio_i2c_sda     : inout std_logic;
 
+        --bbb gpio
+        po_nes_f_full   : out   std_logic;
+        po_bbb_f_empty  : out   std_logic;
+
         po_dbg_cnt          : out std_logic_vector (63 downto 0)
     );
     end component ;
@@ -84,6 +88,10 @@ architecture stimulus of testbench_i2c_test is
 
     signal i2c_scl          : std_logic;
     signal i2c_sda          : std_logic;
+
+    signal nes_f_full       : std_logic;
+    signal bbb_f_empty      : std_logic;
+
     signal dbg_cnt          : std_logic_vector (63 downto 0);
     
     signal rd_data          : std_logic_vector (7 downto 0);
@@ -124,6 +132,10 @@ begin
 
     i2c_scl,
     i2c_sda,
+
+    nes_f_full,
+    bbb_f_empty,
+
     dbg_cnt);
 
     --- input reset.
