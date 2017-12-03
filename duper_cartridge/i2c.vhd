@@ -5,9 +5,9 @@ use ieee.std_logic_arith.conv_std_logic_vector;
 use ieee.std_logic_unsigned.all;
 
 
----po_i2c_status(0): '1' = bus transfering, '0' = stopped.
----po_i2c_status(1): '1' = acknowleged, '0' = not acknowleged.
 ---po_i2c_status(2): '1' = read, '0' = write.
+---po_i2c_status(1): '1' = acknowleged, '0' = not acknowleged.
+---po_i2c_status(0): '1' = bus transfering, '0' = stopped.
 entity i2c_slave is 
     port (
         pi_rst_n            : in    std_logic;

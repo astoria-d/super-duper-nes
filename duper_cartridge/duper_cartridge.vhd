@@ -110,7 +110,7 @@ component fifo
     );
 end component;
 
----firo status register
+---fifo status register
 ---bit	
 ---7	always 0
 ---6	always 0
@@ -310,7 +310,11 @@ begin
                 reg_next_state <= nes_fifo_read_ok;
 
             when nes_fifo_read_ok =>
-                reg_next_state <= nes_fifo_read_ok;
+                if (reg_prg_ce_n = '0' and reg_prg_r_nw = '1' and reg_prg_addr = "111111111111001") then
+                    reg_next_state <= nes_fifo_read_ok;
+                else
+                    reg_next_state <= idle;
+                end if;
 
             when nes_fifo_write =>
                 reg_next_state <= nes_fifo_push;

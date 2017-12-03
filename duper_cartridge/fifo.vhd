@@ -54,7 +54,11 @@ begin
     p_read : process (pi_base_clk)
     begin
         if (rising_edge(pi_base_clk)) then
-            po_data <= work_ram(conv_integer(reg_fifo_head));
+            if (pi_ce_n = '0' and pi_oe_n = '0') then
+                po_data <= work_ram(conv_integer(reg_fifo_head));
+            else
+                po_data <= (others => 'Z');
+            end if;
         end if;
     end process;
 

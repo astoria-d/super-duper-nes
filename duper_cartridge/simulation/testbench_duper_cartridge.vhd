@@ -25,16 +25,16 @@ architecture stimulus of testbench_i2c_test is
     constant bus_cycle : integer := 3;
 
 
----firo status register
+---fifo status register
 ---bit	
----0	write fifo empty
----1	write fifo full
----2	always 0
----3	always 0
----4	read fifo empty
----5	read fifo full
----6	always 0
 ---7	always 0
+---6	always 0
+---5	read fifo full
+---4	read fifo empty
+---3	always 0
+---2	always 0
+---1	write fifo full
+---0	write fifo empty
     constant wfifo_empty_bit    : integer := 0;
     constant wfifo_full_bit     : integer := 1;
     constant rfifo_empty_bit    : integer := 4;
@@ -209,6 +209,7 @@ end;
             step_cnt <= 0;
             start_scl <= '0';
         elsif (stage_cnt = 1) then
+        --pseudo rom read.
             if (step_cnt < bus_cycle * 1) then
                 if (step_cnt mod bus_cycle = 0) then
                     mem_read (conv_std_logic_vector(16#fffa#, 15));
@@ -229,10 +230,28 @@ end;
                 stage_cnt <= stage_cnt + 1;
             end if;
         elsif (stage_cnt = 2) then
+        --polling fifo status.
             start_scl <= '1';
             if (reg_rom_data (rfifo_empty_bit) = '1') then
                 if (step_cnt mod bus_cycle = 0) then
                     mem_read (conv_std_logic_vector(16#fff8#, 15));
+                else
+                    bus_wait;
+                end if;
+                step_cnt <= step_cnt + 1;
+            else
+                bus_wait;
+                step_cnt <= 0;
+                stage_cnt <= stage_cnt + 1;
+            end if;
+        elsif (stage_cnt = 3) then
+        --read fifo..
+            start_scl <= '0';
+            --wait for test pattern.
+            if (reg_rom_data /= conv_std_logic_vector(16#5a#, 8)) then
+                if (step_cnt mod bus_cycle = 0) then
+                    --0xfff9 is fifo read.
+                    mem_read (conv_std_logic_vector(16#fff9#, 15));
                 else
                     bus_wait;
                 end if;
