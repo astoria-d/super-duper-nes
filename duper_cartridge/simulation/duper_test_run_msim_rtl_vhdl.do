@@ -43,6 +43,8 @@ add wave -label pi_data     -radix hex  sim:/testbench_i2c_test/sim_board/rd_fif
 add wave -label po_data     -radix hex  sim:/testbench_i2c_test/sim_board/rd_fifo_inst/po_data
 add wave -label po_stat_empty   sim:/testbench_i2c_test/sim_board/rd_fifo_inst/po_stat_empty
 add wave -label po_stat_full    sim:/testbench_i2c_test/sim_board/rd_fifo_inst/po_stat_full
+add wave -label reg_fifo_size    -radix unsigned        sim:/testbench_i2c_test/sim_board/rd_fifo_inst/reg_fifo_size
+
 
 add wave -divider i2c
 
