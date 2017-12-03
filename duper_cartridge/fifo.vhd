@@ -3,7 +3,6 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.conv_integer;
 use ieee.std_logic_unsigned.all;
 
-----SRAM syncronous memory.
 entity fifo is 
     generic (abus_size : integer := 8);
     port (

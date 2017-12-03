@@ -179,20 +179,29 @@ signal reg_nes_fifo_pushed  : integer range 0 to 1;
 signal reg_prom_oe_n        : std_logic;
 
 --read fifo registers.
-signal reg_fifo_ce_n        : std_logic;
-signal reg_fifo_oe_n        : std_logic;
-signal reg_fifo_we_n        : std_logic;
-signal reg_fifo_status      : std_logic_vector (7 downto 0);
+signal reg_ififo_ce_n        : std_logic;
+signal reg_ififo_oe_n        : std_logic;
+signal reg_ififo_we_n        : std_logic;
+signal reg_ififo_status      : std_logic_vector (7 downto 0);
 
+signal wr_ififo_empty       : std_logic;
+signal wr_ififo_full        : std_logic;
+signal wr_ififo_data        : std_logic_vector (7 downto 0);
 
-signal wr_rd_fifo_empty     : std_logic;
-signal wr_rd_fifo_full      : std_logic;
-signal wr_rd_fifo_data      : std_logic_vector (7 downto 0);
+--write fifo registers.
+signal reg_ofifo_ce_n       : std_logic;
+signal reg_ofifo_oe_n       : std_logic;
+signal reg_ofifo_we_n       : std_logic;
+signal reg_ofifo_status     : std_logic_vector (7 downto 0);
+
+signal wr_ofifo_empty       : std_logic;
+signal wr_ofifo_full        : std_logic;
+signal wr_ofifo_data        : std_logic_vector (7 downto 0);
 
 --i2c registers.
 signal reg_slave_out_data   : std_logic_vector (7 downto 0);
 signal reg_slave_addr_ack   : std_logic;
-signal wr_slave_in_data    : std_logic_vector (7 downto 0);
+signal wr_slave_in_data     : std_logic_vector (7 downto 0);
 
 ---po_i2c_status(2): '1' = read, '0' = write.
 ---po_i2c_status(1): '1' = acknowleged, '0' = not acknowleged.
@@ -233,19 +242,19 @@ begin
     reg_p : process (pi_base_clk, pi_reset_n)
     begin
         if (pi_reset_n = '0') then
-            reg_fifo_status <= "00010001";
+            reg_ififo_status <= "00010001";
 
         elsif (rising_edge(pi_base_clk)) then
-            reg_fifo_status(7 downto 6) <= (others => '0');
-            reg_fifo_status(rfifo_full_bit)     <= wr_rd_fifo_full;
-            reg_fifo_status(rfifo_empty_bit)    <= wr_rd_fifo_empty;
-            reg_fifo_status(3 downto 2) <= (others => '0');
-            reg_fifo_status(wfifo_full_bit)     <= '0';
-            reg_fifo_status(wfifo_empty_bit)    <= '1';
+            reg_ififo_status(7 downto 6) <= (others => '0');
+            reg_ififo_status(rfifo_full_bit)     <= wr_ififo_full;
+            reg_ififo_status(rfifo_empty_bit)    <= wr_ififo_empty;
+            reg_ififo_status(3 downto 2) <= (others => '0');
+            reg_ififo_status(wfifo_full_bit)     <= '0';
+            reg_ififo_status(wfifo_empty_bit)    <= '1';
         end if;
     end process;
-    po_nes_f_full <= reg_fifo_status(rfifo_full_bit);
-    po_bbb_f_empty <= reg_fifo_status(wfifo_empty_bit);
+    po_nes_f_full <= reg_ififo_status(rfifo_full_bit);
+    po_bbb_f_empty <= reg_ififo_status(wfifo_empty_bit);
 
     --state transition process...
     set_stat_p : process (pi_reset_n, pi_base_clk)
@@ -361,9 +370,9 @@ begin
         case reg_cur_state is
             when idle =>
                 reg_prom_oe_n <= '1';
-                reg_fifo_ce_n <= '1';
-                reg_fifo_oe_n <= '1';
-                reg_fifo_we_n <= '1';
+                reg_ififo_ce_n <= '1';
+                reg_ififo_oe_n <= '1';
+                reg_ififo_we_n <= '1';
 
             when rom_read =>
                 reg_prom_oe_n <= '0';
@@ -374,26 +383,26 @@ begin
             when fifo_status_read =>
 
             when nes_fifo_read =>
-                reg_fifo_ce_n <= '1';
-                reg_fifo_oe_n <= '0';
-                reg_fifo_we_n <= '1';
+                reg_ififo_ce_n <= '1';
+                reg_ififo_oe_n <= '0';
+                reg_ififo_we_n <= '1';
 
             when nes_fifo_pop =>
-                reg_fifo_ce_n <= '0';
+                reg_ififo_ce_n <= '0';
 
             when nes_fifo_read_ok =>
-                reg_fifo_ce_n <= '1';
+                reg_ififo_ce_n <= '1';
 
             when nes_fifo_write =>
-                reg_fifo_ce_n <= '1';
-                reg_fifo_oe_n <= '1';
-                reg_fifo_we_n <= '0';
+                reg_ififo_ce_n <= '1';
+                reg_ififo_oe_n <= '1';
+                reg_ififo_we_n <= '0';
 
             when nes_fifo_push =>
-                reg_fifo_ce_n <= '0';
+                reg_ififo_ce_n <= '0';
 
             when nes_fifo_write_ok =>
-                reg_fifo_ce_n <= '1';
+                reg_ififo_ce_n <= '1';
 
             when bbb_fifo_read =>
 
@@ -413,10 +422,10 @@ begin
                 reg_prg_data_out <= wr_prg_data_out;
 
             when fifo_status_read =>
-                reg_prg_data_out <= reg_fifo_status;
+                reg_prg_data_out <= reg_ififo_status;
 
             when nes_fifo_read_ok =>
-                reg_prg_data_out <= wr_rd_fifo_data;
+                reg_prg_data_out <= wr_ififo_data;
 
             when others =>
                 reg_prg_data_out <= (others => 'Z');
@@ -436,13 +445,27 @@ begin
     port map (
         pi_reset_n,
         pi_base_clk,
-        reg_fifo_ce_n,
-        reg_fifo_oe_n,
-        reg_fifo_we_n,
+        reg_ififo_ce_n,
+        reg_ififo_oe_n,
+        reg_ififo_we_n,
         wr_slave_in_data,
-        wr_rd_fifo_data,
-        wr_rd_fifo_empty,
-        wr_rd_fifo_full
+        wr_ififo_data,
+        wr_ififo_empty,
+        wr_ififo_full
+    );
+
+    --i2c outgoing fifo.
+    wr_fifo_inst : fifo generic map (8)
+    port map (
+        pi_reset_n,
+        pi_base_clk,
+        reg_ofifo_ce_n,
+        reg_ofifo_oe_n,
+        reg_ofifo_we_n,
+        reg_prg_data_in,
+        wr_ofifo_data,
+        wr_ofifo_empty,
+        wr_ofifo_full
     );
 
     --i2c slave
