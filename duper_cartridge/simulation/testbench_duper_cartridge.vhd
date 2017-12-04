@@ -94,16 +94,13 @@ architecture stimulus of testbench_i2c_test is
     signal bbb_f_empty      : std_logic;
 
     signal dbg_cnt          : std_logic_vector (63 downto 0);
-    
-    signal rd_data          : std_logic_vector (7 downto 0);
-    signal start_scl        : std_logic;
-
 
     signal reg_rom_data     : std_logic_vector(7 downto 0);
+    signal reg_bbb_data     : std_logic_vector (7 downto 0);
 
+    signal start_scl        : std_logic;
     signal step_cnt         : integer := 0;
     signal stage_cnt        : integer := 0;
-
     signal i2c_step_cnt     : integer := 0;
 
 begin
@@ -287,6 +284,26 @@ end;
                 step_cnt <= step_cnt + 1;
             end if;
 
+        elsif (stage_cnt = 5) then
+        --polling fifo status.
+            if (step_cnt = 0) then
+                mem_read (conv_std_logic_vector(16#fff8#, 15));
+                step_cnt <= step_cnt + 1;
+            else
+                if (reg_rom_data (wfifo_empty_bit) = '0') then
+                    if (step_cnt mod bus_cycle = 0) then
+                        mem_read (conv_std_logic_vector(16#fff8#, 15));
+                    else
+                        bus_wait;
+                    end if;
+                    step_cnt <= step_cnt + 1;
+                else
+                    bus_wait;
+                    step_cnt <= 0;
+                    stage_cnt <= stage_cnt + 1;
+                end if;
+            end if;
+
         else
             bus_wait;
             stage_cnt <= stage_cnt + 1;
@@ -319,6 +336,8 @@ end;
             else
                 i2c_step_cnt <= i2c_step_cnt + 1;
             end if;
+        elsif (stage_cnt = 5) then
+            i2c_step_cnt <= i2c_step_cnt + 1;
         else
             i2c_step_cnt <= 0;
         end if;
@@ -335,6 +354,12 @@ end;
         elsif (stage_cnt = 2) then
             start_scl <= '1';
         elsif (stage_cnt = 3) then
+            if (step_cnt < 50) then
+                start_scl <= '0';
+            else
+                start_scl <= '1';
+            end if;
+        elsif (stage_cnt = 5) then
             if (step_cnt < 50) then
                 start_scl <= '0';
             else
@@ -392,10 +417,19 @@ begin
     i2c_sda <= data(i);
 end;
 
+procedure input_data
+(
+    i       : in integer
+) is
+begin
+    reg_bbb_data(i) <= i2c_sda;
+end;
+
 
     begin
         remaining_time := i2c_clock_time;
         if (stage_cnt = 2) then
+        --from bbb to nes i2c write.
             if (i2c_step_cnt = 0) then
                 start_index := 0;
             elsif (i2c_step_cnt = 1) then
@@ -446,6 +480,7 @@ end;
             end if;
 
         elsif (stage_cnt = 3) then
+        --from bbb to nes i2c write.
             if (i2c_step_cnt = 0) then
                 start_index := 0;
             elsif (i2c_step_cnt = 1) then
@@ -495,176 +530,61 @@ end;
                 i2c_sda <= '1';
             end if;
 
+        elsif (stage_cnt = 5) then
+        --from bbb to nes i2c read.
+            if (i2c_step_cnt = 3) then
+                start_index := 0;
+            elsif (i2c_step_cnt = 4) then
+                --start up seq...
+                wait_clock (i2c_clock_time / 4);
+                i2c_sda <= '0';
+
+                --set i2c addr...
+                --addr output with write.....
+                --0x44 = 100 0101.
+                start_index := i2c_step_cnt;
+                wait_clock (i2c_clock_time / 2);
+                output_addr(6 - i2c_step_cnt + start_index, conv_std_logic_vector(16#44#, 7));
+
+            elsif (i2c_step_cnt <= 10) then
+                wait_clock (i2c_clock_time * 3 / 4);
+                output_addr(6 - i2c_step_cnt + start_index, conv_std_logic_vector(16#44#, 7));
+
+            elsif (i2c_step_cnt = 11) then
+                wait_clock (i2c_clock_time * 3 / 4);
+                i2c_sda <= i2c_read;
+
+            elsif (i2c_step_cnt = 12) then
+                --wait ack...
+                wait_clock (i2c_clock_time * 3 / 4);
+                ack_wait;
+
+            --read data
+            elsif (i2c_step_cnt = 13) then
+                start_index := i2c_step_cnt;
+                input_data(8 - i2c_step_cnt + start_index);
+
+            elsif (i2c_step_cnt <= 20) then
+                input_data(8 - i2c_step_cnt + start_index);
+
+            elsif (i2c_step_cnt = 21) then
+                --return ack...
+                wait_clock (i2c_clock_time * 3 / 4);
+                i2c_sda <= '0';
+
+            elsif (i2c_step_cnt = 22) then
+                --stop seq...
+                i2c_sda <= '0';
+                wait_clock (i2c_clock_time / 4);
+                i2c_sda <= '1';
+            end if;
+
         else
             --pull up.
             i2c_sda <= '1';
         end if;
         wait_remaining;
     end process;
-
-
-
---    --- sda data generation....
---    sda_p : process
---
---procedure output_data
---(
---    data    : in std_logic_vector (7 downto 0)
---) is
---begin
---    i2c_sda <= data(7);
---    wait for i2c_clock_time;
---    i2c_sda <= data(6);
---    wait for i2c_clock_time;
---    i2c_sda <= data(5);
---    wait for i2c_clock_time;
---    i2c_sda <= data(4);
---    wait for i2c_clock_time;
---    i2c_sda <= data(3);
---    wait for i2c_clock_time;
---    i2c_sda <= data(2);
---    wait for i2c_clock_time;
---    i2c_sda <= data(1);
---    wait for i2c_clock_time;
---    i2c_sda <= data(0);
---    wait for i2c_clock_time / 2;
---end;
---
---procedure input_data is
---begin
---    wait for i2c_clock_time / 2;
---    rd_data(7) <= i2c_sda;
---    wait for i2c_clock_time;
---    rd_data(6) <= i2c_sda;
---    wait for i2c_clock_time;
---    rd_data(5) <= i2c_sda;
---    wait for i2c_clock_time;
---    rd_data(4) <= i2c_sda;
---    wait for i2c_clock_time;
---    rd_data(3) <= i2c_sda;
---    wait for i2c_clock_time;
---    rd_data(2) <= i2c_sda;
---    wait for i2c_clock_time;
---    rd_data(1) <= i2c_sda;
---    wait for i2c_clock_time;
---    rd_data(0) <= i2c_sda;
---    wait for i2c_clock_time / 2;
---end;
---
---procedure ack_respond is
---begin
---    i2c_sda <= '0';
---    wait for i2c_clock_time;
---end;
---
---    begin
---        rd_data <= (others => '0');
---        start_scl <= '0';
---
-
---        --pullup...
---        i2c_sda <= '1';
---        start_scl <= '1';
---        wait for start_time ;
---
---        --start up seq...
---        i2c_sda <= '0';
---        
---        wait for i2c_clock_time / 2;
---
---        --addr output with write.....
---        --0x44 = 100 0101.
---        output_addr(conv_std_logic_vector(16#44#, 7), '0');
---        --ack wait.
---        ack_wait;
---
---        --addr low
---        wait for i2c_clock_time / 4;
---        output_data(conv_std_logic_vector(16#00#, 8));
---        ack_wait;
---
---        --addr high
---        wait for i2c_clock_time / 4;
---        output_data(conv_std_logic_vector(16#00#, 8));
---        ack_wait;
---
---        --data set
---        wait for i2c_clock_time / 4;
---        output_data(conv_std_logic_vector(16#64#, 8));
---        ack_wait;
---
---        i2c_sda <= '0';
---        start_scl <= '0';
---
---        wait for i2c_clock_time;
---        i2c_sda <= '1';
---
---
---        wait for i2c_clock_time * 4;
---
---        --restart again..
---        i2c_sda <= '0';
---        start_scl <= '1';
---        wait for i2c_clock_time * 1.2;
---        output_addr(conv_std_logic_vector(16#44#, 7), '0');
---        ack_wait;
---
---        --addr low
---        wait for i2c_clock_time / 4;
---        output_data(conv_std_logic_vector(16#00#, 8));
---        ack_wait;
---
---        --addr high
---        wait for i2c_clock_time / 4;
---        output_data(conv_std_logic_vector(16#01#, 8));
---        ack_wait;
---
---        --data set
---        wait for i2c_clock_time / 4;
---        output_data(conv_std_logic_vector(16#75#, 8));
---        ack_wait;
---
---        start_scl <= '0';
---        i2c_sda <= '1';
---
-----        --change direction...
-----        start_scl <= '0';
-----        i2c_sda <= '1';
-----
-----        wait for i2c_clock_time * 1.5;
-----
-----        --restart again..
-----        i2c_sda <= '0';
-----        start_scl <= '1';
-----
-----        wait for i2c_clock_time * 1.5;
-----        wait for i2c_clock_time / 4;
-----        output_addr(conv_std_logic_vector(16#44#, 7), '1');
-----        ack_wait;
-----
-----        i2c_sda <= 'Z';
-----        input_data;
-----        ack_respond;
-----        i2c_sda <= 'Z';
-----
-----        i2c_sda <= 'Z';
-----        input_data;
-----        ack_respond;
-----        i2c_sda <= 'Z';
-----
-----        i2c_sda <= 'Z';
-----        input_data;
-----        ack_respond;
-----        i2c_sda <= 'Z';
-----
-----        i2c_sda <= 'Z';
-----        input_data;
-----        ack_respond;
-----        i2c_sda <= 'Z';
---
---        wait;
---
---    end process;
 
 end stimulus;
 

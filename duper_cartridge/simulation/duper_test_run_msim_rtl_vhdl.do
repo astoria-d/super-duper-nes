@@ -57,6 +57,9 @@ add wave -label po_stat_full    sim:/testbench_i2c_test/sim_board/wr_fifo_inst/p
 add wave -label reg_fifo_size    -radix unsigned        sim:/testbench_i2c_test/sim_board/wr_fifo_inst/reg_fifo_size
 
 
+add wave -divider bbb
+add wave -label reg_bbb_data    -radix hex  sim:/testbench_i2c_test/reg_bbb_data
+
 
 add wave -divider i2c
 add wave -label start_scl       sim:/testbench_i2c_test/start_scl

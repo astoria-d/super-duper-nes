@@ -254,8 +254,8 @@ begin
             reg_ififo_status(rfifo_full_bit)     <= wr_ififo_full;
             reg_ififo_status(rfifo_empty_bit)    <= wr_ififo_empty;
             reg_ififo_status(3 downto 2) <= (others => '0');
-            reg_ififo_status(wfifo_full_bit)     <= '0';
-            reg_ififo_status(wfifo_empty_bit)    <= '1';
+            reg_ififo_status(wfifo_full_bit)     <= wr_ofifo_full;
+            reg_ififo_status(wfifo_empty_bit)    <= wr_ofifo_empty;
         end if;
     end process;
     po_nes_f_full <= reg_ififo_status(rfifo_full_bit);
