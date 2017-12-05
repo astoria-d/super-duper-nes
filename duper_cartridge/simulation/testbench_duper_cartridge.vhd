@@ -532,8 +532,8 @@ end;
 
         elsif (stage_cnt = 5) then
         --from bbb to nes i2c read.
-            if (i2c_step_cnt = 3) then
-                start_index := 0;
+            if (i2c_step_cnt <= 3) then
+                start_index := i2c_step_cnt;
             elsif (i2c_step_cnt = 4) then
                 --start up seq...
                 wait_clock (i2c_clock_time / 4);
@@ -557,15 +557,15 @@ end;
             elsif (i2c_step_cnt = 12) then
                 --wait ack...
                 wait_clock (i2c_clock_time * 3 / 4);
+                start_index := i2c_step_cnt;
                 ack_wait;
 
             --read data
             elsif (i2c_step_cnt = 13) then
-                start_index := i2c_step_cnt;
-                input_data(8 - i2c_step_cnt + start_index);
+                input_data(7 - i2c_step_cnt + start_index);
 
             elsif (i2c_step_cnt <= 20) then
-                input_data(8 - i2c_step_cnt + start_index);
+                input_data(7 - i2c_step_cnt + start_index);
 
             elsif (i2c_step_cnt = 21) then
                 --return ack...
