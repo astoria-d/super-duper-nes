@@ -58,7 +58,9 @@ add wave -label reg_fifo_size    -radix unsigned        sim:/testbench_i2c_test/
 
 
 add wave -divider bbb
-add wave -label reg_bbb_data    -radix hex  sim:/testbench_i2c_test/reg_bbb_data
+add wave -label reg_bbb_data        -radix hex  sim:/testbench_i2c_test/reg_bbb_data
+add wave -label reg_i2c_rd_done                 sim:/testbench_i2c_test/sim_board/reg_i2c_rd_done
+add wave -label reg_i2c_data_out    -radix hex  sim:/testbench_i2c_test/sim_board/reg_i2c_data_out
 
 
 add wave -divider i2c
@@ -91,8 +93,16 @@ view signals
 
 run 15 us
 wave zoom full
+
+#til step 3 end
 run 250 us
 wave zoom full
-run 800 us
+
+#til step 4 end
+run 250 us
+wave zoom full
+
+#til step 5 end
+run 500 us
 wave zoom full
 

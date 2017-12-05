@@ -99,9 +99,9 @@ architecture stimulus of testbench_i2c_test is
     signal reg_bbb_data     : std_logic_vector (7 downto 0);
 
     signal start_scl        : std_logic;
-    signal step_cnt         : integer := 0;
-    signal stage_cnt        : integer := 0;
-    signal i2c_step_cnt     : integer := 0;
+    signal step_cnt         : integer range 0 to 65535 := 0;
+    signal stage_cnt        : integer range 0 to 65535 := 0;
+    signal i2c_step_cnt     : integer range 0 to 65535 := 0;
 
 begin
 
@@ -273,7 +273,7 @@ end;
         --push fifo to bbb..
             if (step_cnt mod bus_cycle = 0 and step_cnt < 30) then
                 --0xfff9 is fifo write.
-                mem_write (conv_std_logic_vector(16#fff9#, 15),conv_std_logic_vector(16#77#, 8));
+                mem_write (conv_std_logic_vector(16#fff9#, 15),conv_std_logic_vector(16#77# + step_cnt, 8));
                 step_cnt <= step_cnt + 1;
             elsif (step_cnt mod bus_cycle = 0 and step_cnt = 30) then
                 bus_wait;

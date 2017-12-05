@@ -5,9 +5,10 @@ use ieee.std_logic_arith.conv_std_logic_vector;
 use ieee.std_logic_unsigned.all;
 
 
+---po_i2c_status(3): '1' = bus transfering, '0' = stopped.
 ---po_i2c_status(2): '1' = read, '0' = write.
----po_i2c_status(1): '1' = acknowleged, '0' = not acknowleged.
----po_i2c_status(0): '1' = bus transfering, '0' = stopped.
+---po_i2c_status(1): '1' = data acknowleged, '0' = not acknowleged.
+---po_i2c_status(0): '1' = addr acknowleged, '0' = not acknowleged.
 entity i2c_slave is 
     port (
         pi_rst_n            : in    std_logic;
@@ -19,7 +20,7 @@ entity i2c_slave is
         pio_i2c_sda         : inout std_logic;
 
         ---i2c bus contoler internal lines...
-        po_i2c_status       : out   std_logic_vector (2 downto 0);
+        po_i2c_status       : out   std_logic_vector (3 downto 0);
         po_slave_in_data    : out   std_logic_vector (7 downto 0);
         pi_slave_out_data   : in    std_logic_vector (7 downto 0)
     );
@@ -234,9 +235,9 @@ end;
                     reg_cur_state = d1 or
                     reg_cur_state = d0 or
                     reg_cur_state = d_ack) then
-                    po_i2c_status(0) <= '1';
+                    po_i2c_status(3) <= '1';
                 else
-                    po_i2c_status(0) <= '0';
+                    po_i2c_status(3) <= '0';
                 end if;
 
                 po_i2c_status(2) <= reg_i2c_cmd_r_nw;
@@ -250,6 +251,13 @@ end;
                 else
                     po_i2c_status(1) <= '0';
                 end if;
+
+                if (reg_cur_state = a_ack) then
+                    po_i2c_status(0) <= '1';
+                else
+                    po_i2c_status(0) <= '0';
+                end if;
+
             else
                 po_i2c_status <= (others => '0');
             end if;--if (reg_i2c_cmd_addr = pi_slave_addr) then
