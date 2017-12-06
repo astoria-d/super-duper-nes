@@ -106,7 +106,8 @@ component fifo
         pi_base_clk     : in std_logic;
         pi_ce_n         : in std_logic;
         pi_oe_n         : in std_logic;
-        pi_we_n         : in std_logic;
+        pi_push_n       : in std_logic;
+        pi_pop_n        : in std_logic;
         pi_data         : in std_logic_vector (7 downto 0);
         po_data         : out std_logic_vector (7 downto 0);
         po_stat_empty   : out std_logic;
@@ -184,7 +185,8 @@ signal reg_prom_oe_n        : std_logic;
 --read fifo registers.
 signal reg_ififo_ce_n        : std_logic;
 signal reg_ififo_oe_n        : std_logic;
-signal reg_ififo_we_n        : std_logic;
+signal reg_ififo_push_n      : std_logic;
+signal reg_ififo_pop_n       : std_logic;
 signal reg_ififo_status      : std_logic_vector (7 downto 0);
 
 signal wr_ififo_empty       : std_logic;
@@ -194,7 +196,8 @@ signal wr_ififo_data        : std_logic_vector (7 downto 0);
 --write fifo registers.
 signal reg_ofifo_ce_n       : std_logic;
 signal reg_ofifo_oe_n       : std_logic;
-signal reg_ofifo_we_n       : std_logic;
+signal reg_ofifo_push_n     : std_logic;
+signal reg_ofifo_pop_n      : std_logic;
 signal reg_ofifo_status     : std_logic_vector (7 downto 0);
 signal reg_i2c_data_out     : std_logic_vector(7 downto 0);
 
@@ -310,8 +313,7 @@ begin
                             reg_next_state <= idle;
                         end if;
 
-                    elsif ((wr_i2c_status(1) = '1' and wr_i2c_status(2) = '1') or
-                           (wr_i2c_status(0) = '1' and wr_i2c_status(2) = '1')) then
+                    elsif (wr_i2c_status(1) = '1' and wr_i2c_status(2) = '1') then
                     --case bbb pop fifo.
                         if (reg_i2c_rd_done = 0) then
                             reg_next_state <= bbb_fifo_read;
@@ -428,11 +430,13 @@ begin
                 reg_prom_oe_n <= '1';
                 reg_ififo_ce_n <= '1';
                 reg_ififo_oe_n <= '1';
-                reg_ififo_we_n <= '1';
+                reg_ififo_push_n <= '1';
+                reg_ififo_pop_n <= '1';
 
                 reg_ofifo_ce_n <= '1';
-                reg_ofifo_oe_n <= '1';
-                reg_ofifo_we_n <= '1';
+                reg_ofifo_oe_n <= '0';
+                reg_ofifo_push_n <= '1';
+                reg_ofifo_pop_n <= '1';
 
             when rom_read =>
                 reg_prom_oe_n <= '0';
@@ -445,7 +449,8 @@ begin
             when nes_fifo_read =>
                 reg_ififo_ce_n <= '1';
                 reg_ififo_oe_n <= '0';
-                reg_ififo_we_n <= '1';
+                reg_ififo_push_n <= '1';
+                reg_ififo_pop_n <= '0';
 
             when nes_fifo_pop =>
                 reg_ififo_ce_n <= '0';
@@ -456,7 +461,7 @@ begin
             when nes_fifo_write =>
                 reg_ififo_ce_n <= '1';
                 reg_ififo_oe_n <= '1';
-                reg_ififo_we_n <= '0';
+                reg_ififo_push_n <= '0';
 
             when nes_fifo_push =>
                 reg_ififo_ce_n <= '0';
@@ -466,8 +471,8 @@ begin
 
             when bbb_fifo_read =>
                 reg_ofifo_ce_n <= '1';
-                reg_ofifo_oe_n <= '0';
-                reg_ofifo_we_n <= '1';
+                reg_ofifo_push_n <= '1';
+                reg_ofifo_pop_n <= '0';
 
             when bbb_fifo_pop =>
                 reg_ofifo_ce_n <= '0';
@@ -477,8 +482,8 @@ begin
 
             when bbb_fifo_write =>
                 reg_ofifo_ce_n <= '1';
-                reg_ofifo_oe_n <= '1';
-                reg_ofifo_we_n <= '0';
+                reg_ofifo_push_n <= '0';
+                reg_ofifo_pop_n <= '1';
 
             when bbb_fifo_push =>
                 reg_ofifo_ce_n <= '0';
@@ -525,7 +530,8 @@ begin
         pi_base_clk,
         reg_ififo_ce_n,
         reg_ififo_oe_n,
-        reg_ififo_we_n,
+        reg_ififo_push_n,
+        reg_ififo_pop_n,
         wr_i2c_in_data,
         wr_ififo_data,
         wr_ififo_empty,
@@ -539,7 +545,8 @@ begin
         pi_base_clk,
         reg_ofifo_ce_n,
         reg_ofifo_oe_n,
-        reg_ofifo_we_n,
+        reg_ofifo_push_n,
+        reg_ofifo_pop_n,
         reg_prg_data_in,
         wr_ofifo_data,
         wr_ofifo_empty,

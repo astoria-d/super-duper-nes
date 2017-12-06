@@ -10,7 +10,8 @@ entity fifo is
         pi_base_clk     : in std_logic;
         pi_ce_n         : in std_logic;
         pi_oe_n         : in std_logic;
-        pi_we_n         : in std_logic;
+        pi_push_n       : in std_logic;
+        pi_pop_n        : in std_logic;
         pi_data         : in std_logic_vector (7 downto 0);
         po_data         : out std_logic_vector (7 downto 0);
         po_stat_empty   : out std_logic;
@@ -37,19 +38,19 @@ signal reg_stat_full    : std_logic;
 
 begin
 
-    --push fifo
+    --write fifo
     p_write : process (pi_rst_n, pi_base_clk)
     begin
         if (pi_rst_n = '0') then
             work_ram <= (others => "11111111");
         elsif (rising_edge(pi_base_clk)) then
-            if (pi_ce_n = '0' and pi_we_n = '0') then
+            if (pi_ce_n = '0' and pi_push_n = '0') then
                 work_ram(conv_integer(reg_fifo_tail)) <= pi_data;
             end if;
         end if;
     end process;
 
-    --pop fifo
+    --read fifo
     p_read : process (pi_base_clk)
     begin
         if (rising_edge(pi_base_clk)) then
@@ -88,12 +89,12 @@ begin
                 reg_stat_full <= '1';
             end if;
 
-            if (pi_ce_n = '0' and pi_we_n = '0') then
+            if (pi_ce_n = '0' and pi_push_n = '0') then
                 if (reg_fifo_size < FIFO_MAX) then
                     reg_fifo_tail <= reg_fifo_tail + 1;
                     reg_fifo_size <= reg_fifo_size + 1;
                 end if;
-            elsif (pi_ce_n = '0' and pi_oe_n = '0') then
+            elsif (pi_ce_n = '0' and pi_pop_n = '0') then
                 if (reg_fifo_size > 0) then
                     reg_fifo_head <= reg_fifo_head + 1;
                     reg_fifo_size <= reg_fifo_size - 1;
