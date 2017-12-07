@@ -557,22 +557,19 @@ end;
             elsif (i2c_step_cnt = 12) then
                 --wait ack...
                 wait_clock (i2c_clock_time * 3 / 4);
-                start_index := i2c_step_cnt;
+                start_index := i2c_step_cnt + 1;
                 ack_wait;
 
             --read data
-            elsif (i2c_step_cnt = 13) then
+            elsif (i2c_step_cnt >= 14 and i2c_step_cnt <= 21) then
                 input_data(7 - i2c_step_cnt + start_index);
 
-            elsif (i2c_step_cnt <= 20) then
-                input_data(7 - i2c_step_cnt + start_index);
-
-            elsif (i2c_step_cnt = 21) then
+            elsif (i2c_step_cnt = 22) then
                 --return ack...
                 wait_clock (i2c_clock_time * 3 / 4);
                 i2c_sda <= '0';
 
-            elsif (i2c_step_cnt = 22) then
+            elsif (i2c_step_cnt = 23) then
                 --stop seq...
                 i2c_sda <= '0';
                 wait_clock (i2c_clock_time / 4);

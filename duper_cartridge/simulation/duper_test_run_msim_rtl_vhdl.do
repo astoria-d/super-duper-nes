@@ -62,7 +62,7 @@ add wave -label reg_fifo_size    -radix unsigned        sim:/testbench_i2c_test/
 add wave -divider bbb
 add wave -label reg_bbb_data        -radix hex  sim:/testbench_i2c_test/reg_bbb_data
 add wave -label reg_i2c_rd_done                 sim:/testbench_i2c_test/sim_board/reg_i2c_rd_done
-add wave -label reg_i2c_data_out    -radix hex  sim:/testbench_i2c_test/sim_board/reg_i2c_data_out
+add wave -label wr_ofifo_data       -radix hex  sim:/testbench_i2c_test/sim_board/wr_ofifo_data
 
 
 add wave -divider i2c
@@ -83,6 +83,7 @@ add wave -label reg_i2c_cmd_addr        -radix hex  sim:/testbench_i2c_test/sim_
 add wave -label reg_i2c_cmd_r_nw                    sim:/testbench_i2c_test/sim_board/i2c_slave_inst/reg_i2c_cmd_r_nw
 add wave -label reg_i2c_cmd_in_data     -radix hex  sim:/testbench_i2c_test/sim_board/i2c_slave_inst/reg_i2c_cmd_in_data
 add wave -label po_slave_in_data        -radix hex  sim:/testbench_i2c_test/sim_board/i2c_slave_inst/po_slave_in_data
+add wave -label pi_slave_out_data       -radix hex  sim:/testbench_i2c_test/sim_board/i2c_slave_inst/pi_slave_out_data
 add wave -label po_i2c_status                       sim:/testbench_i2c_test/sim_board/i2c_slave_inst/po_i2c_status
 
 #add wave -label rd_data                 -radix hex  sim:/testbench_i2c_test/rd_data
