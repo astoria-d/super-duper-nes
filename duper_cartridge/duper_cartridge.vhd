@@ -199,7 +199,6 @@ signal reg_ofifo_oe_n       : std_logic;
 signal reg_ofifo_push_n     : std_logic;
 signal reg_ofifo_pop_n      : std_logic;
 signal reg_ofifo_status     : std_logic_vector (7 downto 0);
-signal reg_i2c_data_out     : std_logic_vector(7 downto 0);
 
 signal wr_ofifo_empty       : std_logic;
 signal wr_ofifo_full        : std_logic;
@@ -433,7 +432,7 @@ begin
                 reg_ififo_push_n <= '1';
                 reg_ififo_pop_n <= '1';
 
-                reg_ofifo_ce_n <= '1';
+                reg_ofifo_ce_n <= '0';
                 reg_ofifo_oe_n <= '0';
                 reg_ofifo_push_n <= '1';
                 reg_ofifo_pop_n <= '1';
@@ -470,26 +469,22 @@ begin
                 reg_ififo_ce_n <= '1';
 
             when bbb_fifo_read =>
-                reg_ofifo_ce_n <= '1';
-                reg_ofifo_push_n <= '1';
-                reg_ofifo_pop_n <= '0';
-
-            when bbb_fifo_pop =>
-                reg_ofifo_ce_n <= '0';
-
-            when bbb_fifo_read_ok =>
-                reg_ofifo_ce_n <= '1';
-
-            when bbb_fifo_write =>
-                reg_ofifo_ce_n <= '1';
-                reg_ofifo_push_n <= '0';
                 reg_ofifo_pop_n <= '1';
 
+            when bbb_fifo_pop =>
+                reg_ofifo_pop_n <= '0';
+
+            when bbb_fifo_read_ok =>
+                reg_ofifo_pop_n <= '1';
+
+            when bbb_fifo_write =>
+                reg_ofifo_push_n <= '1';
+
             when bbb_fifo_push =>
-                reg_ofifo_ce_n <= '0';
+                reg_ofifo_push_n <= '0';
 
             when bbb_fifo_write_ok =>
-                reg_ofifo_ce_n <= '1';
+                reg_ofifo_push_n <= '1';
 
         end case;
     end process;
@@ -553,18 +548,6 @@ begin
         wr_ofifo_full
     );
 
-    set_bbb_out_p : process (pi_reset_n, pi_base_clk)
-    begin
-        if (pi_reset_n = '0') then
-            reg_i2c_data_out <= (others => '1');
-        elsif (rising_edge(pi_base_clk)) then
-            if (reg_cur_state = bbb_fifo_read_ok) then
-                reg_i2c_data_out <= wr_ofifo_data;
-            end if;
-        end if;--if (pi_rst_n = '0') then
-    end process;
-
-
 
     --i2c slave
     i2c_slave_inst : i2c_slave
@@ -576,7 +559,7 @@ begin
         pio_i2c_sda,
         wr_i2c_status,
         wr_i2c_in_data,
-        reg_i2c_data_out
+        wr_ofifo_data
     );
 
     --character rom

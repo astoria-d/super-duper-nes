@@ -90,7 +90,7 @@ begin
             end if;
 
             if (pi_ce_n = '0' and pi_push_n = '0') then
-                if (reg_fifo_size < FIFO_MAX) then
+                if (reg_fifo_size <= FIFO_MAX) then
                     reg_fifo_tail <= reg_fifo_tail + 1;
                     reg_fifo_size <= reg_fifo_size + 1;
                 end if;
