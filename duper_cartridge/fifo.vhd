@@ -24,7 +24,7 @@ architecture rtl of fifo is
 subtype ram_data is std_logic_vector (7 downto 0);
 type ram_array is array (0 to 2**abus_size - 1) of ram_data;
 
-constant FIFO_MAX       : integer := 2 ** abus_size - 1;
+constant FIFO_MAX       : integer := 2 ** abus_size;
 
 ---ram is initialized with 0.
 signal work_ram : ram_array := (others => (others => '0'));
@@ -32,7 +32,7 @@ signal work_ram : ram_array := (others => (others => '0'));
 --fifo pointer registers.
 signal reg_fifo_head : std_logic_vector(abus_size -1 downto 0);
 signal reg_fifo_tail : std_logic_vector(abus_size -1 downto 0);
-signal reg_fifo_size    : integer range 0 to 2 ** abus_size - 1;
+signal reg_fifo_size    : integer range 0 to 2 ** abus_size;
 signal reg_stat_empty   : std_logic;
 signal reg_stat_full    : std_logic;
 
@@ -44,7 +44,7 @@ begin
         if (pi_rst_n = '0') then
             work_ram <= (others => "11111111");
         elsif (rising_edge(pi_base_clk)) then
-            if (pi_ce_n = '0' and pi_push_n = '0') then
+            if (pi_ce_n = '0' and pi_push_n = '0' and reg_fifo_size < FIFO_MAX) then
                 work_ram(conv_integer(reg_fifo_tail)) <= pi_data;
             end if;
         end if;
@@ -90,7 +90,7 @@ begin
             end if;
 
             if (pi_ce_n = '0' and pi_push_n = '0') then
-                if (reg_fifo_size <= FIFO_MAX) then
+                if (reg_fifo_size < FIFO_MAX) then
                     reg_fifo_tail <= reg_fifo_tail + 1;
                     reg_fifo_size <= reg_fifo_size + 1;
                 end if;
