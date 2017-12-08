@@ -57,8 +57,8 @@ add wave -label wr_ofifo_data       -radix hex  sim:/nes2bbb_testbench/sim_board
 
 add wave -divider i2c
 add wave -label start_scl       sim:/nes2bbb_testbench/start_scl
-#add wave -label i2c_scl         sim:/nes2bbb_testbench/i2c_scl
 add wave -label i2c_step_cnt    sim:/nes2bbb_testbench/i2c_step_cnt
+#add wave -label i2c_scl_type    sim:/nes2bbb_testbench/i2c_scl_type
 add wave -label pi_i2c_scl      sim:/nes2bbb_testbench/sim_board/pi_i2c_scl
 add wave -label pio_i2c_sda     sim:/nes2bbb_testbench/sim_board/pio_i2c_sda
 
@@ -89,5 +89,8 @@ run 30 us
 wave zoom full
 
 #step 1 more rom write until fifo full...
-run 500 us
+#run 500 us
+#wave zoom full
+
+run 200 us
 wave zoom full

@@ -110,6 +110,7 @@ architecture stimulus of nes2bbb_testbench is
     signal step_cnt         : integer range 0 to 65535 := 0;
     signal stage_cnt        : integer range 0 to 65535 := 0;
     signal i2c_step_cnt     : integer range 0 to 65535 := 0;
+    signal start_index      : integer range 0 to 65535 := 0;
 
 begin
 
@@ -235,7 +236,8 @@ end;
             stage_cnt <= 0;
             step_cnt <= 0;
         elsif (rising_edge(phi2)) then
----stage 0: initialize....
+
+            ---stage 0: initialize....
             if (stage_cnt = 0) then
                 if (step_cnt = 10) then
                     stage_cnt <= stage_cnt + 1;
@@ -243,7 +245,8 @@ end;
                 else
                     step_cnt <= step_cnt + 1;
                 end if;
----stage 1: rom write.....
+
+            ---stage 1: rom write.....
             elsif (stage_cnt = 1) then
                 if (step_cnt < bus_cycle * 1000) then
                     if (step_cnt mod bus_cycle = 0) then
@@ -261,6 +264,112 @@ end;
         end if;
     end process;
 
+
+
+
+    --- i2c bus emulation...
+    i2c_cpu : process (reset_input, i2c_scl_x4)
+
+procedure increment_cnt is
+begin
+    if (i2c_scl_type = i2c_clk_0) then
+        i2c_step_cnt <= i2c_step_cnt + 1;
+    end if;
+end;
+
+procedure start_seq is
+begin
+    if (i2c_scl_type = i2c_clk_1) then
+        i2c_sda <= '0';
+    end if;
+end;
+
+procedure output_addr
+(
+    i       : in integer;
+    addr    : in std_logic_vector (6 downto 0)
+) is
+begin
+    if (i2c_scl_type = i2c_clk_3) then
+        i2c_sda <= addr(i);
+    end if;
+end;
+
+procedure set_rw
+(
+    rw      : in std_logic
+) is
+begin
+    if (i2c_scl_type = i2c_clk_3) then
+        i2c_sda <= rw;
+    end if;
+end;
+
+procedure ack_wait is
+begin
+    if (i2c_scl_type = i2c_clk_3) then
+        i2c_sda <= 'Z';
+    end if;
+end;
+
+procedure output_data
+(
+    i       : in integer;
+    data    : in std_logic_vector (7 downto 0)
+) is
+begin
+    if (i2c_scl_type = i2c_clk_3) then
+        i2c_sda <= data(i);
+    end if;
+end;
+
+    begin
+        if (reset_input = '0') then
+            i2c_step_cnt <= 0;
+            i2c_sda <= '1';
+            start_scl <= '0';
+
+        elsif (rising_edge(i2c_scl_x4)) then
+
+            ---stage 1: i2c read.....
+            if (stage_cnt = 1) then
+                increment_cnt;
+
+                if (i2c_step_cnt < 3) then
+                    start_scl <= '1';
+
+                elsif (i2c_step_cnt = 3) then
+                    start_index <= i2c_step_cnt + 1;
+                elsif (i2c_step_cnt = start_index) then
+                    --start up seq...
+                    start_seq;
+
+                    --set i2c addr...
+                    --addr output with write.....
+                    --0x44 = 100 0101.
+                    output_addr(6 - i2c_step_cnt + start_index, conv_std_logic_vector(16#44#, 7));
+
+                elsif (i2c_step_cnt <= start_index + 6) then
+                    output_addr(6 - i2c_step_cnt + start_index, conv_std_logic_vector(16#44#, 7));
+
+                elsif (i2c_step_cnt = start_index + 7) then
+                    set_rw(i2c_write);
+
+                elsif (i2c_step_cnt = start_index + 8) then
+                    --wait ack...
+                    ack_wait;
+
+                elsif (i2c_step_cnt < start_index + 16) then
+                    output_data(7 - i2c_step_cnt + start_index, conv_std_logic_vector(16#55#, 8));
+
+                elsif (i2c_step_cnt = start_index + 16) then
+                    ack_wait;
+
+                end if;
+
+            end if;
+        end if;
+    end process;
 
 end stimulus;
 
