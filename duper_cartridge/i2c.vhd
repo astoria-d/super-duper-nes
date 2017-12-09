@@ -4,7 +4,6 @@ use ieee.std_logic_unsigned.conv_integer;
 use ieee.std_logic_arith.conv_std_logic_vector;
 use ieee.std_logic_unsigned.all;
 
-
 ---po_i2c_status(3): '1' = bus transfering, '0' = stopped.
 ---po_i2c_status(2): '1' = read, '0' = write.
 ---po_i2c_status(1): '1' = data acknowleged, '0' = not acknowleged.
@@ -17,12 +16,13 @@ entity i2c_slave is
         ---i2c bus lines...
         pi_slave_addr       : in    std_logic_vector (6 downto 0);
         pi_i2c_scl          : in    std_logic;
-        pio_i2c_sda         : inout std_logic;
+        pi_i2c_sda          : in    std_logic;
+        po_i2c_sda          : out   std_logic;
 
         ---i2c bus contoler internal lines...
-        po_i2c_status       : out   std_logic_vector (3 downto 0);
-        po_slave_in_data    : out   std_logic_vector (7 downto 0);
-        pi_slave_out_data   : in    std_logic_vector (7 downto 0)
+        pi_i2c_read_data    : in    std_logic_vector (7 downto 0);
+        po_i2c_write_data   : out   std_logic_vector (7 downto 0);
+        po_i2c_status       : out   std_logic_vector (3 downto 0)
     );
 end i2c_slave;
 
@@ -62,7 +62,7 @@ begin
             reg_temp_scl := (others => '0');
         elsif (rising_edge(pi_base_clk)) then
             --shift two stage register.
-            reg_temp_sda := pio_i2c_sda & reg_temp_sda(2 downto 1);
+            reg_temp_sda := pi_i2c_sda & reg_temp_sda(2 downto 1);
             reg_temp_scl := pi_i2c_scl & reg_temp_scl(2 downto 1);
             reg_bsyn_sda <= reg_temp_sda(0);
             reg_bsyn_scl <= reg_temp_scl(0);
@@ -109,7 +109,7 @@ begin
     end process;
 
     --state change to next.
-    next_stat_p : process (reg_cur_state, reg_i2c_cmd_r_nw, pio_i2c_sda)
+    next_stat_p : process (reg_cur_state, reg_i2c_cmd_r_nw, pi_i2c_sda)
 
 procedure set_next_stat
 (
@@ -160,7 +160,7 @@ end;
                     set_next_stat(d_ack);
                 else
                     --wait for ack.
-                    if (pio_i2c_sda = '0') then
+                    if (pi_i2c_sda = '0') then
                         set_next_stat(d_ack);
                     else
                         set_next_stat(d0);
@@ -178,43 +178,43 @@ end;
             reg_i2c_cmd_addr <= (others => '0');
             reg_i2c_cmd_r_nw <= '1';
             reg_i2c_cmd_in_data <= (others => '0');
-            po_slave_in_data <= (others => '0');
+            po_i2c_write_data <= (others => '0');
         elsif (rising_edge(pi_i2c_scl)) then
             --address sequence.
             if (reg_cur_sp = start and reg_cur_state = idle) then
-                reg_i2c_cmd_addr (6) <= pio_i2c_sda;
+                reg_i2c_cmd_addr (6) <= pi_i2c_sda;
             elsif (reg_cur_state = a6) then
-                reg_i2c_cmd_addr (5) <= pio_i2c_sda;
+                reg_i2c_cmd_addr (5) <= pi_i2c_sda;
             elsif (reg_cur_state = a5) then
-                reg_i2c_cmd_addr (4) <= pio_i2c_sda;
+                reg_i2c_cmd_addr (4) <= pi_i2c_sda;
             elsif (reg_cur_state = a4) then
-                reg_i2c_cmd_addr (3) <= pio_i2c_sda;
+                reg_i2c_cmd_addr (3) <= pi_i2c_sda;
             elsif (reg_cur_state = a3) then
-                reg_i2c_cmd_addr (2) <= pio_i2c_sda;
+                reg_i2c_cmd_addr (2) <= pi_i2c_sda;
             elsif (reg_cur_state = a2) then
-                reg_i2c_cmd_addr (1) <= pio_i2c_sda;
+                reg_i2c_cmd_addr (1) <= pi_i2c_sda;
             elsif (reg_cur_state = a1) then
-                reg_i2c_cmd_addr (0) <= pio_i2c_sda;
+                reg_i2c_cmd_addr (0) <= pi_i2c_sda;
             elsif (reg_cur_state = a0) then
-                reg_i2c_cmd_r_nw <= pio_i2c_sda;
+                reg_i2c_cmd_r_nw <= pi_i2c_sda;
 
             --data write sequence (input).
             elsif (reg_cur_state = a_ack and reg_i2c_cmd_r_nw = '0') then
-                reg_i2c_cmd_in_data (6) <= pio_i2c_sda;
+                reg_i2c_cmd_in_data (6) <= pi_i2c_sda;
             elsif (reg_cur_state = d7 and reg_i2c_cmd_r_nw = '0') then
-                reg_i2c_cmd_in_data (5) <= pio_i2c_sda;
+                reg_i2c_cmd_in_data (5) <= pi_i2c_sda;
             elsif (reg_cur_state = d6 and reg_i2c_cmd_r_nw = '0') then
-                reg_i2c_cmd_in_data (4) <= pio_i2c_sda;
+                reg_i2c_cmd_in_data (4) <= pi_i2c_sda;
             elsif (reg_cur_state = d5 and reg_i2c_cmd_r_nw = '0') then
-                reg_i2c_cmd_in_data (3) <= pio_i2c_sda;
+                reg_i2c_cmd_in_data (3) <= pi_i2c_sda;
             elsif (reg_cur_state = d4 and reg_i2c_cmd_r_nw = '0') then
-                reg_i2c_cmd_in_data (2) <= pio_i2c_sda;
+                reg_i2c_cmd_in_data (2) <= pi_i2c_sda;
             elsif (reg_cur_state = d3 and reg_i2c_cmd_r_nw = '0') then
-                reg_i2c_cmd_in_data (1) <= pio_i2c_sda;
+                reg_i2c_cmd_in_data (1) <= pi_i2c_sda;
             elsif (reg_cur_state = d2 and reg_i2c_cmd_r_nw = '0') then
-                reg_i2c_cmd_in_data (0) <= pio_i2c_sda;
+                reg_i2c_cmd_in_data (0) <= pi_i2c_sda;
             elsif (reg_cur_state = d1 and reg_i2c_cmd_r_nw = '0') then
-                po_slave_in_data <= reg_i2c_cmd_in_data & pio_i2c_sda;
+                po_i2c_write_data <= reg_i2c_cmd_in_data & pi_i2c_sda;
             end if;
         end if;--if (pi_rst_n = '0') then
     end process;
@@ -246,7 +246,7 @@ end;
                     po_i2c_status(1) <= '1';
                 elsif (reg_cur_state = d0 and reg_i2c_cmd_r_nw = '1') then
                     --read
-                    po_i2c_status(1) <= not pio_i2c_sda;
+                    po_i2c_status(1) <= not pi_i2c_sda;
                 else
                     po_i2c_status(1) <= '0';
                 end if;
@@ -267,57 +267,57 @@ end;
     out_data : process (pi_rst_n, pi_i2c_scl)
     begin
         if (pi_rst_n = '0') then
-            pio_i2c_sda <= 'Z';
+            po_i2c_sda <= 'Z';
         elsif (falling_edge(pi_i2c_scl)) then
             if (reg_i2c_cmd_addr = pi_slave_addr) then
                 if (reg_cur_state = rw) then
                     --addr ack reply.
-                    pio_i2c_sda <= '0';
+                    po_i2c_sda <= '0';
                 elsif (reg_cur_state = a_ack) then
                     --data input.
                     if (reg_i2c_cmd_r_nw = '0') then
-                        pio_i2c_sda <= 'Z';
+                        po_i2c_sda <= 'Z';
                     --data output.
                     else
-                        pio_i2c_sda <= pi_slave_out_data(7);
+                        po_i2c_sda <= pi_i2c_read_data(7);
                     end if;
 
                 --data output.
                 elsif (reg_cur_state = d7 and reg_i2c_cmd_r_nw = '1') then
-                    pio_i2c_sda <= pi_slave_out_data(6);
+                    po_i2c_sda <= pi_i2c_read_data(6);
                 elsif (reg_cur_state = d6 and reg_i2c_cmd_r_nw = '1') then
-                    pio_i2c_sda <= pi_slave_out_data(5);
+                    po_i2c_sda <= pi_i2c_read_data(5);
                 elsif (reg_cur_state = d5 and reg_i2c_cmd_r_nw = '1') then
-                    pio_i2c_sda <= pi_slave_out_data(4);
+                    po_i2c_sda <= pi_i2c_read_data(4);
                 elsif (reg_cur_state = d4 and reg_i2c_cmd_r_nw = '1') then
-                    pio_i2c_sda <= pi_slave_out_data(3);
+                    po_i2c_sda <= pi_i2c_read_data(3);
                 elsif (reg_cur_state = d3 and reg_i2c_cmd_r_nw = '1') then
-                    pio_i2c_sda <= pi_slave_out_data(2);
+                    po_i2c_sda <= pi_i2c_read_data(2);
                 elsif (reg_cur_state = d2 and reg_i2c_cmd_r_nw = '1') then
-                    pio_i2c_sda <= pi_slave_out_data(1);
+                    po_i2c_sda <= pi_i2c_read_data(1);
                 elsif (reg_cur_state = d1 and reg_i2c_cmd_r_nw = '1') then
-                    pio_i2c_sda <= pi_slave_out_data(0);
+                    po_i2c_sda <= pi_i2c_read_data(0);
 
                 elsif (reg_cur_state = d0) then
                     --data ack reply.
                     if (reg_i2c_cmd_r_nw = '0') then
-                        pio_i2c_sda <= '0';
+                        po_i2c_sda <= '0';
                     else
                     --yield bus for incoming data.
-                        pio_i2c_sda <= 'Z';
+                        po_i2c_sda <= 'Z';
                     end if;
 
                 elsif (reg_cur_state = d_ack) then
                     --data receive.
                     if (reg_i2c_cmd_r_nw = '0') then
-                        pio_i2c_sda <= 'Z';
+                        po_i2c_sda <= 'Z';
                     else
                         --data out.
-                        pio_i2c_sda <= pi_slave_out_data(7);
+                        po_i2c_sda <= pi_i2c_read_data(7);
                     end if;
                 end if;
             else
-                pio_i2c_sda <= 'Z';
+                po_i2c_sda <= 'Z';
             end if;--reg_i2c_cmd_addr = pi_slave_addr
         end if;--if (pi_rst_n = '0') then
     end process;

@@ -72,8 +72,8 @@ add wave -label reg_cur_state           sim:/nes2bbb_testbench/sim_board/i2c_sla
 add wave -label reg_i2c_cmd_addr        -radix hex  sim:/nes2bbb_testbench/sim_board/i2c_slave_inst/reg_i2c_cmd_addr
 add wave -label reg_i2c_cmd_r_nw                    sim:/nes2bbb_testbench/sim_board/i2c_slave_inst/reg_i2c_cmd_r_nw
 add wave -label reg_i2c_cmd_in_data     -radix hex  sim:/nes2bbb_testbench/sim_board/i2c_slave_inst/reg_i2c_cmd_in_data
-add wave -label po_slave_in_data        -radix hex  sim:/nes2bbb_testbench/sim_board/i2c_slave_inst/po_slave_in_data
-add wave -label pi_slave_out_data       -radix hex  sim:/nes2bbb_testbench/sim_board/i2c_slave_inst/pi_slave_out_data
+add wave -label po_i2c_write_data        -radix hex  sim:/nes2bbb_testbench/sim_board/i2c_slave_inst/po_i2c_write_data
+add wave -label pi_i2c_read_data       -radix hex  sim:/nes2bbb_testbench/sim_board/i2c_slave_inst/pi_i2c_read_data
 add wave -label po_i2c_status                       sim:/nes2bbb_testbench/sim_board/i2c_slave_inst/po_i2c_status
 
 #add wave -label rd_data                 -radix hex  sim:/nes2bbb_testbench/rd_data

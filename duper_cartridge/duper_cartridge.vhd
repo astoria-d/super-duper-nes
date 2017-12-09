@@ -91,11 +91,12 @@ port (
     ---i2c bus lines...
     pi_slave_addr       : in    std_logic_vector (6 downto 0);
     pi_i2c_scl          : in    std_logic;
-    pio_i2c_sda         : inout std_logic;
+    pi_i2c_sda          : in    std_logic;
+    po_i2c_sda          : out   std_logic;
     ---i2c bus contoler internal lines...
-    po_i2c_status       : out   std_logic_vector (3 downto 0);
-    po_slave_in_data    : out   std_logic_vector (7 downto 0);
-    pi_slave_out_data   : in    std_logic_vector (7 downto 0)
+    pi_i2c_read_data    : in    std_logic_vector (7 downto 0);
+    po_i2c_write_data   : out   std_logic_vector (7 downto 0);
+    po_i2c_status       : out   std_logic_vector (3 downto 0)
     );
 end component;
 
@@ -205,9 +206,10 @@ signal wr_ofifo_full        : std_logic;
 signal wr_ofifo_data        : std_logic_vector (7 downto 0);
 
 --i2c registers.
+signal wr_i2c_sda_out       : std_logic;
+signal wr_i2c_in_data       : std_logic_vector (7 downto 0);
 signal reg_i2c_rd_done      : integer range 0 to 1;
 signal reg_i2c_wr_done      : integer range 0 to 1;
-signal wr_i2c_in_data       : std_logic_vector (7 downto 0);
 
 
 ---po_i2c_status(3): '1' = bus transfering, '0' = stopped.
@@ -417,92 +419,108 @@ begin
 
 
     --each register setting..
-    regs_p : process (reg_cur_state)
+    regs_p : process (pi_reset_n, pi_base_clk)
     begin
-        case reg_cur_state is
-            when idle =>
-                reg_prom_oe_n <= '1';
-                reg_ififo_ce_n <= '1';
-                reg_ififo_oe_n <= '1';
-                reg_ififo_push_n <= '1';
-                reg_ififo_pop_n <= '1';
+        if (pi_reset_n = '0') then
+            reg_prom_oe_n <= '1';
+            reg_ififo_ce_n <= '1';
+            reg_ififo_oe_n <= '1';
+            reg_ififo_push_n <= '1';
+            reg_ififo_pop_n <= '1';
+            reg_ofifo_ce_n <= '1';
+            reg_ofifo_oe_n <= '1';
+            reg_ofifo_push_n <= '1';
+            reg_ofifo_pop_n <= '1';
+        elsif (rising_edge(pi_base_clk)) then
+            case reg_cur_state is
+                when idle =>
+                    reg_prom_oe_n <= '1';
+                    reg_ififo_ce_n <= '1';
+                    reg_ififo_oe_n <= '1';
+                    reg_ififo_push_n <= '1';
+                    reg_ififo_pop_n <= '1';
 
-                reg_ofifo_ce_n <= '0';
-                reg_ofifo_oe_n <= '0';
-                reg_ofifo_push_n <= '1';
-                reg_ofifo_pop_n <= '1';
+                    reg_ofifo_ce_n <= '0';
+                    reg_ofifo_oe_n <= '0';
+                    reg_ofifo_push_n <= '1';
+                    reg_ofifo_pop_n <= '1';
 
-            when rom_read =>
-                reg_prom_oe_n <= '0';
+                when rom_read =>
+                    reg_prom_oe_n <= '0';
 
-            when rom_read_ok =>
-                reg_prom_oe_n <= '0';
+                when rom_read_ok =>
+                    reg_prom_oe_n <= '0';
 
-            when fifo_status_read =>
+                when fifo_status_read =>
 
-            when nes_fifo_read =>
-                reg_ififo_ce_n <= '1';
-                reg_ififo_oe_n <= '0';
-                reg_ififo_push_n <= '1';
-                reg_ififo_pop_n <= '0';
+                when nes_fifo_read =>
+                    reg_ififo_ce_n <= '1';
+                    reg_ififo_oe_n <= '0';
+                    reg_ififo_push_n <= '1';
+                    reg_ififo_pop_n <= '0';
 
-            when nes_fifo_pop =>
-                reg_ififo_ce_n <= '0';
+                when nes_fifo_pop =>
+                    reg_ififo_ce_n <= '0';
 
-            when nes_fifo_read_ok =>
-                reg_ififo_ce_n <= '1';
+                when nes_fifo_read_ok =>
+                    reg_ififo_ce_n <= '1';
 
-            when nes_fifo_write =>
-                reg_ififo_ce_n <= '1';
-                reg_ififo_oe_n <= '1';
-                reg_ififo_push_n <= '0';
+                when nes_fifo_write =>
+                    reg_ififo_ce_n <= '1';
+                    reg_ififo_oe_n <= '1';
+                    reg_ififo_push_n <= '0';
 
-            when nes_fifo_push =>
-                reg_ififo_ce_n <= '0';
+                when nes_fifo_push =>
+                    reg_ififo_ce_n <= '0';
 
-            when nes_fifo_write_ok =>
-                reg_ififo_ce_n <= '1';
+                when nes_fifo_write_ok =>
+                    reg_ififo_ce_n <= '1';
 
-            when bbb_fifo_read =>
-                reg_ofifo_pop_n <= '1';
+                when bbb_fifo_read =>
+                    reg_ofifo_pop_n <= '1';
 
-            when bbb_fifo_pop =>
-                reg_ofifo_pop_n <= '0';
+                when bbb_fifo_pop =>
+                    reg_ofifo_pop_n <= '0';
 
-            when bbb_fifo_read_ok =>
-                reg_ofifo_pop_n <= '1';
+                when bbb_fifo_read_ok =>
+                    reg_ofifo_pop_n <= '1';
 
-            when bbb_fifo_write =>
-                reg_ofifo_push_n <= '1';
+                when bbb_fifo_write =>
+                    reg_ofifo_push_n <= '1';
 
-            when bbb_fifo_push =>
-                reg_ofifo_push_n <= '0';
+                when bbb_fifo_push =>
+                    reg_ofifo_push_n <= '0';
 
-            when bbb_fifo_write_ok =>
-                reg_ofifo_push_n <= '1';
+                when bbb_fifo_write_ok =>
+                    reg_ofifo_push_n <= '1';
 
-        end case;
+            end case;
+        end if;--if (pi_rst_n = '0') then
     end process;
 
 
     --prg rom
     pio_prg_data <= reg_prg_data_out;
 
-    set_nes_out_p : process (reg_cur_state)
+    set_nes_out_p : process (pi_reset_n, pi_base_clk)
     begin
-        case reg_cur_state is
-            when rom_read_ok =>
-                reg_prg_data_out <= wr_prg_data_out;
+        if (pi_reset_n = '0') then
+            reg_prg_data_out <= (others => 'Z');
+        elsif (rising_edge(pi_base_clk)) then
+            case reg_cur_state is
+                when rom_read_ok =>
+                    reg_prg_data_out <= wr_prg_data_out;
 
-            when fifo_status_read =>
-                reg_prg_data_out <= reg_ififo_status;
+                when fifo_status_read =>
+                    reg_prg_data_out <= reg_ififo_status;
 
-            when nes_fifo_read_ok =>
-                reg_prg_data_out <= wr_ififo_data;
+                when nes_fifo_read_ok =>
+                    reg_prg_data_out <= wr_ififo_data;
 
-            when others =>
-                reg_prg_data_out <= (others => 'Z');
-        end case;
+                when others =>
+                    reg_prg_data_out <= (others => 'Z');
+            end case;
+        end if;--if (pi_rst_n = '0') then
     end process;
 
     prom_inst : prg_rom port map (
@@ -543,7 +561,6 @@ begin
         wr_ofifo_full
     );
 
-
     --i2c slave
     i2c_slave_inst : i2c_slave
     port map (
@@ -551,11 +568,13 @@ begin
         pi_base_clk,
         conv_std_logic_vector(16#44#, 7),
         pi_i2c_scl,
-        pio_i2c_sda,
-        wr_i2c_status,
+        reg_i2c_sda_in,
+        wr_i2c_sda_out,
+        wr_ofifo_data,
         wr_i2c_in_data,
-        wr_ofifo_data
+        wr_i2c_status
     );
+    pio_i2c_sda <= wr_i2c_sda_out;
 
     --character rom
     crom_inst : chr_rom port map (
@@ -610,7 +629,7 @@ use ieee.std_logic_unsigned.all;
     end process;
 
     po_dbg_cnt <= reg_dbg_cnt;
-    deb_cnt_p : process (pi_base_clk, pi_reset_n)
+    deb_cnt_p : process (pi_base_clk, reg_reset_n)
 use ieee.std_logic_unsigned.all;
     begin
         if (reg_reset_n = '0') then
