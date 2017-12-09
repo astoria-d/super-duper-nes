@@ -411,10 +411,6 @@ begin
 
             if (reg_cur_state = bbb_fifo_pop) then
                 reg_i2c_rd_done <= 1;
---            if (wr_i2c_status(3) = '0') then
---                reg_i2c_rd_done <= 0;
---            elsif (wr_i2c_status(1) = '1') then
---                reg_i2c_rd_done <= 0;
             end if;
 
         end if;--if (pi_rst_n = '0') then

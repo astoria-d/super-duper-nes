@@ -50,9 +50,9 @@ add wave -label reg_fifo_size    -radix unsigned        sim:/nes2bbb_testbench/s
 
 
 add wave -divider bbb
-add wave -label reg_bbb_data        -radix hex  sim:/nes2bbb_testbench/reg_bbb_data
-add wave -label reg_i2c_rd_done                 sim:/nes2bbb_testbench/sim_board/reg_i2c_rd_done
-add wave -label wr_ofifo_data       -radix hex  sim:/nes2bbb_testbench/sim_board/wr_ofifo_data
+add wave -label reg_bbb_recv         -radix hex  sim:/nes2bbb_testbench/reg_bbb_recv
+#add wave -label reg_i2c_rd_done                 sim:/nes2bbb_testbench/sim_board/reg_i2c_rd_done
+#add wave -label wr_ofifo_data       -radix hex  sim:/nes2bbb_testbench/sim_board/wr_ofifo_data
 
 
 add wave -divider i2c

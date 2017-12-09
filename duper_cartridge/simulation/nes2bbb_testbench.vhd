@@ -104,13 +104,14 @@ architecture stimulus of nes2bbb_testbench is
     signal dbg_cnt          : std_logic_vector (63 downto 0);
 
     signal reg_rom_data     : std_logic_vector(7 downto 0);
-    signal reg_bbb_data     : std_logic_vector (7 downto 0);
+    signal reg_bbb_recv     : std_logic_vector (7 downto 0);
 
     signal start_scl        : std_logic;
     signal step_cnt         : integer range 0 to 65535 := 0;
     signal stage_cnt        : integer range 0 to 65535 := 0;
     signal i2c_step_cnt     : integer range 0 to 65535 := 0;
-    signal start_index      : integer range 0 to 65535 := 0;
+    signal addr_index       : integer range 0 to 65535 := 0;
+    signal data_index       : integer range 0 to 65535 := 0;
 
 begin
 
@@ -312,14 +313,20 @@ begin
     end if;
 end;
 
-procedure output_data
-(
-    i       : in integer;
-    data    : in std_logic_vector (7 downto 0)
-) is
+procedure send_ack is
 begin
     if (i2c_scl_type = i2c_clk_3) then
-        i2c_sda <= data(i);
+        i2c_sda <= '0';
+    end if;
+end;
+
+procedure input_data
+(
+    i       : in integer
+) is
+begin
+    if (i2c_scl_type = i2c_clk_0) then
+        reg_bbb_recv(i) <= i2c_sda;
     end if;
 end;
 
@@ -328,6 +335,8 @@ end;
             i2c_step_cnt <= 0;
             i2c_sda <= '1';
             start_scl <= '0';
+            addr_index <= 0;
+            data_index <= 0;
 
         elsif (rising_edge(i2c_scl_x4)) then
 
@@ -339,31 +348,32 @@ end;
                     start_scl <= '1';
 
                 elsif (i2c_step_cnt = 3) then
-                    start_index <= i2c_step_cnt + 1;
-                elsif (i2c_step_cnt = start_index) then
+                    addr_index <= i2c_step_cnt + 1;
+                elsif (i2c_step_cnt = addr_index) then
                     --start up seq...
                     start_seq;
 
                     --set i2c addr...
                     --addr output with write.....
                     --0x44 = 100 0101.
-                    output_addr(6 - i2c_step_cnt + start_index, conv_std_logic_vector(16#44#, 7));
+                    output_addr(6 - i2c_step_cnt + addr_index, conv_std_logic_vector(16#44#, 7));
 
-                elsif (i2c_step_cnt <= start_index + 6) then
-                    output_addr(6 - i2c_step_cnt + start_index, conv_std_logic_vector(16#44#, 7));
+                elsif (i2c_step_cnt <= addr_index + 6) then
+                    output_addr(6 - i2c_step_cnt + addr_index, conv_std_logic_vector(16#44#, 7));
 
-                elsif (i2c_step_cnt = start_index + 7) then
-                    set_rw(i2c_write);
+                elsif (i2c_step_cnt = addr_index + 7) then
+                    set_rw(i2c_read);
 
-                elsif (i2c_step_cnt = start_index + 8) then
-                    --wait ack...
+                elsif (i2c_step_cnt = addr_index + 8) then
+                    --ack wait...
                     ack_wait;
+                    data_index <= i2c_step_cnt + 1;
 
-                elsif (i2c_step_cnt < start_index + 16) then
-                    output_data(7 - i2c_step_cnt + start_index, conv_std_logic_vector(16#55#, 8));
+                elsif (i2c_step_cnt < data_index + 8) then
+                    input_data(7 - i2c_step_cnt + data_index);
 
-                elsif (i2c_step_cnt = start_index + 16) then
-                    ack_wait;
+                elsif (i2c_step_cnt = data_index + 8) then
+                    send_ack;
 
                 end if;
 
