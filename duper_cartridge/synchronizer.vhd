@@ -74,3 +74,50 @@ begin
 end rtl;
 
 
+
+----------------------------------------------
+----------------------------------------------
+----------------------------------------------
+----------------------------------------------
+library ieee;
+use ieee.std_logic_1164.all;
+
+entity edge_detecter is 
+    port (
+        pi_rst_n        : in    std_logic;
+        pi_base_clk     : in    std_logic;
+        pi_input        : in    std_logic;
+        po_rise         : out   std_logic;
+        po_fall         : out   std_logic
+    );
+end edge_detecter;
+
+architecture rtl of edge_detecter is
+
+begin
+
+    detect_p : process (pi_rst_n, pi_base_clk)
+    variable reg_temp   : std_logic;
+    begin
+        if (pi_rst_n = '0') then
+            reg_temp := '0';
+            po_rise <= '0';
+            po_fall <= '0';
+        elsif (rising_edge(pi_base_clk)) then
+            if (reg_temp /= pi_input) then
+                if (pi_input = '1') then
+                    po_rise <= '1';
+                    po_fall <= '0';
+                else
+                    po_rise <= '0';
+                    po_fall <= '1';
+                end if;
+            else
+                po_rise <= '0';
+                po_fall <= '0';
+            end if;
+            reg_temp := pi_input;
+        end if;--if (pi_rst_n = '0') then
+    end process;
+
+end rtl;
