@@ -402,15 +402,14 @@ begin
                 reg_i2c_wr_done <= 1;
             end if;
 
---TODO!!!!
---must rework flag clear timing!!!!
 ---po_i2c_status(3): '1' = bus transfering, '0' = stopped.
 ---po_i2c_status(2): '1' = read, '0' = write.
 ---po_i2c_status(1): '1' = data acknowleged, '0' = not acknowleged.
 ---po_i2c_status(0): '1' = addr acknowleged, '0' = not acknowleged.
-
             if (reg_cur_state = bbb_fifo_pop) then
                 reg_i2c_rd_done <= 1;
+            elsif (reg_cur_state = idle and (wr_i2c_status(1) = '0')) then
+                reg_i2c_rd_done <= 0;
             end if;
 
         end if;--if (pi_rst_n = '0') then

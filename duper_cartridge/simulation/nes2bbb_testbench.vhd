@@ -249,7 +249,7 @@ end;
 
             ---stage 1: rom write.....
             elsif (stage_cnt = 1) then
-                if (step_cnt < bus_cycle * 1000) then
+                if (step_cnt < 1300) then
                     if (step_cnt mod bus_cycle = 0) then
                         mem_write (conv_std_logic_vector(16#fff9#, 15), conv_std_logic_vector(16#de#, 8) + step_cnt);
                     else
@@ -258,8 +258,9 @@ end;
                     step_cnt <= step_cnt + 1;
                 else
                     bus_wait;
-                    step_cnt <= 0;
-                    stage_cnt <= stage_cnt + 1;
+                    step_cnt <= step_cnt + 1;
+--                    step_cnt <= 0;
+--                    stage_cnt <= stage_cnt + 1;
                 end if;
             end if;
         end if;
@@ -325,7 +326,7 @@ procedure input_data
     i       : in integer
 ) is
 begin
-    if (i2c_scl_type = i2c_clk_0) then
+    if (i2c_scl_type = i2c_clk_0 and (i >= 0 and i < 8)) then
         reg_bbb_recv(i) <= i2c_sda;
     end if;
 end;
@@ -369,12 +370,20 @@ end;
                     ack_wait;
                     data_index <= i2c_step_cnt + 1;
 
-                elsif (i2c_step_cnt < data_index + 8) then
+                elsif (i2c_step_cnt = data_index + 9) then
+
+                    if (i2c_scl_type = i2c_clk_3) then
+                        ---infinete repeat...
+                        data_index <= data_index + 9;
+                        i2c_sda <= 'Z';
+                    end if;
+
+                elsif (i2c_step_cnt < data_index + 9) then
                     input_data(7 - i2c_step_cnt + data_index);
 
-                elsif (i2c_step_cnt = data_index + 8) then
-                    send_ack;
-
+                    if (i2c_step_cnt = data_index + 8) then
+                        send_ack;
+                    end if;
                 end if;
 
             end if;
