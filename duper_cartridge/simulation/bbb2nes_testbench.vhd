@@ -374,7 +374,7 @@ end;
                     end if;
 
                 elsif (i2c_step_cnt < data_index + 9) then
-                    output_data(7 - i2c_step_cnt + data_index, conv_std_logic_vector(data_index, 8));
+                    output_data(7 - i2c_step_cnt + data_index, conv_std_logic_vector(data_index mod 256, 8));
 
                     if (i2c_step_cnt = data_index + 8) then
                         ack_wait;
