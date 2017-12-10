@@ -222,9 +222,6 @@ signal wr_i2c_status     : std_logic_vector (3 downto 0);
 signal reg_reset_n      : std_logic;
 signal reg_dbg_cnt      : std_logic_vector (63 downto 0);
 
---2, 4, 8, 16, 32 divide counter.
-signal reg_divide_cnt      : std_logic_vector (4 downto 0);
-
 -------------------------------------------
 -------------------------------------------
 ------------ implementations... -----------
@@ -247,6 +244,18 @@ begin
     sync10 : synchronized_vector generic map (15)    port map (pi_reset_n, pi_base_clk, pi_prg_addr,    reg_prg_addr);
     sync11 : synchronized_vector generic map (8)     port map (pi_reset_n, pi_base_clk, pio_prg_data,   reg_prg_data_in);
     sync12 : synchronized_vector generic map (13)    port map (pi_reset_n, pi_base_clk, pi_chr_addr,    reg_chr_addr);
+
+--    reg_phi2 <= pi_phi2;
+--    reg_prg_ce_n <= pi_prg_ce_n;
+--    reg_prg_r_nw <= pi_prg_r_nw;
+--    reg_chr_ce_n <= pi_chr_ce_n;
+--    reg_chr_oe_n <= pi_chr_oe_n;
+--    reg_chr_we_n <= pi_chr_we_n;
+--    reg_i2c_scl <= pi_i2c_scl;
+--    reg_i2c_sda_in <= pio_i2c_sda;
+--    reg_prg_addr <= pi_prg_addr;
+--    reg_prg_data_in <= pio_prg_data;
+--    reg_chr_addr <= pi_chr_addr;
 
     --base clock synchronized registers...
     reg_p : process (pi_base_clk, pi_reset_n)
@@ -614,19 +623,11 @@ use ieee.std_logic_unsigned.all;
         end if;
     end process;
 
---------------------------------------------------------------------
---------------------------------------------------------------------
------------------------- misc processes.... ------------------------
---------------------------------------------------------------------
---------------------------------------------------------------------
-
-    divider_p : process (reg_phi2)
-use ieee.std_logic_unsigned.all;
-    begin
-        if (rising_edge(reg_phi2)) then
-            reg_divide_cnt <= reg_divide_cnt + 1;
-        end if;
-    end process;
+----------------------------------------------------------------------
+----------------------------------------------------------------------
+-------------------------- misc processes.... ------------------------
+----------------------------------------------------------------------
+----------------------------------------------------------------------
 
     po_dbg_cnt <= reg_dbg_cnt;
     deb_cnt_p : process (pi_base_clk, reg_reset_n)
