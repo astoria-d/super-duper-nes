@@ -17,7 +17,7 @@ entity duper_cartridge is
         pi_prg_ce_n         : in std_logic;
         pi_prg_r_nw         : in std_logic;
         pi_prg_addr         : in std_logic_vector(14 downto 0);
-        pio_prg_data        : inout std_logic_vector(7 downto 0);
+        po_prg_data         : out std_logic_vector(7 downto 0);
 
         --chrrom
         pi_chr_ce_n         : in std_logic;
@@ -242,20 +242,8 @@ begin
     sync07 : synchronizer port map (pi_reset_n, pi_base_clk, pio_i2c_sda,    reg_i2c_sda_in);
 
     sync10 : synchronized_vector generic map (15)    port map (pi_reset_n, pi_base_clk, pi_prg_addr,    reg_prg_addr);
-    sync11 : synchronized_vector generic map (8)     port map (pi_reset_n, pi_base_clk, pio_prg_data,   reg_prg_data_in);
+--    sync11 : synchronized_vector generic map (8)     port map (pi_reset_n, pi_base_clk, pio_prg_data,   reg_prg_data_in);
     sync12 : synchronized_vector generic map (13)    port map (pi_reset_n, pi_base_clk, pi_chr_addr,    reg_chr_addr);
-
---    reg_phi2 <= pi_phi2;
---    reg_prg_ce_n <= pi_prg_ce_n;
---    reg_prg_r_nw <= pi_prg_r_nw;
---    reg_chr_ce_n <= pi_chr_ce_n;
---    reg_chr_oe_n <= pi_chr_oe_n;
---    reg_chr_we_n <= pi_chr_we_n;
---    reg_i2c_scl <= pi_i2c_scl;
---    reg_i2c_sda_in <= pio_i2c_sda;
---    reg_prg_addr <= pi_prg_addr;
---    reg_prg_data_in <= pio_prg_data;
---    reg_chr_addr <= pi_chr_addr;
 
     --base clock synchronized registers...
     reg_p : process (pi_base_clk, pi_reset_n)
@@ -509,7 +497,7 @@ begin
 
 
     --prg rom
-    pio_prg_data <= reg_prg_data_out;
+    po_prg_data <= reg_prg_data_out;
 
     set_nes_out_p : process (pi_reset_n, pi_base_clk)
     begin
@@ -564,7 +552,8 @@ begin
         reg_ofifo_oe_n,
         reg_ofifo_push_n,
         reg_ofifo_pop_n,
-        reg_prg_data_in,
+--        reg_prg_data_in,
+        "01011010",
         wr_ofifo_data,
         wr_ofifo_empty,
         wr_ofifo_full
@@ -630,10 +619,10 @@ use ieee.std_logic_unsigned.all;
 ----------------------------------------------------------------------
 
     po_dbg_cnt <= reg_dbg_cnt;
-    deb_cnt_p : process (pi_base_clk, reg_reset_n)
+    deb_cnt_p : process (pi_base_clk, pi_reset_n)
 use ieee.std_logic_unsigned.all;
     begin
-        if (reg_reset_n = '0') then
+        if (pi_reset_n = '0') then
             reg_dbg_cnt <= (others => '0');
         elsif (rising_edge(pi_base_clk)) then
             reg_dbg_cnt <= reg_dbg_cnt + 1;
