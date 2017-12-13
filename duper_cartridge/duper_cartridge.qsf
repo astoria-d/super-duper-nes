@@ -86,14 +86,14 @@ set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to pi_chr_we_n
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to pi_chr_oe_n
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to pi_i2c_scl
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to pio_i2c_sda
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to po_prg_data[4]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to po_prg_data[0]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to po_prg_data[5]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to po_prg_data[1]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to po_prg_data[6]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to po_prg_data[2]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to po_prg_data[7]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to po_prg_data[3]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to pio_prg_data[4]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to pio_prg_data[0]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to pio_prg_data[5]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to pio_prg_data[1]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to pio_prg_data[6]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to pio_prg_data[2]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to pio_prg_data[7]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to pio_prg_data[3]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to pi_prg_addr[4]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to pi_prg_addr[12]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to pi_prg_addr[5]
@@ -154,14 +154,14 @@ set_location_assignment PIN_T18 -to po_nes_f_full
 set_location_assignment PIN_T15 -to po_bbb_f_empty
 
 
-set_location_assignment PIN_H16 -to po_prg_data[4]
-set_location_assignment PIN_A12 -to po_prg_data[0]
-set_location_assignment PIN_H15 -to po_prg_data[5]
-set_location_assignment PIN_B12 -to po_prg_data[1]
-set_location_assignment PIN_A13 -to po_prg_data[6]
-set_location_assignment PIN_B13 -to po_prg_data[2]
-set_location_assignment PIN_C13 -to po_prg_data[7]
-set_location_assignment PIN_D13 -to po_prg_data[3]
+set_location_assignment PIN_H16 -to pio_prg_data[4]
+set_location_assignment PIN_A12 -to pio_prg_data[0]
+set_location_assignment PIN_H15 -to pio_prg_data[5]
+set_location_assignment PIN_B12 -to pio_prg_data[1]
+set_location_assignment PIN_A13 -to pio_prg_data[6]
+set_location_assignment PIN_B13 -to pio_prg_data[2]
+set_location_assignment PIN_C13 -to pio_prg_data[7]
+set_location_assignment PIN_D13 -to pio_prg_data[3]
 ##set_location_assignment PIN_G18
 ##set_location_assignment PIN_G17
 set_location_assignment PIN_H18 -to pi_prg_addr[4]

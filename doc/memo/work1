@@ -20,6 +20,11 @@ instal i2c dev.
 sudo sh -c "echo BB-I2C1 > /sys/devices/bone_capemgr.9/slots"
 
 check i2c dev.
+
+list:
+i2cdetect -l
+
+check:
 i2cdetect -r 2
 
 read/write i2c dev.

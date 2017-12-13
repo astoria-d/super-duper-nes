@@ -17,7 +17,7 @@ entity duper_cartridge is
         pi_prg_ce_n         : in std_logic;
         pi_prg_r_nw         : in std_logic;
         pi_prg_addr         : in std_logic_vector(14 downto 0);
-        po_prg_data         : out std_logic_vector(7 downto 0);
+        pio_prg_data        : inout std_logic_vector(7 downto 0);
 
         --chrrom
         pi_chr_ce_n         : in std_logic;
@@ -242,7 +242,7 @@ begin
     sync07 : synchronizer port map (pi_reset_n, pi_base_clk, pio_i2c_sda,    reg_i2c_sda_in);
 
     sync10 : synchronized_vector generic map (15)    port map (pi_reset_n, pi_base_clk, pi_prg_addr,    reg_prg_addr);
---    sync11 : synchronized_vector generic map (8)     port map (pi_reset_n, pi_base_clk, pio_prg_data,   reg_prg_data_in);
+    sync11 : synchronized_vector generic map (8)     port map (pi_reset_n, pi_base_clk, pio_prg_data,   reg_prg_data_in);
     sync12 : synchronized_vector generic map (13)    port map (pi_reset_n, pi_base_clk, pi_chr_addr,    reg_chr_addr);
 
     --base clock synchronized registers...
@@ -497,7 +497,7 @@ begin
 
 
     --prg rom
-    po_prg_data <= reg_prg_data_out;
+    pio_prg_data <= reg_prg_data_out;
 
     set_nes_out_p : process (pi_reset_n, pi_base_clk)
     begin
@@ -552,8 +552,7 @@ begin
         reg_ofifo_oe_n,
         reg_ofifo_push_n,
         reg_ofifo_pop_n,
---        reg_prg_data_in,
-        "01011010",
+        reg_prg_data_in,
         wr_ofifo_data,
         wr_ofifo_empty,
         wr_ofifo_full
