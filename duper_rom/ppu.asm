@@ -1998,6 +1998,45 @@ init_funcs:
 
 ;;ppu initialize
 .proc init_ppu
+
+;;init vram...
+;;2000 - 3000 (16 pages.)
+    ldx #16
+    lda #$20
+    sta $0
+@xloop:
+    lda $0
+    sta $2006
+    lda #$00
+    sta $2006
+
+    lda #' '
+    ldy #0
+:
+    sta $2007
+    iny
+    beq :+
+    jmp :-
+:
+    inc $0
+    dex
+    bne @xloop
+
+;;init attr.
+    lda #$23
+    sta $2006
+    lda #$c0
+    sta $2006
+
+    lda #0
+    ldy #0
+:
+    sta $2007
+    iny
+    beq :+
+    jmp :-
+:
+
 ;;vram pos start from the top left.
     lda #$20
     sta vram_current
