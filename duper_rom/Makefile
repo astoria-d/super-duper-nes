@@ -1,10 +1,10 @@
-ASMSOURCES =	duper-rom.asm ppu.asm nmi.asm
+ASMSOURCES =	duper-rom.asm ppu.asm nmi.asm build_msg.asm
 
 OBJECTS	=	$(ASMSOURCES:.asm=.o)
 
 LIBRARIES =
 #-------------------------------------------------------------------------------
-all :	$(OBJECTS) $(LIBRARIES)
+all :	$(OBJECTS) $(LIBRARIES) FORCE
 	ld65 -o duper-rom.nes -vm --mapfile duper-rom.map  --config linker.cfg --obj $(OBJECTS)
 	./dd-img.sh duper-rom
 	cp sample1-chr-4k.hex ../duper_cartridge/
@@ -25,6 +25,9 @@ disas : all
 
 .asm.o :
 	ca65 -t none $*.asm
+
+FORCE :
+	./build-date.sh
 
 clean :
 	-rm *.nes

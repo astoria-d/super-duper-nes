@@ -6,3 +6,4 @@ tags
 *.dbg
 *.bin
 *.disas
+build_msg.asm

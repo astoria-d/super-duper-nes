@@ -1540,6 +1540,17 @@ init_funcs:
     sta $01
     jsr print_str
 
+;;show build ver.
+    lda #$23
+    sta $02
+    lda #$42
+    sta $03
+    lda build_msg
+    sta $00
+    lda build_msg+1
+    sta $01
+    jsr print_str
+
     lda #$20
     sta $02
     sta top_menu_cur_pos
