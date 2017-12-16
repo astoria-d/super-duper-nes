@@ -272,7 +272,10 @@ end;
         elsif (rising_edge(pi_base_clk)) then
             if (reg_scl_fall = '1') then
                 if (reg_i2c_cmd_addr = pi_slave_addr) then
-                    if (reg_cur_state = rw) then
+                    if (reg_cur_state = idle) then
+                        --stand by.
+                        po_i2c_sda <= 'Z';
+                    elsif (reg_cur_state = rw) then
                         --addr ack reply.
                         po_i2c_sda <= '0';
                     elsif (reg_cur_state = a_ack) then

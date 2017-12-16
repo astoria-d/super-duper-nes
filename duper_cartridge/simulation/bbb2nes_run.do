@@ -79,12 +79,13 @@ view signals
 #run -all
 
 #step 1 rom write...
-run 30 us
+run 5 us
 wave zoom full
 
 #step 1 more rom write until fifo full...
-run 200 us
-wave zoom full
+run 25 us
+run 270 us
+#wave zoom full
 
-run 500 us
+#run 500 us
 

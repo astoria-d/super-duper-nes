@@ -431,9 +431,9 @@ begin
         elsif (rising_edge(pi_base_clk)) then
             case reg_cur_state is
                 when idle =>
-                    reg_prom_oe_n <= '1';
-                    reg_ififo_ce_n <= '1';
-                    reg_ififo_oe_n <= '1';
+                    reg_prom_oe_n <= '0';
+                    reg_ififo_ce_n <= '0';
+                    reg_ififo_oe_n <= '0';
                     reg_ififo_push_n <= '1';
                     reg_ififo_pop_n <= '1';
 
@@ -443,35 +443,28 @@ begin
                     reg_ofifo_pop_n <= '1';
 
                 when rom_read =>
-                    reg_prom_oe_n <= '0';
 
                 when rom_read_ok =>
-                    reg_prom_oe_n <= '0';
 
                 when fifo_status_read =>
 
                 when nes_fifo_read =>
-                    reg_ififo_ce_n <= '1';
-                    reg_ififo_oe_n <= '0';
-                    reg_ififo_push_n <= '1';
-                    reg_ififo_pop_n <= '0';
+                    reg_ififo_pop_n <= '1';
 
                 when nes_fifo_pop =>
-                    reg_ififo_ce_n <= '0';
+                    reg_ififo_pop_n <= '0';
 
                 when nes_fifo_read_ok =>
-                    reg_ififo_ce_n <= '1';
+                    reg_ififo_pop_n <= '1';
 
                 when nes_fifo_write =>
-                    reg_ififo_ce_n <= '1';
-                    reg_ififo_oe_n <= '1';
-                    reg_ififo_push_n <= '0';
+                    reg_ififo_push_n <= '1';
 
                 when nes_fifo_push =>
-                    reg_ififo_ce_n <= '0';
+                    reg_ififo_push_n <= '0';
 
                 when nes_fifo_write_ok =>
-                    reg_ififo_ce_n <= '1';
+                    reg_ififo_push_n <= '1';
 
                 when bbb_fifo_read =>
                     reg_ofifo_pop_n <= '1';
@@ -500,9 +493,11 @@ begin
     pio_prg_data <= reg_prg_data_out;
 
     set_nes_out_p : process (pi_reset_n, pi_base_clk)
+    variable tmp_fifo : std_logic_vector(7 downto 0);
     begin
         if (pi_reset_n = '0') then
             reg_prg_data_out <= (others => 'Z');
+            tmp_fifo := (others => '0');
         elsif (rising_edge(pi_base_clk)) then
             case reg_cur_state is
                 when rom_read_ok =>
@@ -511,8 +506,15 @@ begin
                 when fifo_status_read =>
                     reg_prg_data_out <= reg_ififo_status;
 
-                when nes_fifo_read_ok =>
+                when nes_fifo_read =>
                     reg_prg_data_out <= wr_ififo_data;
+                    tmp_fifo := wr_ififo_data;
+
+                when nes_fifo_pop =>
+                    reg_prg_data_out <= tmp_fifo;
+
+                when nes_fifo_read_ok =>
+                    reg_prg_data_out <= tmp_fifo;
 
                 when others =>
                     reg_prg_data_out <= (others => 'Z');
