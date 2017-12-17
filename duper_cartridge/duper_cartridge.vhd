@@ -565,7 +565,7 @@ begin
         pi_reset_n,
         pi_base_clk,
         conv_std_logic_vector(16#44#, 7),
-        pi_i2c_scl,
+        reg_i2c_scl,
         reg_i2c_sda_in,
         wr_i2c_sda_out,
         wr_ofifo_data,
