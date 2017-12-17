@@ -219,7 +219,6 @@ signal reg_i2c_wr_done      : integer range 0 to 1;
 signal wr_i2c_status     : std_logic_vector (3 downto 0);
 
 ------------misc regs.
-signal reg_reset_n      : std_logic;
 signal reg_dbg_cnt      : std_logic_vector (63 downto 0);
 
 -------------------------------------------
@@ -583,35 +582,6 @@ begin
         reg_chr_addr, 
         po_chr_data
     );
-
-    --nes reset signal emulation.
-    reset_p : process (pi_base_clk)
-use ieee.std_logic_unsigned.all;
-    variable cnt1, cnt2 : integer;
-    begin
-        if (rising_edge(pi_base_clk)) then
-            -- case addr is 0x77fc
-            if (reg_prg_addr = "111111111111100") then
-            -- case addr is 0x77fd
-                cnt1 := cnt1 + 1;
-            elsif (reg_prg_addr = "111111111111101") then
-                cnt2 := cnt2 + 1;
-            else
-                cnt1 := 0;
-                cnt2 := 0;
-            end if;
-
-            --condition:
-            --reset vector is fetched.
-            --cpu address is fixed at the reset vector addr for more than 50 clocks.
-            --assume that reset happened.
-            if (cnt1 + cnt2 > 50) then
-                reg_reset_n <= '0';
-            else
-                reg_reset_n <= '1';
-            end if;
-        end if;
-    end process;
 
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
