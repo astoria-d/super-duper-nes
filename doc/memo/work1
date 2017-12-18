@@ -32,3 +32,4 @@ sudo i2cget -y 2 0x44
 sudo i2cset -y 2 0x44 0x45
 
 
+for ch in $(hexout < /home/dmotooka/aaa) ; do sudo i2cset -y 2 0x44 $ch; done
