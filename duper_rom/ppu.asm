@@ -2037,6 +2037,17 @@ init_funcs:
     jmp :-
 :
 
+;;init sprite.
+    lda #0
+    sta $2003
+
+    ldy #0
+:
+    sta $2004
+    iny
+    bne :-
+
+
 ;;vram pos start from the top left.
     lda #$20
     sta vram_current
