@@ -7,15 +7,6 @@ initctl start unity-panel-service
 
 -----------------------------
 
-
-
-sudo sh -c "echo BB-I2C1 > /sys/devices/bone_capemgr.9/slots"
-sudo sh -c "echo 24c256 0x50 > /sys/bus/i2c/devices/i2c-2/new_device"
-sudo cat /sys/bus/i2c/devices/2-0050/eeprom | hexdump
-sudo sh -c "echo 0x50 > /sys/bus/i2c/devices/i2c-2/delete_device"
-
-----------------------------
-
 instal i2c dev.
 sudo sh -c "echo BB-I2C1 > /sys/devices/bone_capemgr.9/slots"
 
@@ -33,3 +24,22 @@ sudo i2cset -y 2 0x44 0x45
 
 
 for ch in $(hexout < /home/dmotooka/aaa) ; do sudo i2cset -y 2 0x44 $ch; done
+
+
+
+-----------------------
+
+case duper cassette is recognized as "eeprom"
+
+sudo sh -c "echo 24c256 0x44 > /sys/bus/i2c/devices/i2c-2/new_device"
+sudo sh -c "echo duper > /sys/bus/i2c/devices/2-0044/eeprom"
+sudo cat /sys/bus/i2c/devices/2-0044/eeprom | hexdump 
+sudo sh -c "echo 0x44 > /sys/bus/i2c/devices/i2c-2/delete_device"
+
+------------------------
+
+obsolete...
+
+sudo sh -c "echo 24c256 0x50 > /sys/bus/i2c/devices/i2c-2/new_device"
+sudo cat /sys/bus/i2c/devices/2-0050/eeprom | hexdump 
+
