@@ -168,7 +168,7 @@ signal reg_prg_addr         : std_logic_vector(14 downto 0);
 signal reg_prg_data_in      : std_logic_vector(7 downto 0);
 signal reg_chr_ce_n         : std_logic;
 signal reg_chr_oe_n         : std_logic;
-signal reg_chr_we_n         : std_logic;
+--signal reg_chr_we_n         : std_logic;
 signal reg_chr_addr         : std_logic_vector(12 downto 0);
 --bbb side
 signal reg_i2c_scl          : std_logic;
@@ -239,7 +239,7 @@ begin
     sync02 : synchronizer port map (pi_reset_n, pi_base_clk, pi_prg_r_nw,    reg_prg_r_nw);
     sync03 : synchronizer port map (pi_reset_n, pi_base_clk, pi_chr_ce_n,    reg_chr_ce_n);
     sync04 : synchronizer port map (pi_reset_n, pi_base_clk, pi_chr_oe_n,    reg_chr_oe_n);
-    sync05 : synchronizer port map (pi_reset_n, pi_base_clk, pi_chr_we_n,    reg_chr_we_n);
+--    sync05 : synchronizer port map (pi_reset_n, pi_base_clk, pi_chr_we_n,    reg_chr_we_n);
     sync06 : synchronizer port map (pi_reset_n, pi_base_clk, pi_i2c_scl,     reg_i2c_scl);
     sync07 : synchronizer port map (pi_reset_n, pi_base_clk, pio_i2c_sda,    reg_i2c_sda_in);
 
