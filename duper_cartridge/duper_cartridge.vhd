@@ -151,6 +151,8 @@ type duper_state_machine is (
     bbb_fifo_write_ok
     );
 
+constant DATA_DELAY     : integer := 18;
+
 -------------------------------------------
 -------------------------------------------
 ------------- declarations... -------------
@@ -159,7 +161,7 @@ type duper_state_machine is (
 
 --synchronized input.
 --nes side
-signal reg_phi2             : std_logic;
+--signal reg_phi2             : std_logic;
 signal reg_prg_ce_n         : std_logic;
 signal reg_prg_r_nw         : std_logic;
 signal reg_prg_addr         : std_logic_vector(14 downto 0);
@@ -178,6 +180,7 @@ signal reg_prg_data_out     : std_logic_vector(7 downto 0);
 --duper state machine..
 signal reg_cur_state        : duper_state_machine;
 signal reg_next_state       : duper_state_machine;
+signal reg_delay_cnt        : integer range 0 to 31;
 
 
 --prgrom reg
@@ -231,7 +234,7 @@ signal reg_dbg_cnt      : std_logic_vector (63 downto 0);
 begin
 
     --async input to be aligned to the base clock...
-    sync00 : synchronizer port map (pi_reset_n, pi_base_clk, pi_phi2,        reg_phi2);
+--    sync00 : synchronizer port map (pi_reset_n, pi_base_clk, pi_phi2,        reg_phi2);
     sync01 : synchronizer port map (pi_reset_n, pi_base_clk, pi_prg_ce_n,    reg_prg_ce_n);
     sync02 : synchronizer port map (pi_reset_n, pi_base_clk, pi_prg_r_nw,    reg_prg_r_nw);
     sync03 : synchronizer port map (pi_reset_n, pi_base_clk, pi_chr_ce_n,    reg_chr_ce_n);
@@ -272,9 +275,23 @@ begin
         end if;--if (pi_rst_n = '0') then
     end process;
 
+    --cpu data wait proc...
+    delay_cnt_p : process (pi_reset_n, pi_base_clk)
+    begin
+        if (pi_reset_n = '0') then
+            reg_delay_cnt <= 0;
+        elsif (rising_edge(pi_base_clk)) then
+            if (reg_cur_state = bbb_fifo_write) then
+                reg_delay_cnt <= reg_delay_cnt + 1;
+            else
+                reg_delay_cnt <= 0;
+            end if;
+        end if;--if (pi_rst_n = '0') then
+    end process;
+
     --state change to next.
     vac_next_stat_p : process (reg_cur_state, reg_prg_ce_n, reg_prg_r_nw, reg_prg_addr, wr_i2c_status, 
-                               reg_i2c_rd_done, reg_i2c_wr_done)
+                               reg_i2c_rd_done, reg_i2c_wr_done, reg_delay_cnt)
     begin
         case reg_cur_state is
             when idle =>
@@ -372,7 +389,12 @@ begin
                 reg_next_state <= idle;
 
             when bbb_fifo_write =>
-                reg_next_state <= bbb_fifo_push;
+                if (reg_delay_cnt < DATA_DELAY) then
+                    --wait for data to be available.
+                    reg_next_state <= bbb_fifo_write;
+                else
+                    reg_next_state <= bbb_fifo_push;
+                end if;
 
             when bbb_fifo_push =>
                 reg_next_state <= bbb_fifo_write_ok;
