@@ -1,0 +1,9 @@
+
+
+install tool chai.
+sudo apt-get install crossbuild-essential-armhf
+note that kernel build toolchain is different!
+
+
+
+
