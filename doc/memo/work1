@@ -26,6 +26,23 @@ sudo i2cset -y 2 0x44 0x45
 for ch in $(hexout < /home/dmotooka/aaa) ; do sudo i2cset -y 2 0x44 $ch; done
 
 
+--------------------
+
+gpio setup.
+cd /sys/class/gpio
+sudo sh -c "echo 49 > export"
+sudo sh -c "echo 115 > export"
+sudo sh -c "echo in > gpio49/direction"
+sudo sh -c "echo in > gpio115/direction"
+
+read bbb_f_empty
+cat /sys/class/gpio/gpio115/value
+
+
+close.
+sudo sh -c "echo 49 > unexport"
+sudo sh -c "echo 115 > unexport"
+
 
 -----------------------
 
