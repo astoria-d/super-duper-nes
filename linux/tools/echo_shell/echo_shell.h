@@ -16,6 +16,9 @@
 #define ASCII_0 48
 #define ASCII_1 49
 
+#define BBB_FIFO_EMPTY      0
+#define BBB_FIFO_NOT_EMPTY  1
+
 
 #ifdef ENV_CYGWIN
 #define GPIO_DEVICE "./gpio115"
@@ -29,6 +32,7 @@ typedef void (*dummy_handler_t) (unsigned int param);
 int register_gpio_handler(dummy_handler_t func);
 void unregister_gpio_handler(void);
 void gpio_handler_func (unsigned int param);
+int gpio_check(void);
 
 int create_i2c_terminal(void);
 void destroy_i2c_terminal(void);

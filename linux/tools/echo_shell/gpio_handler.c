@@ -11,9 +11,6 @@
 /*sleep 1 msec.*/
 #define SLEEP_INTERVAL 1000000
 
-#define BBB_FIFO_EMPTY      0
-#define BBB_FIFO_NOT_EMPTY  1
-
 
 void* gpio_polling(void* param);
 
@@ -87,6 +84,31 @@ void gpio_handler_func (unsigned int gpio_val){
     if (gpio_val == BBB_FIFO_NOT_EMPTY) {
 /*        printf("gpio data arrived.\n");*/
         sem_post(&echo_shell_sem);
+    }
+}
+
+int gpio_check(void) {
+    int fd;
+
+    fd = open(GPIO_DEVICE, O_RDONLY);
+    if (fd != 0) {
+        int len;
+        unsigned char pin_val;
+
+        len = read(fd, &pin_val, 1);
+        close (fd);
+
+        if (len == 1) {
+            if (pin_val == ASCII_0) {
+                return BBB_FIFO_NOT_EMPTY;
+            }
+            else {
+                return BBB_FIFO_EMPTY;
+            }
+        }
+    }
+    else {
+        return BBB_FIFO_EMPTY;
     }
 }
 

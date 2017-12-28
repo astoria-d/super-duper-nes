@@ -52,9 +52,13 @@ void* i2c_term_loop(void* param) {
             ioctl(fd_i2c, I2C_SLAVE, DUPER_ADDR);
 #endif
 
-            while (len = (read (fd_i2c, &i2c_ch, 1) ) > 0) {
-                printf("%02x\n", i2c_ch);
+            while (gpio_check() == BBB_FIFO_NOT_EMPTY) {
+                len = read (fd_i2c, &i2c_ch, 1);
+                if (len == 1) {
+                    printf("%c", i2c_ch);
+                }
             }
+            printf("\n");
             close (fd_i2c);
         }
 
