@@ -11,14 +11,9 @@
 /*sleep 1 msec.*/
 #define SLEEP_INTERVAL 1000000
 
-#define ASCII_0 48
-#define ASCII_1 49
+#define BBB_FIFO_EMPTY      0
+#define BBB_FIFO_NOT_EMPTY  1
 
-#ifdef ENV_CYGWIN
-#define GPIO_DEVICE "./gpio115"
-#else
-#define GPIO_DEVICE "/sys/class/gpio/gpio115/value"
-#endif
 
 void* gpio_polling(void* param);
 
@@ -55,7 +50,7 @@ void unregister_gpio_handler(void) {
     exit_loop = TRUE;
     pthread_join(gpio_thread_id, NULL);
 
-    printf("unregister gpio handler ok.\n");
+/*    printf("unregister gpio handler ok.\n");*/
 }
 
 
@@ -77,18 +72,21 @@ void* gpio_polling(void* param) {
         /*printf("chk1, %d, val=%d\n", len, pin_val);*/
         if (len == 1) {
             if (pin_val == ASCII_0) {
-                gpio_handler_func((unsigned int)pin_val);
+                (*gpio_handler)(BBB_FIFO_NOT_EMPTY);
             }
         }
         close (fd);
         nanosleep(&ts, NULL);
     }
-    printf("exit.\n");
+    printf("exit gpio thread.\n");
 }
 
 
 
-void gpio_handler_func (unsigned int param){
-    printf("gpio pin %d. %s\n", param, param != 0 ? "data arrived." : "fifo empty");
+void gpio_handler_func (unsigned int gpio_val){
+    if (gpio_val == BBB_FIFO_NOT_EMPTY) {
+/*        printf("gpio data arrived.\n");*/
+        sem_post(&echo_shell_sem);
+    }
 }
 

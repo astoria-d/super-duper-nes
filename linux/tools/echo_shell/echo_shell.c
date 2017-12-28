@@ -8,6 +8,8 @@
 
 static int main_loop_done;
 
+sem_t echo_shell_sem;
+
 static void sig_handler(int sig) {
     main_loop_done = TRUE;
 }
@@ -45,9 +47,22 @@ int main (int argc, char* argv[]) {
         return RT_ERROR;
     }
 
+    ret = sem_init(&echo_shell_sem, 0, 0);
+    if (ret != RT_OK) {
+        fprintf(stderr, "semaphore init error...\n");
+        return RT_ERROR;
+    }
+
     ret = register_gpio_handler(gpio_handler_func);
     if (!ret) {
         fprintf(stderr, "gpio handler init error...\n");
+        return RT_ERROR;
+    }
+
+    ret = create_i2c_terminal();
+    if (!ret) {
+        fprintf(stderr, "i2c terminal init error...\n");
+        unregister_gpio_handler();
         return RT_ERROR;
     }
 
@@ -59,7 +74,10 @@ int main (int argc, char* argv[]) {
         nanosleep(&ts, NULL);
     }
     unregister_gpio_handler();
+    destroy_i2c_terminal();
+    sem_destroy(&echo_shell_sem);
 
+    printf("%s done.\n", argv[0]);
     return RT_OK;
 }
 
