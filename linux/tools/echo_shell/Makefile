@@ -1,7 +1,9 @@
 
-ifeq ($(OSTYPE),cygwin)
+ifneq (,findstring cmd.exe, ${COMSPEC})
+#case cygwin environment.
     ARCH=x86
     CROSS_COMPILE=
+    copy_nfs=
 else
 #arm-linux-gnueabi- doesn't work on user space...
     ARCH=arm
@@ -10,6 +12,7 @@ else
     ifeq ($(TARGET),angstrom)
         CFLAGS += -march=armv4t -mfloat-abi=soft
     endif
+    copy_nfs=cp $(bin) $(NFSROOT)
 endif
 
 
@@ -27,7 +30,7 @@ all:    $(bin)
 
 $(bin): $(obj)
 	$(LD)  $(obj) -o $(bin)
-	cp $(bin) $(NFSROOT)
+	$(copy_nfs)
 
 .c.o: 
 	$(CC) $(CFLAGS) -c $<
