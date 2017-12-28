@@ -10,6 +10,7 @@ else
     ARCH=arm
     CROSS_COMPILE=arm-linux-gnueabihf-
     CFLAGS = -marm -O0 -g 
+    LDFLAGS = -pthread
     ifeq ($(TARGET),angstrom)
         CFLAGS += -march=armv4t -mfloat-abi=soft
     endif
@@ -30,7 +31,7 @@ obj=echo_shell.o gpio_handler.o i2c_terminal.o
 all:    $(bin)
 
 $(bin): $(obj)
-	$(LD)  $(obj) -o $(bin)
+	$(LD) $(LDFLAGS) $(obj) -o $(bin)
 	$(copy_nfs)
 
 .c.o: 
