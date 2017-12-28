@@ -50,7 +50,7 @@ void unregister_gpio_handler(void) {
     exit_loop = TRUE;
     pthread_join(gpio_thread_id, NULL);
 
-/*    printf("unregister gpio handler ok.\n");*/
+/**/    printf("unregister gpio handler ok.\n");
 }
 
 
@@ -78,7 +78,7 @@ void* gpio_polling(void* param) {
         close (fd);
         nanosleep(&ts, NULL);
     }
-    printf("exit gpio thread.\n");
+    /*printf("exit gpio thread.\n");*/
 }
 
 

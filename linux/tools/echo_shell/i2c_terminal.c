@@ -20,11 +20,18 @@ static pthread_t i2c_thread_id;
 void* i2c_term_loop(void* param) {
     while (!exit_loop) {
         int fd_i2c;
+        int ret;
+        struct timespec wt = {1,0};
 #ifdef ENV_CYGWIN
         int fd_gpio;
 #endif
 
-        sem_wait(&echo_shell_sem);
+        ret = sem_timedwait(&echo_shell_sem, &wt);
+        if (ret = -1) {
+            /*case timeout.*/
+            continue;
+        }
+
         /*printf("i2c data received.\n");*/
         fd_i2c = open(I2C_DEVICE, O_RDONLY);
         if (fd_i2c != 0) {
@@ -46,6 +53,8 @@ void* i2c_term_loop(void* param) {
         }
 #endif
     }
+
+    return NULL;
 }
 
 
@@ -75,9 +84,12 @@ void destroy_i2c_terminal(void) {
     int sval;
     exit_loop = TRUE;
     do {
-        sem_post(&echo_shell_sem);
         sem_getvalue(&echo_shell_sem, &sval);
-    } while (sval > 0);
+        /*printf("i2c terminal destroy sval=%d.\n", sval);*/
+        if (sval == 0) break;
+        sem_post(&echo_shell_sem);
+        sleep(1);
+    } while (TRUE);
 
     pthread_join(i2c_thread_id, NULL);
     printf("exit i2c terminal thread.\n");
