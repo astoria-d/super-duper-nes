@@ -1,5 +1,5 @@
 
-ifneq (,findstring cmd.exe, ${COMSPEC})
+ifeq ($(findstring cmd.exe,${COMSPEC}),cmd.exe)
 #case cygwin environment.
     ARCH=x86
     CROSS_COMPILE=
