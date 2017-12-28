@@ -13,6 +13,8 @@
 #include <linux/i2c-dev.h>
 #endif
 
+#include <string.h>
+
 #include "echo_shell.h"
 
 #ifdef ENV_CYGWIN
@@ -21,6 +23,8 @@
 #define I2C_DEVICE "/dev/i2c-2"
 #define DUPER_ADDR 0x44
 #endif
+
+#define CMD_LINE_MAX    1024
 
 static int exit_loop;
 static pthread_t i2c_thread_id;
@@ -45,6 +49,8 @@ void* i2c_term_loop(void* param) {
         if (fd_i2c != 0) {
             int len;
             unsigned char i2c_ch;
+            char cmd[CMD_LINE_MAX];
+            char* p;
 
             /*printf("i2c open.\n");*/
 #ifndef ENV_CYGWIN
@@ -52,13 +58,18 @@ void* i2c_term_loop(void* param) {
             ioctl(fd_i2c, I2C_SLAVE, DUPER_ADDR);
 #endif
 
+            memset(cmd, 0, CMD_LINE_MAX);
+            p = cmd;
             while (gpio_check() == BBB_FIFO_NOT_EMPTY) {
                 len = read (fd_i2c, &i2c_ch, 1);
                 if (len == 1) {
-                    printf("%c", i2c_ch);
+                    *p++ = i2c_ch;
                 }
             }
-            printf("\n");
+            if (p - cmd > 0) {
+                cmd_exec(cmd);
+                /*printf("%s\n", cmd);*/
+            }
             close (fd_i2c);
         }
 

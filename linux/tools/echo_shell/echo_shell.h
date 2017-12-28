@@ -37,6 +37,8 @@ int gpio_check(void);
 int create_i2c_terminal(void);
 void destroy_i2c_terminal(void);
 
+void cmd_exec(const char* cmd);
+
 extern sem_t echo_shell_sem;
 
 #endif

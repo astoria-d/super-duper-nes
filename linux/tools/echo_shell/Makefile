@@ -26,7 +26,7 @@ CC=${CROSS_COMPILE}gcc
 NM=${CROSS_COMPILE}nm
 
 bin=echo_shell
-obj=echo_shell.o gpio_handler.o i2c_terminal.o
+obj=echo_shell.o gpio_handler.o i2c_terminal.o cmd_exec.o
 
 all:    $(bin)
 
