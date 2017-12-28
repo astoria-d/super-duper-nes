@@ -4,6 +4,7 @@ ifeq ($(findstring cmd.exe,${COMSPEC}),cmd.exe)
     ARCH=x86
     CROSS_COMPILE=
     copy_nfs=
+    CFLAGS = -D ENV_CYGWIN
 else
 #arm-linux-gnueabi- doesn't work on user space...
     ARCH=arm
@@ -24,7 +25,7 @@ CC=${CROSS_COMPILE}gcc
 NM=${CROSS_COMPILE}nm
 
 bin=echo_shell
-obj=echo_shell.o
+obj=echo_shell.o gpio_handler.o
 
 all:    $(bin)
 
