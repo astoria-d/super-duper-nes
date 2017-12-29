@@ -29,6 +29,8 @@
 static int exit_loop;
 static pthread_t i2c_thread_id;
 
+static void show_prompt(void);
+
 void* i2c_term_loop(void* param) {
     while (!exit_loop) {
         int fd_i2c;
@@ -37,6 +39,7 @@ void* i2c_term_loop(void* param) {
         int fd_gpio;
 #endif
 
+        show_prompt();
         /*printf("i2c loop...\n");*/
         ret = sem_wait(&echo_shell_sem);
         /*printf("i2c data received.\n");*/
@@ -122,6 +125,26 @@ void destroy_i2c_terminal(void) {
 }
 
 void console_print(const char* outstr) {
+    int fd;
+    fd = open(I2C_DEVICE, O_WRONLY);
+    if (fd != 0) {
+        const char* p;
+#ifndef ENV_CYGWIN
+        ioctl(fd, I2C_SLAVE, DUPER_ADDR);
+#endif
+        p = outstr;
+        while (*p != '\0') {
+            write (fd, p, 1);
+            p++;
+        }
+        close (fd);
+    }
+
     printf("%s", outstr);
+}
+
+static void show_prompt(void) {
+    console_print("# ");
+    fflush(stdout);
 }
 

@@ -1,18 +1,26 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+#include "echo_shell.h"
+
+#define BUF_MAX 1024
 
 void cmd_exec(const char* cmd) {
     FILE* outp;
-    char ch;
+    char buf[BUF_MAX];
 
 /*
     system(cmd);
 */
-    printf("%s\n", cmd);
+    console_print(cmd);
+    console_print("\n");
     outp = popen(cmd, "r");
-    while (fread(&ch, 1, 1, outp) > 0) {
-        printf("%c", ch);
+    memset(buf, 0, BUF_MAX);
+    while (fread(buf, BUF_MAX, 1, outp) > 0) {
+        printf("%s", buf);
+        memset(buf, 0, BUF_MAX);
     }
     pclose(outp);
 }
