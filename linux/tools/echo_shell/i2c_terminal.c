@@ -40,10 +40,7 @@ void* i2c_term_loop(void* param) {
         /*printf("i2c loop...\n");*/
         ret = sem_wait(&echo_shell_sem);
         /*printf("i2c data received.\n");*/
-        if (ret == -1) {
-            /*case kill signal.*/
-            break;
-        }
+        if (exit_loop) break;
 
         fd_i2c = open(I2C_DEVICE, O_RDONLY);
         if (fd_i2c != 0) {
@@ -92,7 +89,7 @@ int create_i2c_terminal(void) {
     int ret;
     pthread_attr_t attr;
 
-    printf("i2c terminal initialize.\n");
+    console_print("i2c console init.\n");
 #ifdef ENV_CYGWIN
     printf("nes incoming data is emulated by the dummy device file %s.\n", I2C_DEVICE);
 #endif
@@ -118,8 +115,13 @@ void destroy_i2c_terminal(void) {
  */
     /*printf("i2c terminal destroy sval=%d.\n", sval);*/
 
-    pthread_kill(i2c_thread_id, SIGTERM);
+    console_print("i2c console terminate.\n");
+    /*pthread_kill(i2c_thread_id, SIGTERM);*/
+    sem_post(&echo_shell_sem);
     pthread_join(i2c_thread_id, NULL);
-    printf("exit i2c terminal thread.\n");
+}
+
+void console_print(const char* outstr) {
+    printf("%s", outstr);
 }
 
