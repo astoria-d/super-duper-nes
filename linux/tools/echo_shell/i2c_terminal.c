@@ -32,6 +32,9 @@ static pthread_t i2c_thread_id;
 static void show_prompt(void);
 
 void* i2c_term_loop(void* param) {
+
+    show_prompt();
+
     while (!exit_loop) {
         int fd_i2c;
         int ret;
@@ -39,7 +42,6 @@ void* i2c_term_loop(void* param) {
         int fd_gpio;
 #endif
 
-        show_prompt();
         /*printf("i2c loop...\n");*/
         ret = sem_wait(&echo_shell_sem);
         /*printf("i2c data received.\n");*/
@@ -67,7 +69,9 @@ void* i2c_term_loop(void* param) {
                 }
             }
             if (p - cmd > 0) {
-                cmd_exec(cmd);
+                int ret;
+                ret = cmd_exec(cmd);
+                if (ret) show_prompt();
                 /*printf("%s\n", cmd);*/
             }
             close (fd_i2c);
@@ -139,7 +143,6 @@ void console_print(const char* outstr) {
         }
         close (fd);
     }
-
     printf("%s", outstr);
 }
 
