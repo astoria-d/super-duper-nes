@@ -1122,19 +1122,9 @@ init_funcs:
 
 
 .proc print_i2c
-
-;;TODO:
-;;new line feed,
-;;page boarder handling
-
-;;get i2c char..
-    lda fifo_data
-    sta out_text_buf
-
-    lda out_text_buf_addr
-    sta $00
-    lda out_text_buf_addr+1
-    sta $01
+;;pop i2c char from fifo..
+    lda $fff9
+    sta $0
 
 ;;set cursor pos.
     lda output_pos
@@ -1142,9 +1132,14 @@ init_funcs:
     lda output_pos+1
     sta $03
 
-    jsr print_str
+    jsr print_chr
 
     inc output_pos+1
+
+    ;;loop until fifo is empty or display area is full.
+    lda #$10
+    and $fff8
+    beq print_i2c
 
     rts
 .endproc
@@ -1902,7 +1897,7 @@ init_funcs:
     sta $2006
 
     lda $00
-    sta $00
+    sta $2007
 
     rts
 .endproc
@@ -2304,10 +2299,6 @@ text_kb_matrix_s:
     .byte   $0
     .byte   " ZXCVBNM<>? "
 
-out_text_buf_addr:
-    .addr   out_text_buf
-
-
 ;;;;r/w global variables.
 .segment "BSS"
 vram_current:
@@ -2378,12 +2369,6 @@ in_text_buf:
 output_pos:
     .byte   $00
     .byte   $00
-
-;;output text buffer is 28 x 15 (420 chars.)
-out_text_buf:
-.repeat 420
-    .byte   $00
-.endrepeat
 
 ;;input ready: 1
 ;;input suspend: 0

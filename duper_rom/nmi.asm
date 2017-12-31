@@ -5,7 +5,6 @@
 .export jp1_data
 .export jp_suspend_cnt
 .export fifo_stat
-.export fifo_data
 
 .segment "STARTUP"
 
@@ -110,8 +109,6 @@
     and $fff8
     sta fifo_stat
     bne :+
-    lda $fff9
-    sta fifo_data
     jmp @need_update
 :
 
@@ -182,6 +179,4 @@ jp_suspend_cnt:
     .byte   $00
 
 fifo_stat:
-    .byte   $00
-fifo_data:
     .byte   $00
