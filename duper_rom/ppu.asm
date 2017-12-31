@@ -7,6 +7,7 @@
 .export init_menu
 .export init_ppu
 .export jp_status
+.export shl_disp_move_next
 
 .segment "STARTUP"
 
@@ -1121,6 +1122,87 @@ init_funcs:
 .endproc
 
 
+.macro  lda_line_addr_lo addr
+;;lda imm
+;;0xA9, imm
+    .byte $A9
+    .lobytes addr
+.endmacro
+
+.macro  lda_line_addr_hi addr
+;;lda imm
+;;0xA9, imm
+    .byte $A9
+    .hibytes addr
+.endmacro
+
+.proc shl_disp_move_next
+    ldx output_pos+1
+    lda output_pos
+    cmp #$22
+    beq @pg3
+    cmp #$21
+    beq @pg2
+@pg1:
+
+    ldy #5  ;;line=6
+    ;;load address of high(line_end_arr1)
+    lda_line_addr_lo line_end_arr1
+    sta $05
+    lda_line_addr_hi line_end_arr1
+    sta $06
+    jmp @line_check
+
+@pg2:
+    ldy #7  ;;line=8
+    lda_line_addr_lo line_end_arr2
+    sta $05
+    lda_line_addr_hi line_end_arr2
+    sta $06
+    jmp @line_check
+
+@pg3:
+    ldy #0  ;;line=1
+    lda_line_addr_lo line_end_arr3
+    sta $05
+    lda_line_addr_hi line_end_arr3
+    sta $06
+
+@line_check:
+
+:
+    lda ($05), y
+    sta $07
+    cpx $07
+    beq @line_end1
+    dey
+    bpl :-
+
+;;no line/page crossing.
+    inc output_pos+1
+    jmp @pg_done
+
+
+@line_end1:
+;;new line.
+    lda $02
+    sta $2006
+    lda $03
+    sta $2006
+    lda $2007
+
+    clc
+    lda #5
+    adc output_pos+1
+    sta output_pos+1
+    bcc @pg_done
+    inc output_pos
+
+@pg_done:
+
+    rts
+.endproc
+
 .proc print_i2c
 ;;pop i2c char from fifo..
     lda $fff9
@@ -1134,7 +1216,7 @@ init_funcs:
 
     jsr print_chr
 
-    inc output_pos+1
+    jsr shl_disp_move_next
 
     ;;loop until fifo is empty or display area is full.
     lda #$10
@@ -2298,6 +2380,20 @@ text_kb_matrix_s:
     .byte   '"'
     .byte   $0
     .byte   " ZXCVBNM<>? "
+
+
+;;page 2042 - 20fd
+line_end_arr1:
+    .byte   $5d, $7d, $9d, $bd, $dd, $fd
+
+;;page 2102 - 21fd
+line_end_arr2:
+    .byte   $1d, $3d, $5d, $7d, $9d, $bd, $dd, $fd
+
+;;page 2202 - 221d
+line_end_arr3:
+    .byte   $1d
+
 
 ;;;;r/w global variables.
 .segment "BSS"
