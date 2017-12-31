@@ -1046,6 +1046,12 @@ init_funcs:
     beq @kb_end
 
 
+    ;;check if input text is empty.
+    ;;the head char is carret(|), then input is empty.
+    lda #$8a
+    cmp in_text_buf
+    beq @kb_end
+
     ;;send input line to i2c...
     jsr send_i2c
 
