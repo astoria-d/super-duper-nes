@@ -9,7 +9,7 @@
 .export jp_status
 
 ;;for debugging..
-.export linefeed
+.export scroll_next
 
 .segment "STARTUP"
 
@@ -1128,10 +1128,6 @@ init_funcs:
     rts
 .endproc
 
-.proc scroll_next
-    rts
-.endproc
-
 .macro  lda_line_addr_lo addr
 ;;lda imm
 ;;0xA9, imm
@@ -1145,6 +1141,102 @@ init_funcs:
     .byte $A9
     .hibytes addr
 .endmacro
+
+.proc scroll_next
+;;0x00=vram high
+;;0x01=vram low
+    lda #$20
+    sta $00
+    lda #$40
+    sta $01
+;;x=lines to copy
+    ldx #14
+
+@next_line:
+
+;;y=char to copy
+    ldy #31
+
+    lda_line_addr_lo shell_copy_buf
+    sta $05
+    lda_line_addr_hi shell_copy_buf
+    sta $06
+
+    lda $2002
+
+;copy from 1 line ahead.
+    clc
+    lda #$20
+    adc $01
+    pha
+    bcc @no_pg_bdr1
+;;next line is ahead of the boarder.
+    lda #1
+    clc
+    adc $00
+    sta $2006
+    pla
+    sta $2006
+    jmp :+
+@no_pg_bdr1:
+    lda $00
+    sta $2006
+    pla
+    sta $2006
+:
+
+;;vram read first is dummy read.
+    lda $2007
+;;copy vram to tmp buf.
+:
+    lda $2007
+    sta ($05), y
+    dey
+    bpl :-
+
+;;copy tmp buf to earlier line.
+    lda $2002
+
+    lda $00
+    sta $2006
+    lda $01
+    sta $2006
+    ldy #31
+:
+    lda ($05), y
+    sta $2007
+    dey
+    bpl :-
+
+;;next line.
+    dex
+    beq @no_next_line
+    lda #$20
+    clc
+    adc $01
+    sta $01
+    bcc @no_pg_bdr2
+;case page boarder.
+    inc $00
+@no_pg_bdr2:
+    jmp @next_line
+@no_next_line:
+
+;;clear off the last line.
+    lda $2002
+    lda #$22
+    sta $2006
+    lda #$02
+    sta $2006
+    lda #' '
+    ldy #27
+:
+    sta $2007
+    dey
+    bpl :-
+
+    rts
+.endproc
 
 .proc shl_disp_move_next
     ldx output_pos+1
@@ -2534,3 +2626,11 @@ jp_status:
 
 kb_sft_status:
     .byte   $00
+
+;;scrolling function uses this area.
+;;1 line is 32 chars.
+shell_copy_buf:
+.repeat 32
+    .byte   $00
+.endrepeat
+
