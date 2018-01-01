@@ -1103,6 +1103,11 @@ init_funcs:
 
 
 .proc send_i2c
+    lda jp_status
+    bne :+
+    rts
+:
+
     ;;in_text_carret holds offset from the head.
     ldx in_text_carret
     ldy #0
