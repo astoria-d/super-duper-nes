@@ -12,14 +12,23 @@
 
 #define BUF_MAX 1024
 #define TMP_FILE "/tmp/echo_shell.tmp"
+/*NES side carret char(0x8a) is sent with the command.*/
+#define NES_NULL_CHR 0x8a
 
 int cmd_exec(const char* cmd) {
     int fd;
     char buf[BUF_MAX];
+    char* end_chr;
 
-    /*check if input string is garbege.*/
-    if (!isascii(*cmd)) {
-        return FALSE;
+    /*check if input string is empty.*/
+    if (*(unsigned char*)cmd == NES_NULL_CHR) {
+        console_print("\n");
+        return TRUE;
+    }
+    end_chr = strchr(cmd, NES_NULL_CHR);
+    if (end_chr != NULL) {
+        /*replace NES carret char with NULL char.*/
+        *end_chr = '\0';
     }
     console_print(cmd);
     console_print("\n");
