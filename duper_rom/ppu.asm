@@ -7,7 +7,9 @@
 .export init_menu
 .export init_ppu
 .export jp_status
-.export shl_disp_move_next
+
+;;for debugging..
+.export linefeed
 
 .segment "STARTUP"
 
@@ -1203,10 +1205,62 @@ init_funcs:
     rts
 .endproc
 
+.proc scroll_next
+    rts
+.endproc
+
+.proc linefeed
+;;if it is last line, scroll_next
+    lda #$22
+    cmp output_pos
+    bne :+
+    lda #$02
+    sta output_pos+1
+    jsr scroll_next
+    rts
+:
+
+;;goto next line.
+;;high half byte is odd num, +1x. (left half pos)
+;;high half byte is even num, +2x. (right half pos)
+    lda #$10
+    and output_pos+1
+    bne @odd
+@evn:
+    lda #$20
+    jmp :+
+@odd:
+    lda #$10
+:
+    clc
+    adc output_pos+1
+    bcc :+
+    inc output_pos
+:
+;;low half byte is x2.
+    sta $09
+    lda #$f0
+    and $09
+    sta $09
+    lda #$02
+    ora $09
+    sta output_pos+1
+
+    rts
+.endproc
+
 .proc print_i2c
 ;;pop i2c char from fifo..
     lda $fff9
     sta $0
+
+;;check if input is new line char '\n'
+    lda #$0a
+    cmp $0
+    bne :+
+    jsr linefeed
+    jmp @new_line_ok
+:
 
 ;;set cursor pos.
     lda output_pos
@@ -1217,6 +1271,7 @@ init_funcs:
     jsr print_chr
 
     jsr shl_disp_move_next
+@new_line_ok:
 
     ;;loop until fifo is empty or display area is full.
     lda #$10
