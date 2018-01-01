@@ -1049,11 +1049,13 @@ init_funcs:
     beq @kb_end
 
 
+;;; no need!! send them all!;;;;;;;;;;;;;;;
     ;;check if input text is empty.
     ;;the head char is carret(|), then input is empty.
-    lda #$8a
-    cmp in_text_buf
-    beq @kb_end
+;    lda #$8a
+;    cmp in_text_buf
+;    beq @kb_end
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
     ;;send input line to i2c...
     jsr send_i2c
@@ -1103,8 +1105,6 @@ init_funcs:
 .proc send_i2c
     ;;in_text_carret holds offset from the head.
     ldx in_text_carret
-    ;;the tail char is a carret '|', must -1
-    dex
     ldy #0
 
     lda in_text_buf_addr
@@ -1195,11 +1195,8 @@ init_funcs:
 
 @line_end1:
 ;;new line.
-    lda $02
-    sta $2006
-    lda $03
-    sta $2006
-    lda $2007
+;;you will need to reset vram.
+    lda $2002
 
     clc
     lda #5
