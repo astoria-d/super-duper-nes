@@ -1123,6 +1123,9 @@ init_funcs:
     rts
 .endproc
 
+.proc scroll_next
+    rts
+.endproc
 
 .macro  lda_line_addr_lo addr
 ;;lda imm
@@ -1164,11 +1167,16 @@ init_funcs:
     jmp @line_check
 
 @pg3:
-    ldy #0  ;;line=1
-    lda_line_addr_lo line_end_arr3
-    sta $05
-    lda_line_addr_hi line_end_arr3
-    sta $06
+;pg3 end needs scroll up.
+    lda line_end_arr3
+    cmp output_pos+1
+    bne :+
+    jsr scroll_next
+;;last line doesn't move. just cursor pos goes to head.
+    lda #02
+    sta output_pos+1
+    rts
+:
 
 @line_check:
 
@@ -1202,10 +1210,6 @@ init_funcs:
 
 @pg_done:
 
-    rts
-.endproc
-
-.proc scroll_next
     rts
 .endproc
 
