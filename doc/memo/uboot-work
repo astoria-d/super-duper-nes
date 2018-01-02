@@ -1,9 +1,17 @@
 
 
+loading moto bbb kernel from uboot:
+
+setenv ipaddr 192.168.1.250; setenv serverip 192.168.1.100; tftpboot 0x80F80000 am335x-boneblack-moto.dtb; tftpboot 0x80007FC0 uImage-BBB-moto;setenv bootargs console=ttyO0,115200n8 root=/dev/mmcblk1p2 ro rootfstype=ext4 rootwait; bootm 0x80007FC0 - 0x80F80000
+
+----------------------
+set ifconfig on the host.
+
 sudo ifconfig enp24s0:0 192.168.1.100 netmask 255.255.255.0
 
-
 ------------
+below is obsolete...
+
 boot from tftp..
 uboot
 
@@ -13,7 +21,6 @@ tftpboot 0x80F80000 am335x-boneblack.dtb
 tftpboot 0x80007FC0 uImage-BBB
 setenv bootargs console=ttyO0,115200n8 root=/dev/mmcblk1p2 ro rootfstype=ext4 rootwait
 bootm 0x80007FC0 - 0x80F80000
-
 
 -------------------
 >>>one line...
