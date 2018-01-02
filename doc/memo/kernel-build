@@ -14,3 +14,8 @@ make V=1 ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- modules -j4
 make V=1 ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- INSTALL_MOD_PATH=$(pwd)/_install modules_install
 
 
+make documents...
+LANG=C make V=1 ARCH=arm CROSS_COMPILE=arm-linux-gnueabi-  htmldocs mandocs > docs.log 2>&1
+##make pdfdocs, psdocs fails for unknown reasons...
+
+
