@@ -18,4 +18,24 @@ make documents...
 LANG=C make V=1 ARCH=arm CROSS_COMPILE=arm-linux-gnueabi-  htmldocs mandocs > docs.log 2>&1
 ##make pdfdocs, psdocs fails for unknown reasons...
 
+-------------------------
+
+# cat /sys/module/bbb_tty/parameters/mod_name
+bbb_tty
+
+# modinfo info bbb_tty.ko
+ERROR: Module info not found.
+filename:       /home/dmotooka/nfs/bbb_tty.ko
+version:        0.1
+description:    super-duper-nes bbb tty module.
+author:         astoria-d
+license:        GPL
+srcversion:     5B2CC8C819609FC62B58036
+depends:
+vermagic:       4.4.68-moto SMP mod_unload modversions ARMv7 p2v8
+parm:           mod_name:charp
+parm:           name:The name to display in /var/log/kern.log
+
+# cat /proc/driver/bbb_tty_test
+bbb tty proc test...
 
