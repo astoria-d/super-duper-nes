@@ -10,6 +10,7 @@
 static int bt_proc_show(struct seq_file *seq, void *offset) {
 
     printk(KERN_INFO "bt_proc_show...\n");
+
     seq_printf(seq, "bbb tty proc test...\n");
 
     return 0;
@@ -34,6 +35,7 @@ static int bt_proc_release(struct inode *inode, struct file *file) {
     int ret;
     ret = single_release(inode, file);
     module_put(THIS_MODULE);
+    printk(KERN_INFO "single_release ret:%d.\n", ret);
     return ret;
 }
 
