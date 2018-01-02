@@ -1,6 +1,6 @@
 
-obj-m               += bbb-tty-core.o
-bbb-tty-core-y      := bbb_tty.o bbb_tty_proc.o
+obj-m               += bbb_tty_core.o
+bbb_tty_core-y      := bbb_tty.o bbb_tty_proc.o
 
 
 V=1
@@ -13,7 +13,7 @@ export CROSS_COMPILE
 
 all:
 	make V=1 -C $(KERNEL_SRC)/ M=$(PWD) modules
-	cp bbb-tty-core.ko $(NFSROOT)
+	cp bbb_tty_core.ko $(NFSROOT)
 
 bbb-tty-core.o:
 	make V=1 -C $(KERNEL_SRC)/ M=$(PWD) 

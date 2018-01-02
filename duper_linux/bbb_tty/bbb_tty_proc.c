@@ -5,7 +5,7 @@
 #include <asm/uaccess.h>
 
 
-#define PROC_ENT "driver/bbb_tty_test"
+#define PROC_ENT "driver/bbb-tty-test"
 
 static int bt_proc_show(struct seq_file *seq, void *offset) {
 

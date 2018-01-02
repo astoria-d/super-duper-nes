@@ -12,7 +12,7 @@ MODULE_VERSION("0.1");
 
 static char *mod_name = "bbb_tty";
 module_param(mod_name, charp, 0444);
-MODULE_PARM_DESC(name, "module name @ /sys/module/bbb_tty/parameters/mod_name");
+MODULE_PARM_DESC(name, "module name @ /sys/module/bbb_tty_core/parameters/mod_name");
 
 
 static int __init bbb_tty_init(void){
