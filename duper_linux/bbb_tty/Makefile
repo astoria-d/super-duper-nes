@@ -1,6 +1,6 @@
 
 obj-m               += bbb_tty_core.o
-bbb_tty_core-y      := bbb_tty.o bbb_tty_proc.o
+bbb_tty_core-y      := bbb_tty.o bbb_tty_proc.o bt_i2c.o
 
 
 V=1

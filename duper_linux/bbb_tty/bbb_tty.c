@@ -26,14 +26,24 @@ static int __init bbb_tty_init(void){
         return -1;
     }
 
+    ret = bt_i2c_init();
+    if (ret) {
+        printk(KERN_ERR "bt_i2c_init failed.\n");
+        return -1;
+    }
+
     return 0;
 }
 
 static void __exit bbb_tty_exit(void){
     bbb_tty_proc_exit();
+    bt_i2c_exit();
     printk(KERN_INFO "%s exit.\n", mod_name);
 }
 
+/*
+*/
 module_init(bbb_tty_init);
 module_exit(bbb_tty_exit);
+
 
