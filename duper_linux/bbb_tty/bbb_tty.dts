@@ -12,9 +12,9 @@
     part-number     = "bbb_tty";
 /*
 not working...
-*/
     board-name      = "duper bbb board";
     manufacturer    = "fujibon university";
+*/
     version         = "00A0";
 
     /*pin ctl overlay...*/
@@ -38,8 +38,10 @@ not working...
             clock-frequency = <100000>;
             status = "okay";
 
-            /*bbb_tty instance...*/
+            /* i2c client instance...*/
             cape_duper_nes: cape_duper_nes@44 {
+                /*the name after comma(,) must match with i2c_device_id entry.
+                 (company name is ignored) */
                 compatible = "fujibon,duper_nes";
                 reg = <0x44>;
                 #address-cells = <1>;

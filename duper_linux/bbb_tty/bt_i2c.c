@@ -7,10 +7,6 @@
 
 #include "bbb_tty.h"
 
-/*
-   driver prove/remove not working...
-   must consider alternative method to access platform device...
-*/
 static int bt_i2c_probe (struct i2c_client *client, const struct i2c_device_id *id) {
 
     printk(KERN_INFO "bt_i2c_probe.\n");
@@ -34,19 +30,10 @@ MODULE_DEVICE_TABLE(i2c, bt_id_table);
 /*
 */
 
-/*
-static struct i2c_board_info duper_nes_devices[] = {
-    {
-        .type = "duper_nes",
-        .addr = 0x31,
-    },
-};
-*/
-
 
 static struct i2c_driver  bt_i2c_driver = {
     .driver     = {
-        .name   = "duper_nes",
+        .name   = "bbb_tty_drv",
     },
     .probe      = bt_i2c_probe,
     .remove     = bt_i2c_remove,
@@ -60,24 +47,8 @@ int bt_i2c_init(void){
     int ret;
     struct i2c_adapter *adapter;
 
-    /*ret = i2c_register_board_info(1, duper_nes_devices, ARRAY_SIZE(duper_nes_devices));
-    printk(KERN_INFO "register i2c board ret:%d.\n", ret);*/
-
     ret = i2c_add_driver(&bt_i2c_driver);
     printk(KERN_INFO "add i2c driver ret:%d.\n", ret);
-
-    /*
-    struct i2c_board_info info = {
-        .type = "bbb_tty_core",
-        .addr = 0x44,
-    };
-
-    adapter = i2c_get_adapter(1);
-    if (!adapter) return -EINVAL;
-
-    client = i2c_new_device(adapter, &info);
-    if (!client) return -EINVAL;
-*/
 
     return 0;
 }
