@@ -1,0 +1,36 @@
+
+disassemble.
+dtc -I dtb -O dts -o am335x-boneblack-moto.dts am335x-boneblack-moto.dtb
+dtc -I dtb -O dts -o am335x-boneblack-disas.dts am335x-boneblack.dtb
+
+------------
+
+from kernel build log.
+
+arm-linux-gnueabi-gcc -E -Wp,-MD,./am335x-boneblack.dtb.d.pre.tmp -nostdinc -I$KERNEL_SRC/arch/arm/boot/dts -I$KERNEL_SRC/arch/arm/boot/dts/include -I$KERNEL_SRC/drivers/of/testcase-data -undef \
+-D__DTS__ -x assembler-with-cpp -o ./am335x-boneblack.dtb.dts.tmp am335x-boneblack.dts
+
+dtc -O dtb -o ./am335x-boneblack.dtb \
+-b 0 -i $KERNEL_SRC/arch/arm/boot/dts/ -Wno-unit_address_vs_reg -d ./am335x-boneblack.dtb.d.dtc.tmp ./am335x-boneblack.dtb.dts.tmp
+
+cat arch/arm/boot/dts/.am335x-boneblack.dtb.d.pre.tmp arch/arm/boot/dts/.am335x-boneblack.dtb.d.dtc.tmp > arch/arm/boot/dts/.am335x-boneblack.dtb.d
+
+---------------
+
+
+# cat am335x-boneblack.dtb.d.dtc.tmp
+./am335x-boneblack.dtb: 
+./am335x-boneblack.dtb.dts.tmp 
+/home/dmotooka/super-duper-nes/linux-4.4/arch/arm/boot/dts/am33xx-clocks.dtsi 
+/home/dmotooka/super-duper-nes/linux-4.4/arch/arm/boot/dts/tps65217.dtsi
+
+# cat am335x-boneblack.dtb.d.pre.tmp
+am335x-boneblack.o: am335x-boneblack.dts \
+ /home/dmotooka/super-duper-nes/linux-4.4/arch/arm/boot/dts/am33xx.dtsi \
+ /home/dmotooka/super-duper-nes/linux-4.4/arch/arm/boot/dts/include/dt-bindings/gpio/gpio.h \
+ /home/dmotooka/super-duper-nes/linux-4.4/arch/arm/boot/dts/include/dt-bindings/pinctrl/am33xx.h \
+ /home/dmotooka/super-duper-nes/linux-4.4/arch/arm/boot/dts/include/dt-bindings/pinctrl/omap.h \
+ /home/dmotooka/super-duper-nes/linux-4.4/arch/arm/boot/dts/skeleton.dtsi \
+ /home/dmotooka/super-duper-nes/linux-4.4/arch/arm/boot/dts/am335x-bone-common.dtsi \
+ /home/dmotooka/super-duper-nes/linux-4.4/arch/arm/boot/dts/include/dt-bindings/display/tda998x.h \
+ /home/dmotooka/super-duper-nes/linux-4.4/arch/arm/boot/dts/am33xx-pruss-rproc.dtsi
