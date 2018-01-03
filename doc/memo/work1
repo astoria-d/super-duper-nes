@@ -1,9 +1,20 @@
 
-rebreoffice menu issue..
+rebre-office menu issue..
 
 initctl stop unity-panel-service
 
 initctl start unity-panel-service
+
+---------------------------
+
+device overlay..
+
+sudo sh -c "echo bbb_tty > /sys/devices/platform/bone_capemgr/slots"
+
+remove device.
+sudo sh -c "echo '-4' > /sys/devices/platform/bone_capemgr/slots"
+
+
 
 -----------------------------
 
