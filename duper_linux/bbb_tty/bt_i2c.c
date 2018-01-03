@@ -3,6 +3,7 @@
 #include <linux/module.h>
 #include <linux/kernel.h>
 #include <linux/platform_device.h>
+#include <linux/of.h>
 
 #include "bbb_tty.h"
 
@@ -32,34 +33,38 @@ static const struct bt_platform_data bt_pdata = {
     .data = 1,
 };
 
-/*
 static const struct of_device_id bt_match[] = {
     {
-        .compatible = "bbb_tty",
+        /*match with dts entry.*/
+        .compatible = "fujibon,duper_nes",
         .data = &bt_pdata,
     },
     { },
 };
 MODULE_DEVICE_TABLE(of, bt_match);
-*/
 
+/*
 static const struct platform_device_id bt_id_table[] = {
     {
-        .name       = "bbb_tty_drv",
+        //.name   = "omap_rtc",
+        .name   = "bbb_tty",
         .driver_data    = &bt_pdata,
     },
     { }
 };
 MODULE_DEVICE_TABLE(platform, bt_id_table);
+*/
 
 
 static struct platform_driver bt_i2c_driver = {
     .probe      = bt_i2c_probe,
     .remove     = bt_i2c_remove,
     .driver     = {
+        /*this name must be unique..*/
         .name   = "bbb_tty",
+        .of_match_table = of_match_ptr(bt_match),
     },
-    .id_table = bt_id_table,
+    //.id_table = bt_id_table,
 };
 
 /*

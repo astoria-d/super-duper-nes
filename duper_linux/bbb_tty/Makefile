@@ -2,6 +2,7 @@
 obj-m               += bbb_tty_core.o
 bbb_tty_core-y      := bbb_tty.o bbb_tty_proc.o bt_i2c.o
 
+clean-files         += *.dtbo
 
 V=1
 ARCH=arm
@@ -20,4 +21,8 @@ bbb-tty-core.o:
 
 clean:
 	make V=1 -C $(KERNEL_SRC)/ M=$(PWD) clean
+
+dtbo:
+	$(KERNEL_SRC)/scripts/dtc/dtc -O dtb -o bbb_tty-00A0.dtbo -@ bbb_tty.dts
+	cp bbb_tty-00A0.dtbo $(NFSROOT)
 

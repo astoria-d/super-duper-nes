@@ -3,6 +3,8 @@
 *.cmd
 *.ko
 *.swp
+*.dtb
+*.dtbo
 Module.symvers
 modules.order
 .tmp_versions/

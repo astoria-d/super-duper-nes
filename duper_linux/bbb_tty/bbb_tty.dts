@@ -1,0 +1,56 @@
+/dts-v1/;
+/plugin/;
+
+/{ 
+
+    compatible = "ti,beaglebone-black";
+    /*part-number is the same as file name -.dtbo, 
+     also, capemgr recognizes the firmware.
+     i.e.,
+     $ echo bbb_tty > /sys/devices/platform/bone_capemgr/slots
+     */
+    part-number     = "bbb_tty";
+/*
+not working...
+*/
+    board-name      = "duper bbb board";
+    manufacturer    = "fujibon university";
+    version         = "00A0";
+
+    /*pin ctl overlay...*/
+    fragment@0 {
+        target = <&am33xx_pinmux>; 
+
+        __overlay__ { 
+            i2c1_pins: pinmux_i2c1_pins {
+               pinctrl-single,pins = <
+                   0x158 0x72 /* i2c1_sda */ 
+                   0x15C 0x72 /* i2c1_sdl */
+                   >;
+           };
+        };
+    };
+
+    fragment@1 {
+        target= <&i2c1>;
+        __overlay__ {
+            pinctrl-0 = <&i2c1_pins>;
+            clock-frequency = <100000>;
+            status = "okay";
+
+            /*bbb_tty instance...*/
+            cape_duper_nes: cape_duper_nes@44 {
+                compatible = "fujibon,duper_nes";
+                reg = <0x44>;
+                #address-cells = <1>;
+                #size-cells = <1>;
+                /*
+                cape0_data: cape_data@0 {
+                    reg = <0 0x100>;
+                };*/
+            };
+        };
+    };
+};
+
+
