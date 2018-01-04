@@ -4,16 +4,20 @@
 #include <linux/proc_fs.h>
 #include <asm/uaccess.h>
 
+#include "bbb_tty.h"
 
 #define PROC_ENT "driver/bbb-tty-test"
 
 static int bt_proc_show(struct seq_file *seq, void *offset) {
+    int ret;
 
     printk(KERN_INFO "bt_proc_show...\n");
 
     seq_printf(seq, "bbb tty proc test...\n");
 
-    return 0;
+    ret = bt_i2c_proc_show(seq, offset);
+
+    return ret;
 }
 
 static int bt_proc_open(struct inode *inode, struct file *file) {
