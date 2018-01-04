@@ -1,12 +1,24 @@
 
-rebre-office menu issue..
 
-initctl stop unity-panel-service
+using i2c2...
 
-initctl start unity-panel-service
+list:
+i2cdetect -l
 
----------------------------
+check:
+i2cdetect -r 2
 
+read/write i2c dev.
+sudo i2cget -y 2 0x44
+sudo i2cset -y 2 0x44 0x45
+
+
+sudo bash -c 'echo duper_nes 0x44 > /sys/bus/i2c/devices/i2c-2/new_device'
+
+cat /proc/driver/bbb-tty-test
+
+
+--------------------------
 device overlay..
 
 sudo sh -c "echo bbb_tty > /sys/devices/platform/bone_capemgr/slots"
@@ -14,6 +26,15 @@ sudo sh -c "echo bbb_tty > /sys/devices/platform/bone_capemgr/slots"
 remove device.
 sudo sh -c "echo '-4' > /sys/devices/platform/bone_capemgr/slots"
 
+
+
+
+------------------------
+device probe not using dts...
+sudo sh -c "echo duper-i2c > /sys/devices/platform/bone_capemgr/slots"
+sudo bash -c 'echo duper_nes 0x44 > /sys/bus/i2c/devices/i2c-1/new_device'
+
+sudo i2cget -y 1 0x44
 
 
 -----------------------------
@@ -70,4 +91,12 @@ obsolete...
 
 sudo sh -c "echo 24c256 0x50 > /sys/bus/i2c/devices/i2c-2/new_device"
 sudo cat /sys/bus/i2c/devices/2-0050/eeprom | hexdump 
+
+---------------------------
+
+rebre-office menu issue..
+
+initctl stop unity-panel-service
+
+initctl start unity-panel-service
 
