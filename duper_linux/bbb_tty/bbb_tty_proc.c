@@ -16,6 +16,8 @@ static int bt_proc_show(struct seq_file *seq, void *offset) {
     seq_printf(seq, "bbb tty proc test...\n");
 
     ret = bt_i2c_proc_show(seq, offset);
+    if (ret) return ret;
+    ret = bt_gpio_proc_show(seq);
 
     return ret;
 }

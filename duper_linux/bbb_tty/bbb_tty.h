@@ -10,7 +10,11 @@ void bbb_tty_proc_exit(void);
 int bt_i2c_init(void);
 void bt_i2c_exit(void);
 
+int bt_gpio_init(void);
+void bt_gpio_exit(void);
+
 int bt_i2c_proc_show(struct seq_file *seq, void *offset);
+int bt_gpio_proc_show(struct seq_file *seq);
 
 struct bt_platform_data {
     int data;
