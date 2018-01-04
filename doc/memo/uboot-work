@@ -4,6 +4,31 @@ loading moto bbb kernel from uboot:
 
 setenv ipaddr 192.168.1.250; setenv serverip 192.168.1.100; tftpboot 0x80F80000 am335x-boneblack-moto.dtb; tftpboot 0x80007FC0 uImage-BBB-moto;setenv bootargs console=ttyO0,115200n8 root=/dev/mmcblk1p2 ro rootfstype=ext4 rootwait; bootm 0x80007FC0 - 0x80F80000
 
+
+-----------------
+
+save boot cmd...
+setenv bootmoto setenv ipaddr 192.168.1.250\; setenv serverip 192.168.1.100\; tftpboot 0x80F80000 am335x-boneblack-moto.dtb\; tftpboot 0x80007FC0 uImage-BBB-moto\;setenv bootargs console=ttyO0,115200n8 root=/dev/mmcblk1p2 ro rootfstype=ext4 rootwait\; bootm 0x80007FC0 - 0x80F80000
+printenv bootmoto
+run bootmoto
+saveenv  <<< saveenv cmd is not implemented!!
+
+U-Boot# load mmc 1:2 ${loadaddr} /boot/uEnv.txt
+834 bytes read in 22 ms (36.1 KiB/s)
+U-Boot# printenv filesize
+filesize=342
+U-Boot# printenv uname_r
+## Error: "uname_r" not defined
+U-Boot# env import -t -r $loadaddr $filesize
+U-Boot# printenv uname_r
+uname_r=3.8.13-bone70
+
+
+
+ls mmc 1:2 /boot
+
+
+
 ----------------------
 set ifconfig on the host.
 
