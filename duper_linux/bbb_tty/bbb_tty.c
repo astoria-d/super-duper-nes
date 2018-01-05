@@ -4,6 +4,7 @@
 #include <linux/console.h>
 #include <linux/tty.h>
 #include <linux/tty_driver.h>
+#include <linux/tty_flip.h>
 
 #include "bbb_tty.h"
 
@@ -11,16 +12,30 @@ static const struct tty_port_operations bt_port_ops = {
 };
 static struct tty_port    bbb_tty_port;
 
+void bbb_tty_receiver(char ch) {
+    int ret;
+
+    ret = tty_insert_flip_char(&bbb_tty_port, ch, TTY_NORMAL);
+    if (ret) {
+        printk(KERN_INFO "tty_insert_filp failed. [%c]\n", ch);
+    }
+
+    tty_flip_buffer_push(&bbb_tty_port);
+}
+
+
 static int nes_tty_write(struct tty_struct * tty,
-        const unsigned char *buf, int c) {
+        const unsigned char *buf, int count) {
     int i;
 
-    for (i = 0; i < c; i++) {
+    //printk("nes_tty_write start.count:%d.\n", count);
+    for (i = 0; i < count; i++) {
         int res;
         res = bt_i2c_putchr(buf[i]);
         if (!res)
             break;
     }
+    //printk("nes_tty_write done.i:%d.\n", i);
     return i;
 }
 
@@ -36,7 +51,7 @@ static int nes_tty_install(struct tty_driver *drv, struct tty_struct *tty) {
 
     ret = tty_port_install(&bbb_tty_port, drv, tty);
     if (ret) {
-        pr_err("tty_port_install failed.\n");
+        printk(KERN_INFO "tty_port_install failed.\n");
         return ret;
     }
 
@@ -105,7 +120,7 @@ int __init bbb_tty_init(void){
 
     bbb_tty_driver = alloc_tty_driver(1);
     if (!bbb_tty_driver) {
-        pr_err("tty driver allocation error.\n");
+        printk(KERN_INFO "tty driver allocation error.\n");
         return -ENOMEM;
     }
 

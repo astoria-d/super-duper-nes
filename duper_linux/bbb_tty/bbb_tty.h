@@ -17,6 +17,8 @@ int bt_i2c_putchr(char ch);
 int bt_gpio_init(void);
 void bt_gpio_exit(void);
 
+void bbb_tty_receiver(char ch);
+
 int bt_i2c_proc_show(struct seq_file *seq, void *offset);
 int bt_gpio_proc_show(struct seq_file *seq);
 
