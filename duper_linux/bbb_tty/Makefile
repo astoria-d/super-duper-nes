@@ -1,6 +1,6 @@
 
 obj-m               += bbb_tty_drv.o
-bbb_tty_drv-y      := bbb_tty.o bbb_tty_proc.o bt_i2c.o bt_gpio.o
+bbb_tty_drv-y      := bt_module.o bbb_tty.o bbb_tty_proc.o bt_i2c.o bt_gpio.o
 
 clean-files         += *.dtbo
 

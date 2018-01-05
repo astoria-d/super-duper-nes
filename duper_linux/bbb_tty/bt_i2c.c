@@ -10,6 +10,14 @@
 
 static struct i2c_client *client;
 
+int bt_i2c_putchr(char ch) {
+    int ret;
+
+    /*xfer ch to i2c*/
+    ret = i2c_master_send(client, &ch, 1);
+    return ret == 1 ? 1 : 0;
+}
+
 int bt_i2c_proc_show(struct seq_file *seq, void *offset) {
     struct i2c_msg msg[1];
     u8 recvdata;
