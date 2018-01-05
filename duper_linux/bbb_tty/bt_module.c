@@ -19,12 +19,6 @@ static int __init bt_module_init(void){
 
     printk(KERN_INFO "module [%s] initialize.\n", mod_name);
 
-    ret = bbb_tty_proc_init();
-    if (ret) {
-        printk(KERN_ERR "bbb_tty_proc_init failed.\n");
-        return -1;
-    }
-
     ret = bt_i2c_init();
     if (ret) {
         printk(KERN_ERR "bt_i2c_init failed.\n");
@@ -42,12 +36,19 @@ static int __init bt_module_init(void){
         printk(KERN_ERR "bbb_tty_init failed.\n");
         return -1;
     }
+
+    ret = bt_proc_init();
+    if (ret) {
+        printk(KERN_ERR "bbb_tty_proc_init failed.\n");
+        return -1;
+    }
+
     return 0;
 }
 
 static void __exit bt_module_exit(void){
+    bt_proc_exit();
     bbb_tty_exit();
-    bbb_tty_proc_exit();
     bt_i2c_exit();
     bt_gpio_exit();
     printk(KERN_INFO "module [%s] exit.\n", mod_name);

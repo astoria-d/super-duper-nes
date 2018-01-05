@@ -52,12 +52,12 @@ static const struct file_operations by_proc_fops = {
 };
 
 
-int bbb_tty_proc_init(void){
+int bt_proc_init(void){
     proc_create_data(PROC_ENT, 0, NULL, &by_proc_fops, NULL);
     return 0;
 }
 
-void bbb_tty_proc_exit(void){
+void bt_proc_exit(void){
     remove_proc_entry(PROC_ENT, NULL);
 }
 
