@@ -5,14 +5,62 @@
 #include <linux/tty.h>
 #include <linux/tty_driver.h>
 #include <linux/tty_flip.h>
+#include <linux/kthread.h>
+#include <linux/sched.h>
+#include <linux/semaphore.h>
 
 #include "bbb_tty.h"
 
-static const struct tty_port_operations bt_port_ops = {
-};
+#define BT_FIFO_SIZE 256
+
+
+/*forward declarations...*/
+static int nes_tty_write(struct tty_struct * tty, const unsigned char *buf, int count);
+static int nes_tty_write_room(struct tty_struct *tty);
+static int nes_tty_install(struct tty_driver *drv, struct tty_struct *tty);
+static void nes_tty_cleanup(struct tty_struct *tty);
+static int nes_tty_open(struct tty_struct *tty, struct file *file);
+static void nes_tty_close(struct tty_struct *tty, struct file *file);
+static void nes_tty_hangup(struct tty_struct *tty);
+static void nes_console_write (struct console *co, const char *str, unsigned int count);
+static struct tty_driver *nes_console_device(struct console *co, int *idx);
+static int nes_console_setup(struct console *cp, char *arg);
+
+
+/*static variables...*/
+static const struct tty_port_operations bt_port_ops = { };
+
 static struct tty_port    bbb_tty_port;
 
-void bbb_tty_receiver(char ch) {
+static struct tty_driver *bbb_tty_driver;
+
+static const struct tty_operations nes_tty_ops = {
+    .write      = nes_tty_write,
+    .write_room = nes_tty_write_room,
+    .install    = nes_tty_install,
+    .cleanup    = nes_tty_cleanup,
+    .open       = nes_tty_open,
+    .close      = nes_tty_close,
+    .hangup     = nes_tty_hangup,
+};
+
+static struct console nes_console_driver = {
+    .name       = "ttynes",
+    .write      = nes_console_write,
+    .device     = nes_console_device,
+    .setup      = nes_console_setup,
+    .flags      = CON_PRINTBUFFER,
+    .index      = -1,
+};
+
+static struct task_struct *bt_thread;
+static struct semaphore gpio_sem;
+static int received_gpio;
+
+/*implementations...*/
+
+static void bbb_tty_receiver(char ch) {
+/*
     int ret;
 
     ret = tty_insert_flip_char(&bbb_tty_port, ch, TTY_NORMAL);
@@ -21,11 +69,40 @@ void bbb_tty_receiver(char ch) {
     }
 
     tty_flip_buffer_push(&bbb_tty_port);
+*/
 }
 
+void bbb_tty_notify(int irq) {
+    received_gpio = bt_irq2gpio(irq);
+    up(&gpio_sem);
+}
 
-static int nes_tty_write(struct tty_struct * tty,
-        const unsigned char *buf, int count) {
+static int bt_data_recv_func(void *arg) {
+
+    __set_current_state(TASK_RUNNING);
+    printk(KERN_INFO "kthread started.\n");
+    while (!kthread_should_stop()) {
+        /*wait for interrupt...*/
+        down(&gpio_sem);
+        if (kthread_should_stop()) break;
+
+        /*printk(KERN_INFO "recgpio %d.\n", received_gpio);*/
+        if (received_gpio == GPIO_BBB_FIFO_EMPTY) {
+            while (!get_bbb_fifo_empty()) {
+                char ch = bt_i2c_getchr();
+                /*printk(KERN_INFO "getch %c.\n", ch);*/
+                bbb_tty_receiver(ch);
+            }
+        }
+        /*CONFIG_HZ=250
+        schedule_timeout_interruptible(HZ);*/
+    }
+    printk(KERN_INFO "kthread done.\n");
+
+    return 0;
+}
+
+static int nes_tty_write(struct tty_struct * tty, const unsigned char *buf, int count) {
     int i;
 
     //printk("nes_tty_write start.count:%d.\n", count);
@@ -40,7 +117,7 @@ static int nes_tty_write(struct tty_struct * tty,
 }
 
 static int nes_tty_write_room(struct tty_struct *tty) {
-        return 1;
+        return BT_FIFO_SIZE;
 }
 
 static int nes_tty_install(struct tty_driver *drv, struct tty_struct *tty) {
@@ -75,21 +152,7 @@ static void nes_tty_hangup(struct tty_struct *tty) {
 }
 
 
-static const struct tty_operations nes_tty_ops = {
-    .write      = nes_tty_write,
-    .write_room = nes_tty_write_room,
-    .install    = nes_tty_install,
-    .cleanup    = nes_tty_cleanup,
-    .open       = nes_tty_open,
-    .close      = nes_tty_close,
-    .hangup     = nes_tty_hangup,
-};
-
-
-static struct tty_driver *bbb_tty_driver;
-
-static void nes_console_write (struct console *co, const char *str,
-                       unsigned int count) {
+static void nes_console_write (struct console *co, const char *str, unsigned int count) {
     while (count--) {
         bt_i2c_putchr( *str++ );
     }
@@ -100,23 +163,24 @@ static struct tty_driver *nes_console_device(struct console *co, int *idx) {
     return bbb_tty_driver;
 }
 
-int nes_console_setup(struct console *cp, char *arg) {
+static int nes_console_setup(struct console *cp, char *arg) {
     return 0;
 }
-
-static struct console nes_console_driver = {
-    .name       = "ttynes",
-    .write      = nes_console_write,
-    .device     = nes_console_device,
-    .setup      = nes_console_setup,
-    .flags      = CON_PRINTBUFFER,
-    .index      = -1,
-};
 
 int __init bbb_tty_init(void){
     int ret;
 
     printk(KERN_INFO "bbb_tty init.\n");
+
+    received_gpio = 0;
+    sema_init(&gpio_sem, 0);
+
+    bt_thread = kthread_create(bt_data_recv_func, NULL, "ttynes_th");
+    if (!bt_thread) {
+        printk(KERN_INFO "failed to craete kernel thread.\n");
+        return -1;
+    }
+    wake_up_process(bt_thread);
 
     bbb_tty_driver = alloc_tty_driver(1);
     if (!bbb_tty_driver) {
@@ -148,6 +212,8 @@ void __exit bbb_tty_exit(void){
     //unregister_console(&nes_console_driver);
     tty_unregister_driver(bbb_tty_driver);
     put_tty_driver(bbb_tty_driver);
+    up(&gpio_sem);
+    kthread_stop(bt_thread);
 
     printk(KERN_INFO "bbb_tty exit.\n");
 }

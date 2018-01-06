@@ -7,8 +7,28 @@
 
 #include "bbb_tty.h"
 
-#define GPIO_BBB_FIFO_EMPTY 115
-#define GPIO_NES_FIFO_FULL  49
+static int gpio_bbb_f_emp_irq;
+static int gpio_nes_f_ful_irq;
+
+int get_bbb_fifo_empty(void) {
+    return gpio_get_value(GPIO_BBB_FIFO_EMPTY);
+}
+
+int get_nes_fifo_full(void) {
+    return gpio_get_value(GPIO_NES_FIFO_FULL);
+}
+
+int bt_irq2gpio(int irq) {
+    if (irq == gpio_bbb_f_emp_irq) {
+        return GPIO_BBB_FIFO_EMPTY;
+    }
+    else if (irq == gpio_nes_f_ful_irq) {
+        return GPIO_NES_FIFO_FULL;
+    }
+    else {
+        return 0;
+    }
+}
 
 int bt_gpio_proc_show(struct seq_file *seq) {
     int val;
@@ -25,11 +45,10 @@ int bt_gpio_proc_show(struct seq_file *seq) {
 
 static irq_handler_t bt_gpio_irq_handler(unsigned int irq, void *dev_id, struct pt_regs *regs){
     printk(KERN_INFO "gpio interrupt. irq:%d\n", irq);
+    bbb_tty_notify(irq);
     return (irq_handler_t) IRQ_HANDLED;
 }
 
-static int gpio_bbb_f_emp_irq;
-static int gpio_nes_f_ful_irq;
 int bt_gpio_init(void){
     int ret;
 

@@ -10,6 +10,25 @@
 
 static struct i2c_client *client;
 
+unsigned char bt_i2c_getchr(void) {
+    struct i2c_msg msg[1];
+    u8 recvdata;
+    int ret;
+
+    memset(msg, 0, sizeof(msg));
+    msg[0].addr = client->addr;
+    msg[0].flags = I2C_M_RD;
+    msg[0].buf = &recvdata;
+    msg[0].len = 1;
+
+    recvdata = 0xff;
+    ret = i2c_transfer(client->adapter, msg, 1);
+    if (ret != 1) {
+        printk(KERN_ERR "i2c recv failed..\n");
+    }
+    return recvdata;
+}
+
 int bt_i2c_putchr(char ch) {
     int ret;
 
