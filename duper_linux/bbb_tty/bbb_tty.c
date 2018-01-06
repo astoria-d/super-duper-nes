@@ -220,13 +220,13 @@ int __init bbb_tty_init(void){
         return -1;
     }
 
-    //register_console(&nes_console_driver);
+    register_console(&nes_console_driver);
 
     return 0;
 }
 
 void __exit bbb_tty_exit(void){
-    //unregister_console(&nes_console_driver);
+    unregister_console(&nes_console_driver);
     tty_unregister_driver(bbb_tty_driver);
     put_tty_driver(bbb_tty_driver);
     up(&gpio_sem);
