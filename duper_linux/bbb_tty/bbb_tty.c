@@ -11,7 +11,8 @@
 
 #include "bbb_tty.h"
 
-#define BT_FIFO_SIZE 256
+#define BT_FIFO_SIZE    256
+#define NES_LF          0x8a
 
 
 /*forward declarations...*/
@@ -59,17 +60,27 @@ static int received_gpio;
 
 /*implementations...*/
 
-static void bbb_tty_receiver(char ch) {
-/*
+static void bbb_tty_receiver(unsigned char ch) {
     int ret;
 
-    ret = tty_insert_flip_char(&bbb_tty_port, ch, TTY_NORMAL);
-    if (ret) {
-        printk(KERN_INFO "tty_insert_filp failed. [%c]\n", ch);
+/*
+    printk(KERN_INFO "receiver: bbb_tty_port.count %d\n", bbb_tty_port.count);
+    printk(KERN_INFO "receiver: bbb_tty_port.buf.head %p\n", bbb_tty_port.buf.head);
+    printk(KERN_INFO "receiver: bbb_tty_port.buf.tail %p\n", bbb_tty_port.buf.tail);
+*/
+    if (bbb_tty_port.count == 0) {
+        /*tty is not open.*/
+        return;
     }
 
+    if (ch == NES_LF) {
+        ch = '\n';
+    }
+    ret = tty_insert_flip_char(&bbb_tty_port, ch, TTY_NORMAL);
+    if (ret != 1) {
+        printk(KERN_INFO "tty_insert_filp failed. [%c]\n", ch);
+    }
     tty_flip_buffer_push(&bbb_tty_port);
-*/
 }
 
 void bbb_tty_notify(int irq) {
@@ -131,7 +142,10 @@ static int nes_tty_install(struct tty_driver *drv, struct tty_struct *tty) {
         printk(KERN_INFO "tty_port_install failed.\n");
         return ret;
     }
-
+/*
+    printk(KERN_INFO "install: bbb_tty_port.buf.head %p\n", bbb_tty_port.buf.head);
+    printk(KERN_INFO "install: bbb_tty_port.buf.tail %p\n", bbb_tty_port.buf.tail);
+*/
     return 0;
 }
 
@@ -140,10 +154,12 @@ static void nes_tty_cleanup(struct tty_struct *tty) {
 }
 
 static int nes_tty_open(struct tty_struct *tty, struct file *file) {
+    tty_port_tty_set(&bbb_tty_port, tty);
     return tty_port_open(&bbb_tty_port, tty, file);
 }
 
 static void nes_tty_close(struct tty_struct *tty, struct file *file) {
+    tty_port_tty_set(&bbb_tty_port, NULL);
     tty_port_close(&bbb_tty_port, tty, file);
 }
 
@@ -197,6 +213,7 @@ int __init bbb_tty_init(void){
     bbb_tty_driver->init_termios    = tty_std_termios;
 
     tty_set_operations(bbb_tty_driver, &nes_tty_ops);
+    tty_port_link_device(&bbb_tty_port, bbb_tty_driver, 0);
     ret = tty_register_driver(bbb_tty_driver);
     if (ret) {
         printk(KERN_ERR "tty driver registration failed.\n");

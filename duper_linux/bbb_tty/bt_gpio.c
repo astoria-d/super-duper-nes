@@ -44,7 +44,7 @@ int bt_gpio_proc_show(struct seq_file *seq) {
 }
 
 static irq_handler_t bt_gpio_irq_handler(unsigned int irq, void *dev_id, struct pt_regs *regs){
-    printk(KERN_INFO "gpio interrupt. irq:%d\n", irq);
+    /*printk(KERN_INFO "gpio interrupt. irq:%d\n", irq);*/
     bbb_tty_notify(irq);
     return (irq_handler_t) IRQ_HANDLED;
 }
