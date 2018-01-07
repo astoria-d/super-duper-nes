@@ -26,10 +26,12 @@ int main (int argc, char* argv[]) {
     else if (pid == 0) {
         /*child.*/
         char* c_argv[] = {NULL};
+        int fd;
 
         printf("execute child shell..\n");
+
         /*open standard in/out*/
-        int fd = open(TTY, O_RDWR | O_NONBLOCK | O_NOCTTY);
+        fd = open(TTY, O_RDWR | O_NONBLOCK | O_NOCTTY);
         if (fd == -1) {
             printf("tty [%s] open failed.\n", TTY);
             return -1;
