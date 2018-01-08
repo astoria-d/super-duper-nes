@@ -17,8 +17,18 @@ sudo bash -c 'echo duper_nes 0x44 > /sys/bus/i2c/devices/i2c-2/new_device'
 
 cat /proc/driver/bbb-tty-test
 
+---------------
+nes shell...
+
 sh < /dev/ttyNES0 >/dev/ttyNES0 2>&1
 bash < /dev/ttyNES0 >/dev/ttyNES0 2>&1
+
+sudo getty ttyNES0 115200
+
+sudo ./getty 115200 /dev/ttyNES0
+
+
+export PS1='# '
 
 --------------------------
 device overlay..

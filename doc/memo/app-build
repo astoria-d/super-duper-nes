@@ -5,5 +5,12 @@ sudo apt-get install crossbuild-essential-armhf
 note that kernel build toolchain is different!
 
 
+--------------
+busybox cross compile.
+
+make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- defconfig
+make ARCH=arm CRSOO_COMPILE=arm-linux-gnueabihf- menuconfig
+make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- CONFIG_PREFIX=$(pwd)/_install install
+
 
 
