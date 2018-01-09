@@ -6,3 +6,25 @@ This is a project that extends NES (Nintendo Entertainment System) with FPGA (DE
 
 astoria-d
 
+-------
+
+# source tree:
+  
+    top  
+    |-- circuit-diagram             (obsolete)  
+    |-- doc                         Technical documents.  
+    |   |-- craft-work-diary        Electronic handcrafts pictures  
+    |   |   |-- yyyymmdd  
+    |   |   |-- ....  
+    |   |   `-- yyyymmdd  
+    |   `-- memo                    Linux work memo  
+    |-- duper_cartridge             NES FPGA cartridge implementation (ROM, I2C slave, FIFO etc.)  
+    |   `-- simulation              Modelsim scripts  
+    |-- duper_linux                 Linux modules  
+    |   |-- bbb_tty                 NES tty driver for BBB  
+    |   |-- nes_shell  
+    |   `-- tools  
+    |-- duper_mapper                motonesemu mapper module.  
+    |-- duper_rom                   NES cardridge ROM code  
+    `-- test  
+
